@@ -1,3 +1,12 @@
+//
+//  BPMLabel.swift
+//  guitar-strumpattern-detection-ios
+//
+//  Created by muhammad aqil zaki on 06/06/26.
+//
+
+import SwiftUI
+
 // MARK: - BPM Label
 struct BPMLabel: View {
     let bpm: Int

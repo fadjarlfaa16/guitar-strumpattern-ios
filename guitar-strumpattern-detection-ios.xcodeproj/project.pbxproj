@@ -10,9 +10,37 @@
 		31FEC7752FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "guitar-strumpattern-detection-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6F58F0182FD2BD4D00A7E379 /* Exceptions for "guitar-strumpattern-detection-ios" folder in "guitar-strumpattern-detection-ios" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Core/Model/.gitkeep,
+				Core/Utils/ChordClassifier/.gitkeep,
+				Core/ViewModel/Dummy/.gitkeep,
+			);
+			target = 31FEC7742FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		6F58F0192FD2BD4D00A7E379 /* Exceptions for "guitar-strumpattern-detection-ios" folder in "Compile Sources" phase from "guitar-strumpattern-detection-ios" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 31FEC7712FD2ACF600FE28F6 /* Sources */;
+			membershipExceptions = (
+				Core/Model/.gitkeep,
+				Core/Utils/ChordClassifier/.gitkeep,
+				Core/ViewModel/Dummy/.gitkeep,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		31FEC7772FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6F58F0182FD2BD4D00A7E379 /* Exceptions for "guitar-strumpattern-detection-ios" folder in "guitar-strumpattern-detection-ios" target */,
+				6F58F0192FD2BD4D00A7E379 /* Exceptions for "guitar-strumpattern-detection-ios" folder in "Compile Sources" phase from "guitar-strumpattern-detection-ios" target */,
+			);
 			path = "guitar-strumpattern-detection-ios";
 			sourceTree = "<group>";
 		};

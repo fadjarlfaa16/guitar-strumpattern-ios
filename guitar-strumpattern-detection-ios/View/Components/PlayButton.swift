@@ -1,3 +1,12 @@
+//
+//  PlayButton.swift
+//  guitar-strumpattern-detection-ios
+//
+//  Created by muhammad aqil zaki on 06/06/26.
+//
+
+import SwiftUI
+
 struct PlayButton: View {
     var action: (() -> Void)?
 
@@ -12,4 +21,8 @@ struct PlayButton: View {
         }
         .buttonStyle(.plain)
     }
+}
+
+#Preview {
+    PlayButton()
 }

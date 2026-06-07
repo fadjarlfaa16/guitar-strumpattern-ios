@@ -3,23 +3,53 @@
 
 import SwiftUI
 import Foundation
+// MARK: - Color Tokens
+extension Color {
+    // Background
+    static let bgPrimary     = Color(hex: "#0D0D14")   // background utama gelap
+    static let bgCard        = Color(hex: "#1A1A2E")   // background card / button
+
+    // Accent
+    static let accentGreen   = Color(hex: "#7DB83A")   // hijau olive (judul, icon)
+    static let accentPurple  = Color(hex: "#4B2E7A")   // ungu gelap (button pattern)
+    static let accentYellow  = Color(hex: "#D4B84A")   // kuning BPM label
+
+    // Text
+    static let textPrimary   = Color.white
+    static let textSecondary = Color(hex: "#AAAAAA")
+    static let textLabel     = Color(hex: "#D4B84A")   // label bpm/time
+}
+
+// MARK: - Spacing Tokens (ganti sesuai token system kamu)
+enum Spacing {
+    static let xs:  CGFloat = 4
+    static let sm:  CGFloat = 8
+    static let md:  CGFloat = 16
+    static let lg:  CGFloat = 24
+    static let xl:  CGFloat = 32
+    static let xxl: CGFloat = 48
+}
+
 // MARK: - Radius Tokens
 enum Radius {
-    static let nonclickable:   CGFloat = 8
-    static let clickable: CGFloat = 999
+    static let sm:   CGFloat = 8
+    static let md:   CGFloat = 16
+    static let lg:   CGFloat = 24
+    static let full: CGFloat = 999
 }
 
 // MARK: - Typography Tokens (ganti font sesuai brand kamu)
-struct AppFont {
-    static let largeTitleBold: Font = .system(size: 34, weight: .bold)
-    static let largeTitlRegular: Font = .system(size: 34, weight: .regular)
-    static let Title2Regular : Font = .system(size: 22, weight: .regular)
-    static let Title3Regular : Font = .system(size: 20, weight: .regular)
-    static let HeadlineSemibold : Font = .system(size: 20, weight: .semibold)
-    static let BodyRegular : Font = .system(size: 17, weight: .regular)
-    static let Caption1Regular : Font = .system(size: 12, weight: .regular)
-    static let Caption2Regular : Font = .system(size: 11, weight: .regular)
+enum AppFont {
+    static func heading(_ size: CGFloat) -> Font {
+        .system(size: size, weight: .bold, design: .default)
     }
+    static func body(_ size: CGFloat) -> Font {
+        .system(size: size, weight: .regular, design: .default)
+    }
+    static func label(_ size: CGFloat) -> Font {
+        .system(size: size, weight: .semibold, design: .default)
+    }
+}
 
 // MARK: - Hex Color Helper
 extension Color {
@@ -46,19 +76,4 @@ extension Color {
             opacity: Double(a) / 255
         )
     }
-}
-
-//MARK: - Illustration Style
-extension Image {
-    static let beatsheadphones : Image = Image(systemName: "beats.headphones")
-        .resizable()
-    static let playcirclefill : Image = Image(systemName: "play.circle.fill")
-        .resizable()
-    static let guitarsfill : Image = Image(systemName: "guitars.fill")
-        .resizable()
-    static let musicnotelist : Image = Image(systemName: "music.note.list")
-        .resizable()
-    static let metronomefill : Image = Image(systemName: "metronome.fill")
-        .resizable()
-
 }

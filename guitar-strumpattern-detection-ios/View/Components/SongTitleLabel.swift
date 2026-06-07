@@ -13,7 +13,7 @@ struct SongTitleLabel: View {
 
     var body: some View {
         Text(title)
-            .font(AppFont.body(12))
+            .font(AppFont.headlineSemibold)
             .foregroundColor(.accentYellow)
             .lineLimit(1)
             .truncationMode(.tail)

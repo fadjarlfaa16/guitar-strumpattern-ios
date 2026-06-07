@@ -17,7 +17,7 @@ struct TimeSignatureLabel: View {
                 .font(.system(size: 12))
                 .foregroundColor(.accentYellow)
             Text("= \(signature)")
-                .font(AppFont.label(13))
+                .font(AppFont.bodyRegular)
                 .foregroundColor(.accentYellow)
         }
     }

@@ -17,7 +17,7 @@ struct BPMLabel: View {
                 .font(.system(size: 12))
                 .foregroundColor(.accentYellow)
             Text("= \(bpm) bpm")
-                .font(AppFont.label(13))
+                .font(AppFont.bodyRegular)
                 .foregroundColor(.accentYellow)
         }
     }

@@ -22,3 +22,7 @@ struct TimeSignatureLabel: View {
         }
     }
 }
+
+#Preview {
+  TimeSignatureLabel(signature: "4/4")
+}

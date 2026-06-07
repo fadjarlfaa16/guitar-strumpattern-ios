@@ -15,10 +15,10 @@ struct TimeSignatureLabel: View {
         HStack(spacing: Spacing.xs) {
             Image(systemName: "music.note")
                 .font(.system(size: 12))
-                .foregroundColor(.accentYellow)
+                .foregroundColor(.brandColorAccentGreen)
             Text("= \(signature)")
-                .font(AppFont.label(13))
-                .foregroundColor(.accentYellow)
+                .font(AppFont.Caption2Regular)
+                .foregroundColor(.brandColorAccentGreen)
         }
     }
 }

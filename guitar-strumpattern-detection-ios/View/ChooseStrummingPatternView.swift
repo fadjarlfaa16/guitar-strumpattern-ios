@@ -24,7 +24,7 @@ struct ChooseStrummingPatternView: View {
     var body: some View {
         ZStack {
             // Background
-            Color.bgPrimary
+            Color.backgroundPrimaryBlack
                 .ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {

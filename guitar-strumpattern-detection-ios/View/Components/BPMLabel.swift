@@ -15,10 +15,10 @@ struct BPMLabel: View {
         HStack(spacing: Spacing.xs) {
             Image(systemName: "timer")
                 .font(.system(size: 12))
-                .foregroundColor(.accentYellow)
+                .foregroundColor(.brandColorAccentGreen)
             Text("= \(bpm) bpm")
-                .font(AppFont.label(13))
-                .foregroundColor(.accentYellow)
+                .font(AppFont.BodyRegular)
+                .foregroundColor(.brandColorAccentGreen)
         }
     }
 }

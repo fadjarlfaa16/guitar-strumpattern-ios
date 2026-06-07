@@ -16,19 +16,19 @@ struct HeroHeader: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             BlobShape()
-                .fill(Color.accentGreen.opacity(0.55))
+                .fill(Color.brandColorAccentGreen.opacity(0.55))
                 .frame(width: 260, height: 260)
                 .offset(x: -20, y: -30)
 
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("First, Choose Your\nPreffered\nStrumming Pattern")
-                    .font(AppFont.heading(26))
-                    .foregroundColor(.textPrimary)
+                    .font(AppFont.largeTitleBold)
+                    .foregroundColor(.textPrimaryWhite)
                     .lineSpacing(2)
 
                 Text("These patterns are choosed\nbased on the song's BPM and\nrhythm")
-                    .font(AppFont.body(14))
-                    .foregroundColor(.textSecondary)
+                    .font(AppFont.BodyRegular)
+                    .foregroundColor(.textPrimaryWhite.opacity(0.7))
             }
             .padding(.top, Spacing.xl)
             .padding(.horizontal, Spacing.lg)
@@ -69,5 +69,5 @@ struct BlobShape: Shape {
 // MARK: - Preview
 #Preview {
     HeroHeader()
-        .background(Color.bgPrimary)
+        .background(Color.backgroundPrimaryBlack)
 }

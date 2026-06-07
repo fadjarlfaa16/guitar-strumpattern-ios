@@ -39,5 +39,5 @@ struct StrummingPatternList: View {
         patterns: StrummingPattern.samples,
         selectedPatternID: $selectedID
     )
-    .background(Color.bgPrimary)
+    .background(Color.backgroundPrimaryBlack)
 }

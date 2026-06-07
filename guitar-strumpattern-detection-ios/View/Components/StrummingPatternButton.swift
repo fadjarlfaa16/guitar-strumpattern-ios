@@ -35,18 +35,18 @@ struct PatternButtonLabel: View {
 
     var body: some View {
         Text(notation)
-            .font(AppFont.label(17))
-            .foregroundColor(.textPrimary)
+            .font(AppFont.BodyRegular)
+            .foregroundColor(.textPrimaryWhite)
             .frame(maxWidth: .infinity)
             .padding(.vertical, Spacing.md)
             .background(
-                RoundedRectangle(cornerRadius: Radius.full)
-                    .fill(isSelected ? Color.accentGreen : Color.accentPurple)
+                RoundedRectangle(cornerRadius: Radius.nonclickable)
+                    .fill(isSelected ? Color.brandColorAccentGreen : Color.brandColorPrimaryPurple)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: Radius.full)
+                RoundedRectangle(cornerRadius: Radius.nonclickable)
                     .strokeBorder(
-                        isSelected ? Color.accentGreen : Color.clear,
+                        isSelected ? Color.brandColorAccentGreen : Color.clear,
                         lineWidth: 2
                     )
             )
@@ -61,5 +61,5 @@ struct PatternButtonLabel: View {
         StrummingPatternButton(pattern: .samples[1], isSelected: true)
     }
     .padding()
-    .background(Color.bgPrimary)
+    .background(Color.backgroundPrimaryBlack)
 }

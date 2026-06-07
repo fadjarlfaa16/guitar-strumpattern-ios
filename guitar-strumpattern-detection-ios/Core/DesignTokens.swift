@@ -1,24 +1,59 @@
 // DesignTokens.swift
 // ⚠️ Placeholder — ganti isi ini dengan tokens kamu sendiri
 
+
 import SwiftUI
 import Foundation
+
+// MARK: - Color Palette
+extension Color {
+    // Background
+    static let bgPrimary     = Color.backgroundPrimaryBlack   // background utama gelap
+    static let bgCard        = Color(hex: "#1A1A2E")   // background card / button
+
+    // Accent
+    static let accentGreen   = Color.brandColorAccentGreen   // hijau olive (judul, icon)
+    static let accentPurple  = Color.brandColorPrimaryPurple   // ungu gelap (button pattern)
+    static let accentYellow  = Color(hex: "#D4B84A")   // kuning BPM label
+
+    // Text
+    static let textPrimary   = Color.textPrimaryWhite
+    static let textSecondary = Color(hex: "#AAAAAA")
+    static let textLabel     = Color(hex: "#D4B84A")   // label bpm/time
+}
 // MARK: - Radius Tokens
 enum Radius {
+    static let xs:  CGFloat = 4
+    static let sm:  CGFloat = 8
+    static let md:  CGFloat = 16
+    static let lg:  CGFloat = 24
+    static let xl:  CGFloat = 32
+    static let xxl: CGFloat = 48
+    static let full: CGFloat = 999
+
     static let nonclickable:   CGFloat = 8
     static let clickable: CGFloat = 999
+}
+// MARK: - Spacings
+enum Spacing {
+    static let xs:  CGFloat = 4
+    static let sm:  CGFloat = 8
+    static let md:  CGFloat = 16
+    static let lg:  CGFloat = 24
+    static let xl:  CGFloat = 32
+    static let xxl: CGFloat = 48
 }
 
 // MARK: - Typography Tokens (ganti font sesuai brand kamu)
 struct AppFont {
     static let largeTitleBold: Font = .system(size: 34, weight: .bold)
     static let largeTitlRegular: Font = .system(size: 34, weight: .regular)
-    static let Title2Regular : Font = .system(size: 22, weight: .regular)
-    static let Title3Regular : Font = .system(size: 20, weight: .regular)
-    static let HeadlineSemibold : Font = .system(size: 20, weight: .semibold)
-    static let BodyRegular : Font = .system(size: 17, weight: .regular)
-    static let Caption1Regular : Font = .system(size: 12, weight: .regular)
-    static let Caption2Regular : Font = .system(size: 11, weight: .regular)
+    static let title2Regular : Font = .system(size: 22, weight: .regular)
+    static let title3Regular : Font = .system(size: 20, weight: .regular)
+    static let headlineSemibold : Font = .system(size: 20, weight: .semibold)
+    static let bodyRegular : Font = .system(size: 17, weight: .regular)
+    static let caption1Regular : Font = .system(size: 12, weight: .regular)
+    static let caption2Regular : Font = .system(size: 11, weight: .regular)
     }
 
 // MARK: - Hex Color Helper

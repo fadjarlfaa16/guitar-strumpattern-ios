@@ -28,7 +28,6 @@ struct SongInfoBar: View {
         .padding(.horizontal, Spacing.lg)
     }
 }
-
 // MARK: - Preview
 #Preview {
     SongInfoBar(song: SongInfoBar.sample)

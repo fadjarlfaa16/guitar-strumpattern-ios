@@ -22,3 +22,7 @@ struct BPMLabel: View {
         }
     }
 }
+
+#Preview {
+    BPMLabel(bpm: 120)
+}

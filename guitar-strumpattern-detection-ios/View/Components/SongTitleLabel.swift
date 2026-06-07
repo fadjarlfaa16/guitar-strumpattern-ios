@@ -19,3 +19,7 @@ struct SongTitleLabel: View {
             .truncationMode(.tail)
     }
 }
+
+#Preview {
+    SongTitleLabel(title: "Sunny - Yorushika")
+}

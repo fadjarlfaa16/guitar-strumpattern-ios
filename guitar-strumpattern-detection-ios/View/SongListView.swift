@@ -24,7 +24,7 @@ struct SongListView: View {
     }
 
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: Spacing.md) {
                     Text("Song Library")
@@ -54,7 +54,7 @@ struct SongListView: View {
             }
             .searchable(text: $searchText, prompt: "Search")
             .background(Color.bgPrimary)
-        }
+//        }
     }
 }
 

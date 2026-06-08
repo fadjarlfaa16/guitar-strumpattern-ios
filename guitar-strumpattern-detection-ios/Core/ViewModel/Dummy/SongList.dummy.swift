@@ -10,22 +10,22 @@ extension SongListItem {
         SongListItem(
             bpm: 120,
             timeSignature: "4/4",
-            title: "Song title",
-            artist: "Artist",
+            title: "Karma Police",
+            artist: "Radiohead",
             scorePercent: 90
         ),
         SongListItem(
             bpm: 120,
             timeSignature: "4/4",
-            title: "Song title",
-            artist: "Artist",
+            title: "drop dead",
+            artist: "Olivia Rodrigo",
             scorePercent: 50
         ),
         SongListItem(
             bpm: 120,
             timeSignature: "4/4",
-            title: "Song title",
-            artist: "Artist",
+            title: "Arteri",
+            artist: "Feast",
             scorePercent: 20
         ),
     ]

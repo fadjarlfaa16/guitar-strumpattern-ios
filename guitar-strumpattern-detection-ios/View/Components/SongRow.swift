@@ -12,18 +12,16 @@ struct SongRow: View {
 
     var body: some View {
         HStack(spacing: Spacing.md) {
-            ScoreBadge(percent: item.scorePercent)
-
             VStack(alignment: .leading, spacing: Spacing.xs) {
-                metadataRow
                 titleRow
+                metadataRow
+
             }
 
             Spacer(minLength: Spacing.sm)
 
             menuButton
         }
-//        .padding(.vertical, Spacing.sm)
     }
 
     // MARK: - Metadata Row
@@ -48,7 +46,7 @@ struct SongRow: View {
     // MARK: - Title Row
     private var titleRow: some View {
         Text(item.displayTitle)
-            .font(AppFont.caption2Regular.self)
+            .font(AppFont.bodyRegular)
             .foregroundColor(.textPrimaryWhite)
 
             .lineLimit(1)

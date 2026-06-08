@@ -31,6 +31,7 @@ struct SongListView: View {
                     .font(.largeTitle)
                     .foregroundColor(.textPrimaryWhite)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .bold()
 
 
                     ForEach(filteredItems) { item in
@@ -38,6 +39,7 @@ struct SongListView: View {
                             onMenuTapped?(item)
                         }
                     }
+                    .padding(.top, Spacing.sm)
                 }
                 .padding(.horizontal, Spacing.xl)
                 .padding(.vertical, Spacing.md)

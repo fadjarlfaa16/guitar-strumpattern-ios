@@ -4,7 +4,7 @@
 import SwiftUI
 
 // MARK: - Song Info Bar View
-struct SongInfoBarView: View {
+struct SongInfoBar: View {
     
     //sample song for test in canvas
     static let sample = SongInfo(
@@ -17,7 +17,7 @@ struct SongInfoBarView: View {
     var onPlayTapped: (() -> Void)? = nil
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: Spacing.sm) {
             PlayButton(action: onPlayTapped)
             BPMLabel(bpm: song.bpm)
             TimeSignatureLabel(signature: song.timeSignature)
@@ -30,6 +30,6 @@ struct SongInfoBarView: View {
 // MARK: - Preview
 #Preview {
     SongInfoBarView(song: SongInfoBarView.sample)
-        .background(.backgroundPrimaryBlack)
+        .background(Color.bgPrimary)
 }
 

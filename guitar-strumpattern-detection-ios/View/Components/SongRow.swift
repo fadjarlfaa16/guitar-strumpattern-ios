@@ -38,18 +38,23 @@ struct SongRow: View {
         HStack(spacing: Spacing.xs) {
             Image(systemName: icon)
                 .font(.system(size: 12))
-                .foregroundColor(.textPrimary)
+                .foregroundColor(.textPrimaryWhite)
             Text(text)
-                .font(AppFont.bodyBold)
-                .foregroundColor(.textPrimary)
+                .font(AppFont.Caption1Regular.self)
+                .foregroundColor(.textPrimaryWhite)
         }
     }
 
     // MARK: - Title Row
     private var titleRow: some View {
         Text(item.displayTitle)
+<<<<<<< HEAD
+            .font(AppFont.Caption2Regular.self)
+            .foregroundColor(.textPrimaryWhite)
+=======
             .font(AppFont.bodyBold)
             .foregroundColor(.textPrimary)
+>>>>>>> Feature/Onboard
             .lineLimit(1)
             .truncationMode(.tail)
     }
@@ -61,7 +66,7 @@ struct SongRow: View {
         } label: {
             Image(systemName: "ellipsis")
                 .font(.system(size: 16, weight: .bold))
-                .foregroundColor(.textPrimary)
+                .foregroundColor(.textPrimaryWhite)
                 .frame(width: 32, height: 32)
         }
         .buttonStyle(.plain)
@@ -93,5 +98,5 @@ struct SongRow: View {
         ))
     }
     .padding(.horizontal, 29)
-    .background(Color.bgPrimary)
+    .background(Color.backgroundPrimaryBlack)
 }

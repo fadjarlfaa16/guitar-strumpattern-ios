@@ -19,8 +19,8 @@ private enum ScoreTier {
 
     var textColor: Color {
         switch self {
-        case .high:   return .accentGreen
-        case .medium: return .accentYellow
+        case .high:   return .brandColorAccentGreen
+        case .medium: return .brandColorAccentGreen
         case .low:    return Color(hex: "#E85D5D")
         }
     }
@@ -43,10 +43,11 @@ struct ScoreBadge: View {
     var body: some View {
         Text("\(percent)%")
             .font(AppFont.largeTitleBold)
+            .font(AppFont.BodyRegular)
             .foregroundColor(tier.textColor)
             .frame(width: 56, height: 56)
             .background(
-                RoundedRectangle(cornerRadius: Radius.sm)
+                RoundedRectangle(cornerRadius: Radius.nonclickable)
                     .fill(tier.backgroundColor)
             )
     }
@@ -59,5 +60,5 @@ struct ScoreBadge: View {
         ScoreBadge(percent: 20)
     }
     .padding()
-    .background(Color.bgPrimary)
+    .background(Color.backgroundPrimaryBlack)
 }

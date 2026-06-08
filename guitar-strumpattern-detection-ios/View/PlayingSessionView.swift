@@ -63,7 +63,7 @@ struct PlayingSessionView: View {
             chords: processedChords, pattern: pattern,
             bpm: bpm, timeSignature: timeSignature, duration: duration
         )
-        _vm = StateObject(wrappedValue: RhythmGameViewModel(chordGroups: groups, bpm: bpm, isTutorialActive: isFirstTime))
+        _vm = StateObject(wrappedValue: RhythmGameViewModel(chordGroups: groups, bpm: bpm))
     }
 
     // MARK: - Actions
@@ -84,41 +84,40 @@ struct PlayingSessionView: View {
                     .padding(.horizontal, 28)
                     .padding(.vertical, 10)
 
-                ZStack {
-                    rhythmLane
-                    
-                    if vm.isTutorialActive && !vm.hasPassedTutorialPause {
-                        Text("STRUM BASED ON THE ARROW")
-                            .font(.system(size: 22, weight: .black, design: .monospaced))
-                            .foregroundStyle(.brandColorAccentGreen)
-                            .padding(.horizontal, 24)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.black.opacity(0.85))
-                                    .strokeBorder(.brandColorAccentGreen.opacity(0.8), lineWidth: 2)
-                            )
-                            .shadow(color: .brandColorAccentGreen.opacity(0.5), radius: 15)
-                            .offset(y: -80)
-                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                    }
-                }
+                rhythmLane
 
+                Spacer()
+                
+                HStack {
+                    if(!vm.isPaused) {
+                        Image.pauseFill
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(Color.textPrimaryWhite)
+                    } else {
+                        Image.playFill
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(Color.textPrimaryWhite)
+                    }
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Text("\(formatTime(vm.currentTime))")
+                            .foregroundStyle(.white)
+                        if let dur = duration {
+                            Text(" / \(dur)")
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+                    }
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                }
+                .padding(.horizontal, 28)
+                
                 strumButtons
                     .padding(.horizontal, 28)
                     .padding(.vertical, 12)
             }
             
-            // Feedback overlay
-            if let result = vm.lastHitResult {
-                feedbackOverlay(result: result)
-                    .transition(.asymmetric(
-                        insertion: .opacity.combined(with: .scale(scale: 0.7)),
-                        removal: .opacity
-                    ))
-                    .animation(.spring(response: 0.18, dampingFraction: 0.55), value: vm.lastHitResult)
-                    .allowsHitTesting(false)
-            }
+            // Feedback overlay removed
 
             // Finished overlay
             if vm.isFinished {
@@ -197,22 +196,7 @@ struct PlayingSessionView: View {
     // ──────────────────────────────────────────────────────────────────
 
     private var hudBar: some View {
-        HStack(spacing: 0) {
-            // Score
-            VStack(alignment: .leading, spacing: 1) {
-                Text("SCORE")
-                    .font(.system(size: 9, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.white.opacity(0.45))
-                Text("\(vm.score)")
-                    .font(.system(size: 24, weight: .black, design: .monospaced))
-                    .foregroundStyle(.white)
-                    .contentTransition(.numericText())
-                    .animation(.spring(response: 0.3), value: vm.score)
-            }
-            .frame(minWidth: 100, alignment: .leading)
-
-            Spacer()
-
+        ZStack {
             // BPM + time signature badge
             HStack(spacing: 8) {
                 Image(systemName: "metronome.fill")
@@ -227,27 +211,14 @@ struct PlayingSessionView: View {
                     .foregroundStyle(.brandColorAccentGreen.opacity(0.8))
             }
             .padding(.horizontal, 14).padding(.vertical, 5)
-            .background(
-                Capsule()
-                    .fill(.brandColorAccentGreen.opacity(0.1))
-                    .strokeBorder(.brandColorAccentGreen.opacity(0.35), lineWidth: 1)
-            )
-
-            Spacer()
-
-            // Combo
-            VStack(alignment: .trailing, spacing: 1) {
-                Text("COMBO")
-                    .font(.system(size: 9, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.white.opacity(0.45))
-                Text("×\(vm.combo)")
-                    .font(.system(size: 24, weight: .black, design: .monospaced))
-                    .foregroundStyle(vm.combo >= 5 ? .brandColorAccentGreen : .white)
-                    .contentTransition(.numericText())
-                    .animation(.spring(response: 0.3), value: vm.combo)
-            }
-            .frame(minWidth: 100, alignment: .trailing)
         }
+    }
+
+    private func formatTime(_ time: TimeInterval) -> String {
+        let maxTime = max(0, time)
+        let m = Int(maxTime) / 60
+        let s = Int(maxTime) % 60
+        return String(format: "%d:%02d", m, s)
     }
 
     // ──────────────────────────────────────────────────────────────────
@@ -261,8 +232,8 @@ struct PlayingSessionView: View {
             let blockSize = RhythmGameViewModel.noteBlockSize
 
             ZStack(alignment: .leading) {
-                laneBackground(width: w, height: h - 100)
-                hitZoneLine(height: h - 100)
+                laneBackground(width: w, height: 150)
+                hitZoneLine(height: 150)
                     .zIndex(100)
 
                 // ── Chord-group pill backgrounds + floating labels ──
@@ -414,47 +385,6 @@ struct PlayingSessionView: View {
     }
 
     // ──────────────────────────────────────────────────────────────────
-    // MARK: - Feedback Overlay
-    // ──────────────────────────────────────────────────────────────────
-
-    private func feedbackOverlay(result: HitResult) -> some View {
-        VStack(spacing: 4) {
-            switch result {
-            case .perfect:
-                Text("PERFECT")
-                    .font(.system(size: 48, weight: .black, design: .monospaced))
-                    .foregroundStyle(LinearGradient(
-                        colors: [.brandColorAccentGreen, .white],
-                        startPoint: .top, endPoint: .bottom))
-                Text("🔥").font(.system(size: 36))
-            case .good:
-                Text("GOOD")
-                    .font(.system(size: 48, weight: .black, design: .monospaced))
-                    .foregroundStyle(LinearGradient(
-                        colors: [.brandColorPrimaryPurple, .white],
-                        startPoint: .top, endPoint: .bottom))
-                Text("✨").font(.system(size: 36))
-            case .miss:
-                Text("MISS")
-                    .font(.system(size: 48, weight: .black, design: .monospaced))
-                    .foregroundStyle(LinearGradient(
-                        colors: [.red, .orange],
-                        startPoint: .top, endPoint: .bottom))
-                Text("💀").font(.system(size: 36))
-            }
-        }
-        .shadow(color: feedbackGlow(result), radius: 36)
-    }
-
-    private func feedbackGlow(_ r: HitResult) -> Color {
-        switch r {
-        case .perfect: return .brandColorAccentGreen
-        case .good:    return .brandColorPrimaryPurple
-        case .miss:    return .red
-        }
-    }
-
-    // ──────────────────────────────────────────────────────────────────
     // MARK: - Finished Overlay
     // ──────────────────────────────────────────────────────────────────
 
@@ -462,58 +392,74 @@ struct PlayingSessionView: View {
         ZStack {
             Color.black.opacity(0.78).ignoresSafeArea()
 
-            HStack(spacing: 48) {
-                VStack(spacing: 20) {
-                    Text("SESSION COMPLETE")
-                        .font(.system(size: 22, weight: .black, design: .monospaced))
-                        .foregroundStyle(.white)
-                    VStack(spacing: 10) {
-                        statRow(label: "FINAL SCORE", value: "\(vm.score)")
-                        statRow(label: "MAX COMBO",   value: "×\(vm.combo)")
-                    }
-                    .padding(20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(.white.opacity(0.06))
-                            .overlay(RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(.white.opacity(0.1), lineWidth: 1))
-                    )
-                }
-
-                Button { vm.startGame() } label: {
-                    VStack(spacing: 8) {
-                        Image(systemName: "play.fill").font(.system(size: 28, weight: .black))
-                        Text("PLAY AGAIN").font(.system(size: 14, weight: .black, design: .monospaced))
-                    }
+            VStack(spacing: 32) {
+                Text("PATTERN COMPLETE!")
+                    .font(.system(size: 28, weight: .black, design: .monospaced))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 36).padding(.vertical, 20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(LinearGradient(
-                                colors: [.brandColorPrimaryPurple,
-                                         Color(hue: 0.75, saturation: 0.8, brightness: 0.6)],
-                                startPoint: .topLeading, endPoint: .bottomTrailing
-                            ))
-                    )
-                    .shadow(color: .brandColorPrimaryPurple.opacity(0.55), radius: 14)
+                    .shadow(color: .brandColorPrimaryPurple.opacity(0.6), radius: 20)
+
+                HStack(spacing: 24) {
+                    Button { 
+                        // Change Pattern placeholder
+                    } label: {
+                        VStack(spacing: 8) {
+                            Image(systemName: "music.note.list").font(.system(size: 24, weight: .bold))
+                            Text("CHANGE PATTERN").font(.system(size: 12, weight: .bold, design: .monospaced))
+                        }
+                        .foregroundStyle(.white.opacity(0.7))
+                        .frame(width: 140)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(.white.opacity(0.05))
+                                .strokeBorder(.white.opacity(0.15), lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(StrumButtonStyle())
+
+                    Button { 
+                        vm.startGame() 
+                    } label: {
+                        VStack(spacing: 8) {
+                            Image(systemName: "arrow.counterclockwise").font(.system(size: 28, weight: .black))
+                            Text("REPLAY").font(.system(size: 14, weight: .black, design: .monospaced))
+                        }
+                        .foregroundStyle(.white)
+                        .frame(width: 160)
+                        .padding(.vertical, 20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(LinearGradient(
+                                    colors: [.brandColorPrimaryPurple,
+                                             Color(hue: 0.75, saturation: 0.8, brightness: 0.6)],
+                                    startPoint: .topLeading, endPoint: .bottomTrailing
+                                ))
+                        )
+                        .shadow(color: .brandColorPrimaryPurple.opacity(0.55), radius: 14)
+                    }
+                    .buttonStyle(StrumButtonStyle())
+
+                    Button { 
+                        // Continue placeholder
+                    } label: {
+                        VStack(spacing: 8) {
+                            Image(systemName: "arrow.right").font(.system(size: 24, weight: .bold))
+                            Text("CONTINUE").font(.system(size: 12, weight: .bold, design: .monospaced))
+                        }
+                        .foregroundStyle(.brandColorAccentGreen)
+                        .frame(width: 140)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(.brandColorAccentGreen.opacity(0.1))
+                                .strokeBorder(.brandColorAccentGreen.opacity(0.3), lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(StrumButtonStyle())
                 }
-                .buttonStyle(StrumButtonStyle())
             }
             .padding(40)
         }
-    }
-
-    private func statRow(label: String, value: String) -> some View {
-        HStack {
-            Text(label)
-                .font(.system(size: 11, weight: .bold, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.5))
-            Spacer()
-            Text(value)
-                .font(.system(size: 22, weight: .black, design: .monospaced))
-                .foregroundStyle(.white)
-        }
-        .frame(minWidth: 200)
     }
 }
 
@@ -523,29 +469,66 @@ struct PlayingSessionView: View {
 
 extension PlayingSessionView {
     private var pauseOverlay: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Color.black.opacity(0.6).ignoresSafeArea()
             
-            VStack(spacing: 20) {
-                Text("PAUSED")
-                    .font(.system(size: 32, weight: .black, design: .monospaced))
-                    .foregroundStyle(.white)
+            HStack {
+                Button {
                     
-                Text("TAP TO RESUME")
-                    .font(.system(size: 16, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.brandColorAccentGreen)
+                } label: {
+                    VStack {
+                        Image.arrowBackward
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 24)
+                            .foregroundStyle(.textPrimaryWhite)
+                        Text("Exit")
+                            .font(.caption)
+                            .foregroundStyle(.textPrimaryWhite)
+                    }
+                }
+                Spacer()
+                Button {
+                    
+                } label: {
+                    VStack {
+                        Image.replay
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 24)
+                            .foregroundStyle(.textPrimaryWhite)
+                        Text("Replay")
+                            .font(.caption)
+                            .foregroundStyle(.textPrimaryWhite)
+                    }
+                }
+                Spacer()
+                Button {
+                    
+                } label: {
+                    VStack {
+                        Image.musicnotelist
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 24)
+                            .foregroundStyle(.textPrimaryWhite)
+                        Text("Change Pattern")
+                            .font(.caption)
+                            .foregroundStyle(.textPrimaryWhite)
+                    }
+                }
             }
-            .padding(40)
+            
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 40)
+            .padding(.vertical, 12)
             .background(
-                RoundedRectangle(cornerRadius: 16)
+                Rectangle()
                     .fill(Color(hue: 0.75, saturation: 0.4, brightness: 0.2))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .strokeBorder(.brandColorAccentGreen.opacity(0.5), lineWidth: 2)
-                    )
             )
             .shadow(color: .black.opacity(0.5), radius: 20)
         }
+        .ignoresSafeArea()
         // Tapping anywhere on the pause overlay resumes the game
         .onTapGesture {
             vm.resumeGame()
@@ -573,7 +556,7 @@ struct StrumButtonStyle: ButtonStyle {
         pattern:       [.down, .up, .down, .noStrum, .down],
         bpm:           120,
         timeSignature: "4/4",
-        duration: "3:00",
+        duration: "0:10",
         isFirstTime: true
     )
     

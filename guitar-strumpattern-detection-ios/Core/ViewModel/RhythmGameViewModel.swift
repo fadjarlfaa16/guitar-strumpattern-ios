@@ -23,16 +23,12 @@ class RhythmGameViewModel: ObservableObject {
 
     // MARK: Published State
     @Published var activeNotes:   [ActiveNote] = []
-    @Published var score:         Int          = 0
-    @Published var combo:         Int          = 0
-    @Published var lastHitResult: HitResult?   = nil
     @Published var isPlaying:     Bool         = false
     @Published var currentTime:   TimeInterval = 0
     @Published var isFinished:    Bool         = false
     @Published var isPaused:      Bool         = false
-    @Published var isTutorialPaused: Bool      = false
-    @Published var isTutorialActive: Bool
-    @Published var hasPassedTutorialPause: Bool = false
+    @Published var isPausedForInput: Bool      = false
+    @Published var hasPassedFirstNote: Bool    = false
     @Published var currentChord:  String?      = nil
 
     // MARK: Configuration
@@ -65,12 +61,9 @@ class RhythmGameViewModel: ObservableObject {
     private var pendingGroups:     [ChordGroup]       = []
     private var feedbackResetTask: Task<Void, Never>? = nil
 
-    // MARK: Init
-
-    init(chordGroups: [ChordGroup] = ChordGroup.sampleGroups, bpm: Int = 120, isTutorialActive: Bool = false) {
-        self.chordGroups      = chordGroups
-        self.bpm              = bpm
-        self.isTutorialActive = isTutorialActive
+    init(chordGroups: [ChordGroup] = ChordGroup.sampleGroups, bpm: Int = 120) {
+        self.chordGroups = chordGroups
+        self.bpm         = bpm
     }
 
     // MARK: - Game Control
@@ -94,14 +87,10 @@ class RhythmGameViewModel: ObservableObject {
     func reset() {
         stopGame()
         activeNotes   = []
-        score         = 0
-        combo         = 0
-        lastHitResult = nil
         currentTime   = 0
         isFinished    = false
         isPaused      = false
-        isTutorialPaused = false
-        hasPassedTutorialPause = false
+        isPausedForInput = false
         currentChord  = nil
         pendingGroups = []
         startDate     = nil
@@ -121,6 +110,11 @@ class RhythmGameViewModel: ObservableObject {
     func resumeGame() {
         guard isPaused else { return }
         isPaused  = false
+        
+        // If we are waiting for a user strum due to a miss, do NOT restart the timeline.
+        // It will restart naturally when they strum correctly in onAction().
+        if isPausedForInput { return }
+        
         // Recalculate startDate so currentTime picks up where it left off
         startDate = Date().addingTimeInterval(-pausedTime)
         timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
@@ -134,12 +128,15 @@ class RhythmGameViewModel: ObservableObject {
         guard let startDate else { return }
         currentTime = Date().timeIntervalSince(startDate)
 
-        // ── Tutorial Pause ──
-        if isTutorialActive && !hasPassedTutorialPause {
-            if let firstGroup = chordGroups.first, let firstNoteTime = firstGroup.notes.first?.time {
-                if currentTime >= firstNoteTime {
-                    currentTime = firstNoteTime // snap to exact hit line
-                    isTutorialPaused = true
+        // ── Auto Pause on Miss ──
+        if !isPausedForInput {
+            // Find the earliest unhit note
+            let unhitNotes = activeNotes.filter { !$0.isHit && !$0.isExpired }
+            if let earliest = unhitNotes.min(by: { $0.input.time < $1.input.time }) {
+                // If it reached the hit line without being strummed
+                if currentTime >= earliest.input.time {
+                    currentTime = earliest.input.time // snap to exact hit line
+                    isPausedForInput = true
                     pausedTime = currentTime
                     timer?.invalidate()
                     timer = nil
@@ -156,20 +153,6 @@ class RhythmGameViewModel: ObservableObject {
                 activeNotes.append(ActiveNote(id: note.id, input: note))
             }
             pendingGroups.removeFirst()
-        }
-
-        // ── Expire missed notes ──
-        // Pure time-based: note expires when currentTime has passed its time
-        // by more than the good window + a small buffer.
-        for i in activeNotes.indices {
-            let n = activeNotes[i]
-            guard !n.isHit && !n.isExpired else { continue }
-            if currentTime - n.input.time > TimingWindow.good + 0.05 {
-                activeNotes[i].isExpired  = true
-                activeNotes[i].hitResult  = .miss
-                combo = 0
-                triggerFeedback(.miss)
-            }
         }
 
         // ── Remove notes that scrolled fully off the left side ──
@@ -210,65 +193,57 @@ class RhythmGameViewModel: ObservableObject {
     func onAction(direction: String) {
         guard isPlaying, !isPaused else { return }
 
-        // Find the closest unhit note to currentTime
-        let candidates = activeNotes
+        // Find the earliest unhit note chronologically
+        let unhitNotes = activeNotes
             .filter { !$0.isHit && !$0.isExpired }
-            .sorted { abs($0.input.time - currentTime) < abs($1.input.time - currentTime) }
+            .sorted { $0.input.time < $1.input.time }
 
-        guard let closest = candidates.first,
-              let idx = activeNotes.firstIndex(where: { $0.id == closest.id }) else {
-            combo = 0; triggerFeedback(.miss); return
+        guard let target = unhitNotes.first,
+              let idx = activeNotes.firstIndex(where: { $0.id == target.id }) else {
+            return
         }
 
-        // ── Tutorial Pause Logic ──
-        if isTutorialPaused {
-            // In tutorial pause, force the user to strum the correct direction
-            guard closest.input.direction == direction else {
-                triggerFeedback(.miss)
-                return
+        let delta = target.input.time - currentTime
+
+        // If the game is already paused waiting for this note
+        if isPausedForInput {
+            if target.input.direction == direction {
+                // Correct strum! Resume the timeline.
+                activeNotes[idx].isHit = true
+                activeNotes[idx].isExpired = true
+                if !hasPassedFirstNote { hasPassedFirstNote = true }
+                
+                isPausedForInput = false
+                startDate = Date().addingTimeInterval(-pausedTime)
+                timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
+                    Task { @MainActor [weak self] in self?.tick() }
+                }
             }
-            
-            // Correct strum! Resume the game
-            isTutorialPaused = false
-            hasPassedTutorialPause = true
-            startDate = Date().addingTimeInterval(-pausedTime)
-            timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
-                Task { @MainActor [weak self] in self?.tick() }
-            }
+            // If wrong strum while paused, do nothing (stay paused)
+            return
         }
 
-        let delta = abs(closest.input.time - currentTime)
+        // If the game is flowing normally:
+        // Define a strict hit window (e.g., 0.2 seconds before the line)
+        let hitWindow: TimeInterval = 0.20
 
-        // Wrong direction is always a miss
-        guard closest.input.direction == direction else {
-            combo = 0; triggerFeedback(.miss); return
+        if delta > hitWindow {
+            // Strummed too early. Ignore it to prevent early hits or sudden timeline shifts.
+            return
         }
 
-        if delta <= TimingWindow.perfect      { register(index: idx, result: .perfect) }
-        else if delta <= TimingWindow.good    { register(index: idx, result: .good)    }
-        else { combo = 0; triggerFeedback(.miss) }
-    }
-
-    // MARK: - Helpers
-
-    private func register(index: Int, result: HitResult) {
-        activeNotes[index].isHit     = true
-        activeNotes[index].hitResult = result
-        activeNotes[index].isExpired = true
-        switch result {
-        case .perfect: score += 300; combo += 1
-        case .good:    score += 100; combo += 1
-        case .miss:    combo = 0
-        }
-        triggerFeedback(result)
-    }
-
-    private func triggerFeedback(_ result: HitResult) {
-        lastHitResult = result
-        feedbackResetTask?.cancel()
-        feedbackResetTask = Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 700_000_000)
-            if !Task.isCancelled { self.lastHitResult = nil }
+        // Inside the hit window:
+        if target.input.direction == direction {
+            // Correct strum!
+            activeNotes[idx].isHit = true
+            activeNotes[idx].isExpired = true
+            if !hasPassedFirstNote { hasPassedFirstNote = true }
+        } else {
+            // Wrong strum inside the window!
+            // We do NOTHING here. By ignoring it, the timeline continues flowing naturally
+            // for the remaining fraction of a second until it hits the line, where the 
+            // `tick()` auto-pause will cleanly freeze the note exactly on the hit line.
+            // This completely fixes the "sudden shift" bug.
         }
     }
 

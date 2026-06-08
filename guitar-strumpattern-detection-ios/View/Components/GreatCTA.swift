@@ -35,7 +35,7 @@ struct AddSongButton: View {
             action?()
         } label: {
             Text("Add Song")
-                .font(AppFont.HeadlineSemibold)
+                .font(AppFont.headlineSemibold)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.md)
@@ -57,7 +57,7 @@ struct SkipButton: View {
             action?()
         } label: {
             Text("Skip for now")
-                .font(AppFont.Caption1Regular)
+                .font(AppFont.caption1Regular)
                 .foregroundColor(Color.brandColorPrimaryPurple)
         }
         .buttonStyle(.plain)

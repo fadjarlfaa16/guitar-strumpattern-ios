@@ -11,6 +11,7 @@ struct ChooseStrummingPatternView: View {
     let rhythm: String
     let patterns: [StrummingPattern]
     var onPatternSelected: ((StrummingPattern) -> Void)? = nil
+    @State private var selectedPatternID: UUID? = nil  // ← add here
 
     var body: some View {
         ZStack {
@@ -42,7 +43,7 @@ struct ChooseStrummingPatternView: View {
                 .foregroundColor(.textPrimary)
 
             Text("These patterns are choosed based on the song's BPM and rhythm")
-                .font(AppFont.body(15))
+                .font(AppFont.bodyRegular)
                 .foregroundColor(.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -55,18 +56,22 @@ struct ChooseStrummingPatternView: View {
 
     private func metadataLabel(_ text: String) -> some View {
         Text(text)
-            .font(AppFont.label(13))
+            .font(AppFont.caption1Regular)
             .foregroundColor(.brandColorSecondaryPink)
     }
 
     // MARK: - Pattern List
     private var patternList: some View {
-        VStack(spacing: Spacing.md) {
-            ForEach(patterns) { pattern in
-                StrummingPatternButton(label: pattern.label) {
-                    onPatternSelected?(pattern)
-                }
-            }
+        StrummingPatternList(
+            patterns: patterns,
+            selectedPatternID: $selectedPatternID
+        )
+        .padding(.top, Spacing.sm)
+        .onChange(of: selectedPatternID) { _, newID in
+            guard let newID,
+                  let pattern = patterns.first(where: { $0.id == newID })
+            else { return }
+            onPatternSelected?(pattern)
         }
         .padding(.top, Spacing.sm)
     }

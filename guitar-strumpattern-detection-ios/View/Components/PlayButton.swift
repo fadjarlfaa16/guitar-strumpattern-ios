@@ -17,11 +17,9 @@ struct PlayButton: View {
             Image(systemName: "play.circle.fill")
                 .resizable()
                 .frame(width: 28, height: 28)
-<<<<<<< HEAD
-                .foregroundColor(.brandColorPrimaryPurple)
-=======
+
                 .foregroundColor(.brandColorAccentGreen)
->>>>>>> Feature/Onboard
+
         }
         .buttonStyle(.plain)
     }

@@ -40,7 +40,7 @@ struct PatternButtonLabel: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, Spacing.md)
             .background(
-                RoundedRectangle(cornerRadius: Radius.nonclickable)
+                RoundedRectangle(cornerRadius: Radius.clickable)
                     .fill(isSelected ? Color.brandColorAccentGreen : Color.brandColorPrimaryPurple)
             )
             .overlay(

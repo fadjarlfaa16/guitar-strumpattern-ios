@@ -2,20 +2,15 @@
 //  StrummingPattern.swift
 //  guitar-strumpattern-detection-ios
 //
-//  Created by muhammad aqil zaki on 06/06/26.
-//
+
 import Foundation
 
-struct StrummingPattern: Identifiable {
+struct StrummingPattern: Identifiable, Equatable, Sendable {
     let id: UUID
-    let notation: String
+    let label: String
 
-    init(id: UUID = UUID(), notation: String) {
+    init(id: UUID = UUID(), label: String) {
         self.id = id
-        self.notation = notation
+        self.label = label
     }
-}
-
-extension StrummingPattern {
-    static let samples: [StrummingPattern] = [StrummingPattern(notation: "DUUD - DDUUU"),StrummingPattern(notation: "DUUD - DUUD")]
 }

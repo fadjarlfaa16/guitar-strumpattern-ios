@@ -15,6 +15,8 @@ struct guitar_strumpattern_detection_iosApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.dark)
+
         }
     }
 }

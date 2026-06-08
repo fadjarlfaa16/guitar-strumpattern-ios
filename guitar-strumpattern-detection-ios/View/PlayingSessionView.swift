@@ -10,6 +10,7 @@ import SwiftUI
 // MARK: - Playing Session View
 
 struct PlayingSessionView: View {
+    @Environment(\.dismiss) private var dismiss
 
     // MARK: - Parameters
 
@@ -32,9 +33,10 @@ struct PlayingSessionView: View {
 
     @StateObject private var vm: RhythmGameViewModel
     @State private var screenWidth: CGFloat = 0
+    @AppStorage("appState") private var appState: AppState = .onboarding
+    @State private var tutorialPauseStep: Int = 0
 
     // MARK: - Init
-
     init(
         chords:        [ChordSegment] = ChordGroup.sampleSegments,
         pattern:       [StrumBeat]    = ChordGroup.samplePattern,
@@ -48,6 +50,7 @@ struct PlayingSessionView: View {
         self.timeSignature = timeSignature
         self.duration      = duration
         self.isFirstTime   = isFirstTime
+        self._tutorialPauseStep = State(initialValue: isFirstTime ? 1 : 0)
         
         var processedChords = chords
         if isFirstTime {
@@ -84,7 +87,26 @@ struct PlayingSessionView: View {
                     .padding(.horizontal, 28)
                     .padding(.vertical, 10)
 
-                rhythmLane
+                ZStack(alignment: .top) {
+                    rhythmLane
+                    
+                    if isFirstTime && !vm.hasPassedFirstNote {
+                        Text("Let’s get started by strumming according to the arrow on the screen.")
+                            .font(AppFont.bodyRegular)
+                            .foregroundStyle(.textPrimaryWhite)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule()
+                                    .fill(Color.backgroundPrimaryBlack.opacity(0.75))
+                            )
+                            .offset(y: -10)
+                            .transition(.opacity)
+                            .animation(.easeInOut(duration: 0.4), value: vm.hasPassedFirstNote)
+                    }
+                }
+                .zIndex(10)
 
                 Spacer()
                 
@@ -132,10 +154,31 @@ struct PlayingSessionView: View {
                     .transition(.opacity)
                     .animation(.easeInOut(duration: 0.25), value: vm.isPaused)
             }
+
+            // Pause Tutorial Step 1
+            if tutorialPauseStep == 1 {
+                ZStack {
+                    backgroundGradient
+                    .opacity(0.6)
+                    .ignoresSafeArea()
+                
+                    Text("Tap the screen to pause")
+                        .font(AppFont.title3Bold)
+                        .foregroundStyle(.textPrimaryWhite)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                }
+                .transition(.opacity)
+                .zIndex(20)
+                .allowsHitTesting(false)
+            }
         }
         .onTapGesture {
             if vm.isPlaying && !vm.isPaused && !vm.isFinished {
                 vm.pauseGame()
+                if tutorialPauseStep == 1 {
+                    withAnimation { tutorialPauseStep = 2 }
+                }
             }
         }
         .onKeyPress(.upArrow)   { handleStrumUp();   return .handled }
@@ -153,6 +196,7 @@ struct PlayingSessionView: View {
         .onDisappear { unlockOrientation(); vm.stopGame() }
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
+        .navigationBarBackButtonHidden(true)
     }
 
     // ──────────────────────────────────────────────────────────────────
@@ -199,9 +243,11 @@ struct PlayingSessionView: View {
         ZStack {
             // BPM + time signature badge
             HStack(spacing: 8) {
-                Image(systemName: "metronome.fill")
-                    .foregroundStyle(.brandColorAccentGreen)
-                    .font(.system(size: 12))
+                Spacer()
+                HStack {
+                    Image(systemName: "metronome.fill")
+                        .foregroundStyle(.brandColorAccentGreen)
+                        .font(.system(size: 12))
                 Text("\(bpm) BPM")
                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.brandColorAccentGreen)
@@ -209,6 +255,15 @@ struct PlayingSessionView: View {
                 Text(timeSignature)
                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.brandColorAccentGreen.opacity(0.8))
+                }
+                Spacer()
+                Button {
+                    appState = .uploadSong
+                } label: {
+                    Text("Skip")
+                        .font(AppFont.bodyBold)
+                        .foregroundStyle(.textPrimaryWhite)
+                }
             }
             .padding(.horizontal, 14).padding(.vertical, 5)
         }
@@ -440,7 +495,7 @@ struct PlayingSessionView: View {
                     .buttonStyle(StrumButtonStyle())
 
                     Button { 
-                        // Continue placeholder
+                        appState = .uploadSong
                     } label: {
                         VStack(spacing: 8) {
                             Image(systemName: "arrow.right").font(.system(size: 24, weight: .bold))
@@ -474,7 +529,7 @@ extension PlayingSessionView {
             
             HStack {
                 Button {
-                    
+                    dismiss()
                 } label: {
                     VStack {
                         Image.arrowBackward
@@ -527,11 +582,29 @@ extension PlayingSessionView {
                     .fill(Color(hue: 0.75, saturation: 0.4, brightness: 0.2))
             )
             .shadow(color: .black.opacity(0.5), radius: 20)
+            
+            // Pause Tutorial Step 2
+            if tutorialPauseStep == 2 {
+                VStack {
+                    Spacer()
+                    Text("Tap again to unpause")
+                        .font(AppFont.title3Regular)
+                        .foregroundStyle(.textPrimaryWhite)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(Capsule().fill(Color.backgroundPrimaryBlack.opacity(0.8)))
+                    Spacer()
+                }
+                .allowsHitTesting(false)
+            }
         }
         .ignoresSafeArea()
         // Tapping anywhere on the pause overlay resumes the game
         .onTapGesture {
             vm.resumeGame()
+            if tutorialPauseStep == 2 {
+                withAnimation { tutorialPauseStep = 0 }
+            }
         }
     }
 }

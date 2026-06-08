@@ -19,7 +19,7 @@ struct CustomButton: View {
                 .padding(.vertical, 6)
         }
         .tint(Color.brandColorPrimaryPurple)
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(.glassProminent)
     }
 }
 

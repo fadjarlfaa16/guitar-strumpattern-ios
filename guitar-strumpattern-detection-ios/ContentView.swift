@@ -2,22 +2,27 @@
 //  ContentView.swift
 //  guitar-strumpattern-detection-ios
 //
-//  Created by Muhammad Fadjar Al Farisyi on 05/06/26.
-//
 
 import SwiftUI
 
+enum AppState: String {
+    case onboarding
+    case songList
+    case uploadSong
+}
+
 struct ContentView: View {
+    @AppStorage("appState") private var appState: AppState = .onboarding
+
     var body: some View {
-        PlayingSessionView(
-            chords:        ChordGroup.sampleSegments,
-            pattern:       ChordGroup.samplePattern,
-            bpm:           120,
-            timeSignature: "4/4",
-            duration:      "3:00",
-            isFirstTime:   true
-        )
-        
+        switch appState {
+        case .onboarding:
+            OnboardingWelcome()
+        case .songList:
+            SongListView(items: SongListItem.samples)
+        case .uploadSong:
+            GreatPageView()
+        }
     }
 }
 

@@ -9,6 +9,8 @@ import SwiftUI
 
 
 struct PrepareYourGuitarView: View {
+    @State private var navigateToChoosePattern = false
+
     var body: some View {
         ZStack {
             // Background
@@ -42,13 +44,23 @@ struct PrepareYourGuitarView: View {
                 
                 // Next Button
                 VStack(spacing: 12) {
-                    CustomButton(title: "Next")
+                    CustomButton(title: "Next") {
+                        navigateToChoosePattern = true
+                    }
                     Button(action: {
+                        navigateToChoosePattern = true
                     }) {
                         Text("Skip for Now")
                             .font(AppFont.bodyRegular)
                             .foregroundColor(.brandColorPrimaryPurple)
                     }
+                }
+                .navigationDestination(isPresented: $navigateToChoosePattern) {
+                    ChooseStrummingPatternView(
+                        bpm: 120,
+                        rhythm: "4/4",
+                        patterns: StrummingPattern.samples
+                    )
                 }
             }
             .padding(.horizontal, 24)

@@ -2,6 +2,8 @@ import SwiftUI
 
 
 struct OnboardingWelcome: View {
+    @State private var navigateToPrepare = false
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -42,12 +44,16 @@ struct OnboardingWelcome: View {
                     
                     Spacer()
                     // Next Button
-                    NavigationLink(destination: PrepareYourGuitarView()) {
-                        CustomButton(title: "Next")
+                    CustomButton(title: "Next") {
+                        navigateToPrepare = true
+                    }
+                    .navigationDestination(isPresented: $navigateToPrepare) {
+                        PrepareYourGuitarView()
                     }
                 }
                 .padding(.horizontal, 24)
             }
+            .preferredColorScheme(.dark)
         }
     }
 }

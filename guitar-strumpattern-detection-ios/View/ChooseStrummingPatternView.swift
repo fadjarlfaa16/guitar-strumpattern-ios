@@ -12,6 +12,7 @@ struct ChooseStrummingPatternView: View {
     let patterns: [StrummingPattern]
     var onPatternSelected: ((StrummingPattern) -> Void)? = nil
     @State private var selectedPatternID: UUID? = nil  // ← add here
+    @State private var navigateToSession = false
 
     var body: some View {
         ZStack {
@@ -30,8 +31,6 @@ struct ChooseStrummingPatternView: View {
                 .padding(.bottom, Spacing.xl)
             }
         }
-        .navigationTitle("Choose strumming pattern")
-        .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Header
@@ -72,6 +71,12 @@ struct ChooseStrummingPatternView: View {
                   let pattern = patterns.first(where: { $0.id == newID })
             else { return }
             onPatternSelected?(pattern)
+            navigateToSession = true
+        }
+        .navigationDestination(isPresented: $navigateToSession) {
+            PlayingSessionView(
+                isFirstTime: true
+            )
         }
         .padding(.top, Spacing.sm)
     }

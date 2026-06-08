@@ -5,8 +5,8 @@ import SwiftUI
 
 // MARK: - Great Page View
 struct GreatPageView: View {
-    var onAddSong: (() -> Void)? = nil
-    var onSkip: (() -> Void)? = nil
+    @State private var navigateToSongList = false
+    @AppStorage("appState") private var appState: AppState = .onboarding
 
     var body: some View {
         ZStack {
@@ -34,9 +34,14 @@ struct GreatPageView: View {
 
                 // 4. CTA: Add Song + Skip for now
                 GreatCTA(
-                    onAddSong: onAddSong,
-                    onSkip: onSkip
+                    onAddSong: {
+                        appState = .songList
+                    },
+                    onSkip: { navigateToSongList = true }
                 )
+                .navigationDestination(isPresented: $navigateToSongList) {
+                    SongListView(items: SongListItem.samples)
+                }
             }
         }
         .toolbarColorScheme(.dark, for: .navigationBar)

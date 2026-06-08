@@ -46,15 +46,16 @@ enum Spacing {
 
 // MARK: - Typography Tokens (ganti font sesuai brand kamu)
 enum AppFont {
-    static let largeTitleBold: Font = .system(size: 34, weight: .bold)
-    static let largeTitleRegular: Font = .system(size: 34, weight: .regular)
-    static let title2Regular : Font = .system(size: 22, weight: .regular)
-    static let title3Regular : Font = .system(size: 20, weight: .regular)
-    static let headlineSemibold : Font = .system(size: 20, weight: .semibold)
-    static let bodyRegular : Font = .system(size: 17, weight: .regular)
-    static let bodyBold : Font = .system(size: 17, weight: .bold)
-    static let caption1Regular : Font = .system(size: 12, weight: .regular)
-    static let caption2Regular : Font = .system(size: 11, weight: .regular)
+    static let largeTitleBold: Font = .largeTitle.bold()
+    static let largeTitleRegular: Font = .largeTitle
+    static let title2Regular : Font = .title2
+    static let title3Regular : Font = .title3
+    static let title3Bold : Font = .title3.bold()
+    static let headlineSemibold : Font = .headline.weight(.semibold)
+    static let bodyRegular : Font = .body
+    static let bodyBold : Font = .body.bold()
+    static let caption1Regular : Font = .caption
+    static let caption2Regular : Font = .caption2
     }
 
 // MARK: - Hex Color Helper
@@ -97,6 +98,13 @@ extension Image {
         .resizable()
     static let metronomefill : Image = Image(systemName: "metronome.fill")
         .resizable()
-
+    static let pauseFill : Image = Image(systemName: "pause.fill")
+        .resizable()
+    static let playFill : Image = Image(systemName: "play.fill")
+        .resizable()
+    static let arrowBackward : Image = Image(systemName: "arrow.backward")
+        .resizable()
+    static let replay : Image = Image(systemName: "arrow.trianglehead.counterclockwise")
+        .resizable()
 }
 

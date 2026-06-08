@@ -2,26 +2,27 @@
 //  StrummingPatternButton.swift
 //  guitar-strumpattern-detection-ios
 //
-//  Created by muhammad aqil zaki on 06/06/26.
-//
-
-
-// StrummingPatternButtonView.swift
-// Komponen satu baris tombol strumming pattern
 
 import SwiftUI
 
 // MARK: - Strumming Pattern Button
 struct StrummingPatternButton: View {
-    let pattern: StrummingPattern
-    let isSelected: Bool
-    var onTap: (() -> Void)? = nil
+    let label: String
+    var action: (() -> Void)? = nil
 
     var body: some View {
         Button {
-            onTap?()
+            action?()
         } label: {
-            PatternButtonLabel(notation: pattern.notation, isSelected: isSelected)
+            Text(label)
+                .font(AppFont.heading(16))
+                .foregroundColor(.textPrimary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Spacing.lg)
+                .background(
+                    Capsule()
+                        .fill(Color.accentPurple)
+                )
         }
         .buttonStyle(.plain)
     }

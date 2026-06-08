@@ -30,8 +30,8 @@ struct StrumBlock: View {
 
     private var blockColor: Color {
         switch noteState {
-        case .defaultState:  return .brandColorPrimaryPurple
-        case .successState:  return .brandColorAccentGreen
+        case .defaultState:  return .textPrimaryWhite
+        case .successState:  return .green
         case .missState:     return .red
         }
     }
@@ -49,16 +49,11 @@ struct StrumBlock: View {
         Image(systemName: icon)
             .font(.system(size: 55).bold())
             .padding()
-            .foregroundStyle(.textPrimaryWhite)
+            .foregroundStyle(blockColor)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(blockColor.opacity(0.35))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(blockColor, lineWidth: 1.5)
-                    )
+                    .fill(.brandColorPrimaryPurple.opacity(0.35))
             )
-            .shadow(color: glowColor, radius: noteState == .defaultState ? 6 : 16)
             .scaleEffect(noteState == .successState ? 1.12 : 1.0)
             .animation(.spring(response: 0.25, dampingFraction: 0.5), value: noteState)
     }

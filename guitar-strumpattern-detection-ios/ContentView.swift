@@ -10,8 +10,12 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         PlayingSessionView(
-            pattern: NoteInput.samplePattern,
-            bpm: 120
+            chords:        ChordGroup.sampleSegments,
+            pattern:       ChordGroup.samplePattern,
+            bpm:           120,
+            timeSignature: "4/4",
+            duration:      "3:00",
+            isFirstTime:   true
         )
         
     }

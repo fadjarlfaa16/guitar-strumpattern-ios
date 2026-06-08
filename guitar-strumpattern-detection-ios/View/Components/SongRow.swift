@@ -48,8 +48,13 @@ struct SongRow: View {
     // MARK: - Title Row
     private var titleRow: some View {
         Text(item.displayTitle)
+<<<<<<< HEAD
             .font(AppFont.Caption2Regular.self)
             .foregroundColor(.textPrimaryWhite)
+=======
+            .font(AppFont.bodyBold)
+            .foregroundColor(.textPrimary)
+>>>>>>> Feature/Onboard
             .lineLimit(1)
             .truncationMode(.tail)
     }

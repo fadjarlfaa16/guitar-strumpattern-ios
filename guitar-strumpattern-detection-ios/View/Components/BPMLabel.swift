@@ -17,8 +17,13 @@ struct BPMLabel: View {
                 .font(.system(size: 12))
                 .foregroundColor(.brandColorAccentGreen)
             Text("= \(bpm) bpm")
+<<<<<<< HEAD
                 .font(AppFont.BodyRegular)
                 .foregroundColor(.brandColorAccentGreen)
+=======
+                .font(AppFont.bodyRegular)
+                .foregroundColor(.accentYellow)
+>>>>>>> Feature/Onboard
         }
     }
 }

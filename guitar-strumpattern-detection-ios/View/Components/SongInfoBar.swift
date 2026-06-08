@@ -18,19 +18,18 @@ struct SongInfoBar: View {
 
     var body: some View {
         HStack(spacing: Spacing.sm) {
-            Spacer()
             PlayButton(action: onPlayTapped)
             BPMLabel(bpm: song.bpm)
             TimeSignatureLabel(signature: song.timeSignature)
             SongTitleLabel(title: song.displayTitle)
             Spacer()
         }
-        .padding(.horizontal, Spacing.lg)
+        .padding(.horizontal, 16)
     }
 }
 // MARK: - Preview
 #Preview {
-    SongInfoBar(song: SongInfoBar.sample)
-        .background(Color.backgroundPrimaryBlack)
+    SongInfoBarView(song: SongInfoBarView.sample)
+        .background(Color.bgPrimary)
 }
 

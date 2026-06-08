@@ -27,7 +27,7 @@ struct HeroHeader: View {
                     .lineSpacing(2)
 
                 Text("These patterns are choosed\nbased on the song's BPM and\nrhythm")
-                    .font(AppFont.BodyRegular)
+                    .font(AppFont.bodyRegular)
                     .foregroundColor(.textPrimaryWhite.opacity(0.7))
             }
             .padding(.top, Spacing.xl)

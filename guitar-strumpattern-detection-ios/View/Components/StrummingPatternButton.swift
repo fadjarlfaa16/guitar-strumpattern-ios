@@ -8,6 +8,7 @@ import SwiftUI
 // MARK: - Strumming Pattern Button
 struct StrummingPatternButton: View {
     let label: String
+    var isSelected: Bool = false
     var action: (() -> Void)? = nil
 
     var body: some View {
@@ -15,13 +16,13 @@ struct StrummingPatternButton: View {
             action?()
         } label: {
             Text(label)
-                .font(AppFont.heading(16))
-                .foregroundColor(.textPrimary)
+                .font(AppFont.headlineSemibold)
+                .foregroundColor(isSelected ? .black : .textPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.lg)
                 .background(
                     Capsule()
-                        .fill(Color.accentPurple)
+                        .fill(isSelected ? Color.accentGreen : Color.accentPurple)
                 )
         }
         .buttonStyle(.plain)

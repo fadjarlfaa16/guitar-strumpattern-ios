@@ -42,8 +42,7 @@ struct ScoreBadge: View {
 
     var body: some View {
         Text("\(percent)%")
-            .font(AppFont.largeTitleBold)
-            .font(AppFont.BodyRegular)
+            .font(AppFont.largeTitleRegular)
             .foregroundColor(tier.textColor)
             .frame(width: 56, height: 56)
             .background(

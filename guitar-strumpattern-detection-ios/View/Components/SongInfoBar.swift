@@ -29,7 +29,7 @@ struct SongInfoBar: View {
 }
 // MARK: - Preview
 #Preview {
-    SongInfoBarView(song: SongInfoBarView.sample)
+    SongInfoBar(song: SongInfoBar.sample)
         .background(Color.bgPrimary)
 }
 

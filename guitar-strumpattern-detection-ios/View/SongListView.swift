@@ -24,22 +24,14 @@ struct SongListView: View {
     }
 
     var body: some View {
-<<<<<<< HEAD
+
         ScrollView {
             LazyVStack(alignment: .leading, spacing: Spacing.md) {
                 Text("Song Library")
                     .font(.largeTitle)
                     .foregroundColor(.textPrimaryWhite)
                     .frame(maxWidth: .infinity, alignment: .leading)
-=======
-//        NavigationStack {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: Spacing.md) {
-                    Text("Song Library")
-                        .font(.largeTitle)
-                        .foregroundColor(.textPrimary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
->>>>>>> arip/arip-riil
+
 
                     ForEach(filteredItems) { item in
                         SongRow(item: item) {
@@ -63,7 +55,6 @@ struct SongListView: View {
             }
             .searchable(text: $searchText, prompt: "Search")
             .background(Color.bgPrimary)
-//        }
     }
 }
 

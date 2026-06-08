@@ -28,7 +28,7 @@ struct GreatHeader: View {
                     .foregroundColor(.white)
 
                 Text("Before you go, you need to add a\nsong from your local library. Make\nsure its in MP3, WAV, and M4A")
-                    .font(AppFont.BodyRegular)
+                    .font(AppFont.bodyRegular)
                     .foregroundColor(.white.opacity(0.75))
                     .fixedSize(horizontal: false, vertical: true)
             }

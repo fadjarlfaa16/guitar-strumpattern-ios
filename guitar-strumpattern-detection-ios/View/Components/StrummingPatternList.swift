@@ -20,7 +20,7 @@ struct StrummingPatternList: View {
         VStack(spacing: Spacing.md) {
             ForEach(patterns) { pattern in
                 StrummingPatternButton(
-                    pattern: pattern,
+                    label: pattern.notation,
                     isSelected: selectedPatternID == pattern.id
                 ) {
                     selectedPatternID = pattern.id

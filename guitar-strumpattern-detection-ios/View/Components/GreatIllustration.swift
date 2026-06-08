@@ -14,18 +14,20 @@ import SwiftUI
 // MARK: - Great Illustration View
 struct GreatIllustration: View {
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            // Icon musik (kuning, kiri bawah)
-            Image(systemName: "music.note")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 64, height: 64)
-                .foregroundColor(Color.brandColorAccentGreen)
-                .offset(x: -20, y: 10)
+            ZStack(alignment: .bottomLeading) {
+                        // File upload di belakang (bawah)
+                        FileUploadIcon()
+                            .zIndex(0)
 
-            // Icon file upload (pink, kanan atas)
-            FileUploadIcon()
-        }
+                        // Music note di depan, overlap ke kiri atas
+                        Image(systemName: "music.note")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 64, height: 64)
+                            .foregroundColor(Color.brandColorAccentGreen)
+                            .offset(x: -20, y: 0)
+                            .zIndex(1)
+                    }
         .frame(width: 140, height: 120)
     }
 }

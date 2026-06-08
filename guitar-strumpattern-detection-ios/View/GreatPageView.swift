@@ -39,8 +39,6 @@ struct GreatPageView: View {
                 )
             }
         }
-        .navigationTitle("GreatPage")
-        .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }

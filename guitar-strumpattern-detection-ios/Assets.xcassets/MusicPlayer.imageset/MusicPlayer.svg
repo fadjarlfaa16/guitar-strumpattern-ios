@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="318px" height="49px" viewBox="0 0 318 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>MusicPlayer</title>
+    <defs>
+        <path d="M86,28 L217,28 L217,49 L86,49 Z M200,3 L271,3 L271,25 L200,25 Z M89,3 L197,3 L197,25 L89,25 Z M44,5 L84,5 L84,44 L44,44 Z" id="path-1"></path>
+        <path d="M0,28 L131,28 L131,49 L0,49 Z M114,3 L185,3 L185,25 L114,25 Z M3,3 L111,3 L111,25 L3,25 Z" id="path-2"></path>
+        <path d="M0,0 L131,0 L131,21 L0,21 Z" id="path-3"></path>
+        <path d="M114,3 L185,3 L185,25 L114,25 Z M3,3 L111,3 L111,25 L3,25 Z" id="path-4"></path>
+    </defs>
+    <g id="MusicPlayer" stroke="none" fill="none" xlink:href="#path-1">
+        <g id="Stack-8" transform="translate(86, 0)" xlink:href="#path-2" fill="#D4EC39">
+            <g id="Stack" transform="translate(0, 28)" xlink:href="#path-3" font-family="SFPro-Regular, SF Pro" font-size="16" font-weight="normal" line-spacing="21">
+                <text id="Niki---Backburner">
+                    <tspan x="0" y="15"> Niki - Backburner</tspan>
+                </text>
+            </g>
+            <g xlink:href="#path-4" font-family="SFPro-Semibold, SF Pro" font-size="17" font-weight="500" line-spacing="22">
+                <text id="􀠕-=-4/4">
+                    <tspan x="114" y="19"> 􀠕 = 4/4</tspan>
+                </text>
+                <text id="􀐰-=-120-bpm">
+                    <tspan x="3" y="19">􀐰 = 120 bpm</tspan>
+                </text>
+            </g>
+        </g>
+        <text id="􀊖" font-family="SFPro-Regular, SF Pro" font-size="33" font-weight="normal" fill="#A17AE1">
+            <tspan x="44.4868164" y="36">􀊖</tspan>
+        </text>
+    </g>
+</svg>

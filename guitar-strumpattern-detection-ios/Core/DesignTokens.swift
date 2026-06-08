@@ -45,13 +45,14 @@ enum Spacing {
 }
 
 // MARK: - Typography Tokens (ganti font sesuai brand kamu)
-struct AppFont {
+enum AppFont {
     static let largeTitleBold: Font = .system(size: 34, weight: .bold)
-    static let largeTitlRegular: Font = .system(size: 34, weight: .regular)
+    static let largeTitleRegular: Font = .system(size: 34, weight: .regular)
     static let title2Regular : Font = .system(size: 22, weight: .regular)
     static let title3Regular : Font = .system(size: 20, weight: .regular)
     static let headlineSemibold : Font = .system(size: 20, weight: .semibold)
     static let bodyRegular : Font = .system(size: 17, weight: .regular)
+    static let bodyBold : Font = .system(size: 17, weight: .bold)
     static let caption1Regular : Font = .system(size: 12, weight: .regular)
     static let caption2Regular : Font = .system(size: 11, weight: .regular)
     }

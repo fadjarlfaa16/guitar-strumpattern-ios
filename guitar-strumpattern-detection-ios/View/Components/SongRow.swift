@@ -40,7 +40,7 @@ struct SongRow: View {
                 .font(.system(size: 12))
                 .foregroundColor(.textPrimary)
             Text(text)
-                .font(AppFont.label(13))
+                .font(AppFont.bodyBold)
                 .foregroundColor(.textPrimary)
         }
     }
@@ -48,7 +48,7 @@ struct SongRow: View {
     // MARK: - Title Row
     private var titleRow: some View {
         Text(item.displayTitle)
-            .font(AppFont.heading(14))
+            .font(AppFont.bodyBold)
             .foregroundColor(.textPrimary)
             .lineLimit(1)
             .truncationMode(.tail)

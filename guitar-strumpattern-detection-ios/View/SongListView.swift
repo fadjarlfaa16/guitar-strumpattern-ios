@@ -15,7 +15,7 @@ struct SongListView: View {
             LazyVStack(alignment: .leading, spacing: Spacing.md) {
                 Text("Song Library")
                     .font(.largeTitle)
-                    .foregroundColor(.textPrimary)
+                    .foregroundColor(.textPrimaryWhite)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 ForEach(items) { item in
@@ -27,7 +27,7 @@ struct SongListView: View {
             .padding(.horizontal, Spacing.xl)
 //            .padding(.vertical, Spacing.md)
         }
-        .background(Color.bgPrimary)
+        .background(Color.backgroundPrimaryBlack)
     }
 }
 

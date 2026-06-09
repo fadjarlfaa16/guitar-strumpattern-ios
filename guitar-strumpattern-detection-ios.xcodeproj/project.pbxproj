@@ -279,7 +279,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+<<<<<<< Updated upstream
 				DEVELOPMENT_TEAM = YC8SS4YRCV;
+=======
+				DEVELOPMENT_TEAM = 549WDU3BYN;
+>>>>>>> Stashed changes
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -311,7 +315,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+<<<<<<< Updated upstream
 				DEVELOPMENT_TEAM = YC8SS4YRCV;
+=======
+				DEVELOPMENT_TEAM = 549WDU3BYN;
+>>>>>>> Stashed changes
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

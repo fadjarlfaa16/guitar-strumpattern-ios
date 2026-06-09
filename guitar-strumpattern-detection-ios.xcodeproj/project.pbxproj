@@ -280,7 +280,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 				DEVELOPMENT_TEAM = YC8SS4YRCV;
+=======
+				DEVELOPMENT_TEAM = 549WDU3BYN;
+>>>>>>> Stashed changes
 =======
 				DEVELOPMENT_TEAM = 549WDU3BYN;
 >>>>>>> Stashed changes
@@ -316,7 +320,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 				DEVELOPMENT_TEAM = YC8SS4YRCV;
+=======
+				DEVELOPMENT_TEAM = 549WDU3BYN;
+>>>>>>> Stashed changes
 =======
 				DEVELOPMENT_TEAM = 549WDU3BYN;
 >>>>>>> Stashed changes

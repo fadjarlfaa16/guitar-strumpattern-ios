@@ -8,7 +8,8 @@ import Observation
 
 
 @Observable
-final class SavedSong {
-    var songs: [SongListItem] = []
+final class AppState {
+    var savedSongs: [SongListItem] = []
+    var isFirst: Bool = true
 }
 

@@ -6,8 +6,8 @@ import SwiftUI
 // MARK: - Great Page View
 struct GreatPageView: View {
     @State private var navigateToSongList = false
-    @AppStorage("appState") private var appState: AppState = .onboarding
-    @Environment(SavedSong.self) private var savedSong
+    @AppStorage("appState") private var navRoot: NavRoot = .onboarding
+    @Environment(AppState.self) private var appState
     var songListSample: [SongListItem] = []
 
     var body: some View {
@@ -37,11 +37,13 @@ struct GreatPageView: View {
                 // 4. CTA: Add Song + Skip for now
                 GreatCTA(
                     onAddSong: {
-                        savedSong.songs.append(contentsOf: SongListItem.samples)
-                        appState = .songList
+                        appState.savedSongs.append(contentsOf: SongListItem.samples)
+                        appState.isFirst = false
+                        navRoot = .songList
                     },
                     onSkip: {
-                        appState = .songList
+                        appState.isFirst = false
+                        navRoot = .songList
                     }
                 )
             }
@@ -54,6 +56,6 @@ struct GreatPageView: View {
 #Preview {
     NavigationStack {
         GreatPageView()
-            .environment(SavedSong())
+            .environment(AppState())
     }
 }

@@ -9,15 +9,14 @@ import SwiftUI
 struct SongListView: View {
     var onMenuTapped: ((SongListItem) -> Void)? = nil
     var onAddTapped: (() -> Void)? = nil
-    let isFirstTime: Bool = false
 
     // State untuk Search dan UI
     @State private var searchText = ""
     @State private var showEmptyState = false
 
     // State Navigasi Global
-    @AppStorage("appState") private var appState: AppState = .songList
-    @Environment(SavedSong.self) private var savedSong
+    @AppStorage("appState") private var navRoot: NavRoot = .songList
+    @Environment(AppState.self) private var appState
 
     private var filteredItems: [SongListItem] {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -30,7 +29,7 @@ struct SongListView: View {
     }
 
     private var items: [SongListItem] {
-        savedSong.songs
+        appState.savedSongs
     }
 
     var body: some View {
@@ -51,7 +50,7 @@ struct SongListView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
-            } else if(isFirstTime) {
+            } else if(appState.isFirst) {
                 VStack {
                     Spacer()
                     firstTimeView
@@ -74,7 +73,8 @@ struct SongListView: View {
                     .padding(.bottom, Spacing.md)
                 }
                 Button("Reset") {
-                    appState = .onboarding
+                    appState.savedSongs.removeAll()
+                    navRoot = .onboarding
                 }
             }
         }
@@ -83,6 +83,11 @@ struct SongListView: View {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Button {
+                    if(appState.savedSongs.isEmpty) {
+                        appState.savedSongs.append(contentsOf: SongListItem.samples)
+                    } else {
+                        appState.savedSongs.removeAll()
+                    }
                     onAddTapped?()
                 } label: {
                     Image(systemName: "plus")
@@ -162,7 +167,7 @@ struct SongListView: View {
             
             // CTA Button yang mengubah AppState kembali ke Onboarding
             CustomButton(title: "Do Tutorial") {
-                appState = .onboarding
+                navRoot = .onboarding
             }
             .padding(.horizontal, Spacing.xxl)
             .padding(.top, Spacing.sm)
@@ -176,6 +181,6 @@ struct SongListView: View {
     // Dibungkus NavigationStack agar toolbar dan navigasinya ter-render di Canvas
     NavigationStack {
         SongListView()
-            .environment(SavedSong())
+            .environment(AppState())
     }
 }

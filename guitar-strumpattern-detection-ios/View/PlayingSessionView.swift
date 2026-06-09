@@ -33,7 +33,7 @@ struct PlayingSessionView: View {
 
     @StateObject private var vm: RhythmGameViewModel
     @State private var screenWidth: CGFloat = 0
-    @AppStorage("appState") private var appState: AppState = .onboarding
+    @AppStorage("appState") private var appState: NavRoot = .onboarding
     @State private var tutorialPauseStep: Int = 0
 
     // MARK: - Init

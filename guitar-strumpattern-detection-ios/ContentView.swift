@@ -5,14 +5,14 @@
 
 import SwiftUI
 
-enum AppState: String {
+enum NavRoot: String {
     case onboarding
     case songList
     case uploadSong
 }
 
 struct ContentView: View {
-    @AppStorage("appState") private var appState: AppState = .onboarding
+    @AppStorage("appState") private var appState: NavRoot = .onboarding
 
     var body: some View {
         switch appState {

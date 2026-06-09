@@ -9,6 +9,7 @@ import SwiftUI
 struct SongListView: View {
     var onMenuTapped: ((SongListItem) -> Void)? = nil
     var onAddTapped: (() -> Void)? = nil
+    let isFirstTime: Bool = false
 
     // State untuk Search dan UI
     @State private var searchText = ""
@@ -50,6 +51,13 @@ struct SongListView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
+            } else if(isFirstTime) {
+                VStack {
+                    Spacer()
+                    firstTimeView
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 // Tampilan List Lagu Asli
                 ScrollView {
@@ -120,6 +128,27 @@ struct SongListView: View {
     
     // MARK: - Empty State View Component
     private var emptyStateView: some View {
+        VStack() {
+            Image.musicnotelist
+                .scaledToFit()
+                .frame(width: 80, height: 80)
+                .foregroundColor(.textSecondary)
+            
+            VStack {
+                Text("Your library is empty")
+                    .font(AppFont.title3Bold)
+                    .foregroundColor(.textSecondary)
+                    .padding(.top, Spacing.xs)
+                Text("Press + to add a new song to the library")
+                    .font(AppFont.bodyRegular)
+                    .foregroundColor(.textSecondary)
+            }
+            .padding()
+        }
+        .padding(.horizontal, Spacing.xl)
+    }
+    
+    private var firstTimeView: some View {
         VStack(spacing: Spacing.md) {
             Image.musicnotelist
                 .scaledToFit()

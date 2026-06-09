@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct SongListItem: Identifiable, Equatable, Sendable {
+struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
     let id: UUID
     let bpm: Int
     let timeSignature: String

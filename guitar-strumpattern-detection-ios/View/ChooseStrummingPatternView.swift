@@ -10,8 +10,10 @@ struct ChooseStrummingPatternView: View {
     let bpm: Int
     let rhythm: String
     let patterns: [StrummingPattern]
+    var isFirstTime: Bool = false
     var onPatternSelected: ((StrummingPattern) -> Void)? = nil
-    @State private var selectedPatternID: UUID? = nil  // ← add here
+    @State private var selectedPatternID: UUID? = nil
+    @State private var selectedPattern: StrummingPattern? = nil
     @State private var navigateToSession = false
 
     var body: some View {
@@ -30,6 +32,15 @@ struct ChooseStrummingPatternView: View {
                 .padding(.top, Spacing.xxl)
                 .padding(.bottom, Spacing.xl)
             }
+        }
+        .navigationDestination(isPresented: $navigateToSession) {
+            let beats = selectedPattern?.beats ?? []
+            PlayingSessionView(
+                pattern: beats.isEmpty ? ChordGroup.samplePattern : beats,
+                bpm: bpm,
+                timeSignature: rhythm,
+                isFirstTime: isFirstTime
+            )
         }
     }
 
@@ -70,13 +81,9 @@ struct ChooseStrummingPatternView: View {
             guard let newID,
                   let pattern = patterns.first(where: { $0.id == newID })
             else { return }
+            selectedPattern = pattern
             onPatternSelected?(pattern)
             navigateToSession = true
-        }
-        .navigationDestination(isPresented: $navigateToSession) {
-            PlayingSessionView(
-                isFirstTime: true
-            )
         }
         .padding(.top, Spacing.sm)
     }

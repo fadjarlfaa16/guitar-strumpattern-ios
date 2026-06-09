@@ -11,7 +11,12 @@ struct SongListView: View {
     var onMenuTapped: ((SongListItem) -> Void)? = nil
     var onAddTapped: (() -> Void)? = nil
 
+    // State untuk Search dan UI
     @State private var searchText = ""
+    @State private var showEmptyState = false
+    
+    // State Navigasi Global
+    @AppStorage("appState") private var appState: AppState = .songList
 
     private var filteredItems: [SongListItem] {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -24,43 +29,116 @@ struct SongListView: View {
     }
 
     var body: some View {
-
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: Spacing.md) {
-                Text("Song Library")
-                    .font(.largeTitle)
-                    .foregroundColor(.textPrimaryWhite)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .bold()
-
-
-                    ForEach(filteredItems) { item in
-                        SongRow(item: item) {
-                            onMenuTapped?(item)
+        VStack(alignment: .leading, spacing: 0) {
+            
+            // 1. Header (Statis di atas)
+            headerView
+                .padding(.horizontal, Spacing.xl)
+                .padding(.bottom, Spacing.md)
+            
+            // 2. Area Konten Utama
+            if showEmptyState {
+                // Tampilan Empty State
+                VStack {
+                    Spacer()
+                    emptyStateView
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+            } else {
+                // Tampilan List Lagu Asli
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: Spacing.md) {
+                        ForEach(filteredItems) { item in
+                            SongRow(
+                                item: item,
+                                onMenuTapped: { onMenuTapped?(item) }
+                            )
                         }
                     }
                     .padding(.top, Spacing.sm)
-                }
-                .padding(.horizontal, Spacing.xl)
-                .padding(.vertical, Spacing.md)
-            }
-            .toolbar {
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
-                ToolbarSpacer(.flexible, placement: .bottomBar)
-                ToolbarItem(placement: .bottomBar) {
-                    Button {
-                        onAddTapped?()
-                    } label: {
-                        Image(systemName: "plus")
-                    }
+                    .padding(.horizontal, Spacing.xl)
+                    .padding(.bottom, Spacing.md)
                 }
             }
-            .searchable(text: $searchText, prompt: "Search")
-            .background(Color.bgPrimary)
+        }
+        .toolbar {
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Button {
+                    onAddTapped?()
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .searchable(text: $searchText, prompt: "Search")
+        .toolbar(.hidden, for: .navigationBar)
+        .background(Color.bgPrimary)
+        .navigationDestination(for: SongListItem.self) { song in
+            ChooseStrummingPatternView(
+                bpm: song.bpm,
+                rhythm: song.timeSignature,
+                patterns: StrummingPattern.samples
+            )
+        }
+    }
+    
+    // MARK: - Header Component
+    private var headerView: some View {
+        HStack {
+            Text("Song Library")
+                .font(.largeTitle)
+                .foregroundColor(.textPrimaryWhite)
+                .bold()
+            
+            Spacer()
+            
+            // Tombol toggle (Untuk testing UI Show/Hide Empty State)
+            Button {
+                withAnimation(.easeInOut) {
+                    showEmptyState.toggle()
+                }
+            } label: {
+                Image(systemName: showEmptyState ? "eye.slash.fill" : "eye.fill")
+                    .foregroundColor(.textSecondary) // Menggunakan token textSecondary
+                    .imageScale(.medium)
+                    .padding(.leading, 8)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    // MARK: - Empty State View Component
+    private var emptyStateView: some View {
+        VStack(spacing: Spacing.md) {
+            Image.musicnotelist
+                .scaledToFit()
+                .frame(width: 80, height: 80)
+                .foregroundColor(.textSecondary)
+            
+            Text("Finish your tutorial first")
+                .font(AppFont.bodyRegular)
+                .foregroundColor(.textSecondary)
+                .padding(.top, Spacing.xs)
+            
+            // CTA Button yang mengubah AppState kembali ke Onboarding
+            CustomButton(title: "Do Tutorial") {
+                appState = .onboarding
+            }
+            .padding(.horizontal, Spacing.xxl)
+            .padding(.top, Spacing.sm)
+        }
+        .padding(.horizontal, Spacing.xl)
     }
 }
 
-
+// MARK: - Preview
 #Preview {
-    SongListView(items: SongListItem.samples)
+    // Dibungkus NavigationStack agar toolbar dan navigasinya ter-render di Canvas
+    NavigationStack {
+        SongListView(items: SongListItem.samples)
+    }
 }

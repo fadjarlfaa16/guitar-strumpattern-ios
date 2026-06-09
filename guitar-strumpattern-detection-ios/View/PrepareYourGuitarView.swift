@@ -59,7 +59,8 @@ struct PrepareYourGuitarView: View {
                     ChooseStrummingPatternView(
                         bpm: 120,
                         rhythm: "4/4",
-                        patterns: StrummingPattern.samples
+                        patterns: StrummingPattern.samples,
+                        isFirstTime: true
                     )
                 }
             }

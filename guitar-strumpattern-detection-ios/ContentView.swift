@@ -19,9 +19,13 @@ struct ContentView: View {
         case .onboarding:
             OnboardingWelcome()
         case .songList:
-            SongListView(items: SongListItem.samples)
+            NavigationStack {
+                SongListView(items: SongListItem.samples)
+            }
         case .uploadSong:
-            GreatPageView()
+            NavigationStack {
+                GreatPageView()
+            }
         }
     }
 }

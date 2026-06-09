@@ -12,13 +12,14 @@ struct SongRow: View {
 
     var body: some View {
         HStack(spacing: Spacing.md) {
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                titleRow
-                metadataRow
-
+            NavigationLink(value: item) {
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    titleRow
+                    metadataRow
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-
-            Spacer(minLength: Spacing.sm)
+            .buttonStyle(.plain)
 
             menuButton
         }

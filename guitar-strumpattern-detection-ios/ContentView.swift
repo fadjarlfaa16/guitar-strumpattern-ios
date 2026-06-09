@@ -13,13 +13,16 @@ enum NavRoot: String {
 
 struct ContentView: View {
     @AppStorage("appState") private var appState: NavRoot = .onboarding
+    @Environment(Routes.self) private var routes
 
     var body: some View {
+        @Bindable var routes = routes
+        
         switch appState {
         case .onboarding:
             OnboardingWelcome()
         case .songList:
-            NavigationStack {
+            NavigationStack(path: $routes.songLibraryRoute) {
                 SongListView()
             }
         case .uploadSong:

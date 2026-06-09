@@ -10,6 +10,6 @@ import Observation
 @Observable
 final class AppState {
     var savedSongs: [SongListItem] = []
-    var isFirst: Bool = true
+    var isFirstTime: Bool = true
 }
 

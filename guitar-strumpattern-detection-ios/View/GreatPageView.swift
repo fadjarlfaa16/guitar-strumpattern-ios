@@ -38,11 +38,11 @@ struct GreatPageView: View {
                 GreatCTA(
                     onAddSong: {
                         appState.savedSongs.append(contentsOf: SongListItem.samples)
-                        appState.isFirst = false
+                        appState.isFirstTime = false
                         navRoot = .songList
                     },
                     onSkip: {
-                        appState.isFirst = false
+                        appState.isFirstTime = false
                         navRoot = .songList
                     }
                 )

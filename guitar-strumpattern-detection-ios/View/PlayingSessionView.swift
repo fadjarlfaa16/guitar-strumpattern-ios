@@ -27,14 +27,15 @@ struct PlayingSessionView: View {
     var duration: String?
     
     /// If true, delays the first notes by 3 seconds and shows a tutorial prompt.
-    var isFirstTime: Bool
 
     // MARK: - ViewModel & State
 
     @StateObject private var vm: RhythmGameViewModel
     @State private var screenWidth: CGFloat = 0
-    @AppStorage("appState") private var appState: NavRoot = .onboarding
+    @AppStorage("appState") private var navRoot: NavRoot = .onboarding
     @State private var tutorialPauseStep: Int = 0
+    @Environment(AppState.self) private var appState
+    @Environment(Routes.self) private var routes
 
     // MARK: - Init
     init(
@@ -49,7 +50,6 @@ struct PlayingSessionView: View {
         self.bpm           = bpm
         self.timeSignature = timeSignature
         self.duration      = duration
-        self.isFirstTime   = isFirstTime
         self._tutorialPauseStep = State(initialValue: isFirstTime ? 1 : 0)
         
         var processedChords = chords
@@ -90,7 +90,7 @@ struct PlayingSessionView: View {
                 ZStack(alignment: .top) {
                     rhythmLane
                     
-                    if isFirstTime && !vm.hasPassedFirstNote {
+                    if appState.isFirstTime && !vm.hasPassedFirstNote {
                         Text("Let’s get started by strumming according to the arrow on the screen.")
                             .font(AppFont.bodyRegular)
                             .foregroundStyle(.textPrimaryWhite)
@@ -257,12 +257,14 @@ struct PlayingSessionView: View {
                     .foregroundStyle(.brandColorAccentGreen.opacity(0.8))
                 }
                 Spacer()
-                Button {
-                    appState = .uploadSong
-                } label: {
-                    Text("Skip")
-                        .font(AppFont.bodyBold)
-                        .foregroundStyle(.textPrimaryWhite)
+                if(appState.isFirstTime) {
+                    Button {
+                        navRoot = .uploadSong
+                    } label: {
+                        Text("Skip")
+                            .font(AppFont.bodyBold)
+                            .foregroundStyle(.textPrimaryWhite)
+                    }
                 }
             }
             .padding(.horizontal, 14).padding(.vertical, 5)
@@ -494,8 +496,14 @@ struct PlayingSessionView: View {
                     }
                     .buttonStyle(StrumButtonStyle())
 
-                    Button { 
-                        appState = .uploadSong
+                    Button {
+                        if(appState.isFirstTime) {
+                            navRoot = .uploadSong
+                            print("isFirstTime")
+                        } else {
+                            routes.songLibraryRoute = NavigationPath()
+                            print(navRoot.rawValue)
+                        }
                     } label: {
                         VStack(spacing: 8) {
                             Image(systemName: "arrow.right").font(.system(size: 24, weight: .bold))
@@ -529,7 +537,7 @@ extension PlayingSessionView {
             
             HStack {
                 Button {
-                    dismiss()
+                    routes.songLibraryRoute = NavigationPath()
                 } label: {
                     VStack {
                         Image.arrowBackward
@@ -544,7 +552,7 @@ extension PlayingSessionView {
                 }
                 Spacer()
                 Button {
-                    
+                    vm.startGame()
                 } label: {
                     VStack {
                         Image.replay
@@ -559,7 +567,7 @@ extension PlayingSessionView {
                 }
                 Spacer()
                 Button {
-                    
+                    dismiss()
                 } label: {
                     VStack {
                         Image.musicnotelist

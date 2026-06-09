@@ -50,7 +50,7 @@ struct SongListView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
-            } else if(appState.isFirst) {
+            } else if(appState.isFirstTime) {
                 VStack {
                     Spacer()
                     firstTimeView
@@ -74,6 +74,7 @@ struct SongListView: View {
                 }
                 Button("Reset") {
                     appState.savedSongs.removeAll()
+                    appState.isFirstTime = true
                     navRoot = .onboarding
                 }
             }

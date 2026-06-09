@@ -7,6 +7,8 @@ import SwiftUI
 struct GreatPageView: View {
     @State private var navigateToSongList = false
     @AppStorage("appState") private var appState: AppState = .onboarding
+    @Environment(SavedSong.self) private var savedSong
+    var songListSample: [SongListItem] = []
 
     var body: some View {
         ZStack {
@@ -35,13 +37,13 @@ struct GreatPageView: View {
                 // 4. CTA: Add Song + Skip for now
                 GreatCTA(
                     onAddSong: {
+                        savedSong.songs.append(contentsOf: SongListItem.samples)
                         appState = .songList
                     },
-                    onSkip: { navigateToSongList = true }
+                    onSkip: {
+                        appState = .songList
+                    }
                 )
-                .navigationDestination(isPresented: $navigateToSongList) {
-                    SongListView(items: SongListItem.samples)
-                }
             }
         }
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -52,5 +54,6 @@ struct GreatPageView: View {
 #Preview {
     NavigationStack {
         GreatPageView()
+            .environment(SavedSong())
     }
 }

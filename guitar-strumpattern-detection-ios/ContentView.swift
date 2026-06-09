@@ -20,7 +20,7 @@ struct ContentView: View {
             OnboardingWelcome()
         case .songList:
             NavigationStack {
-                SongListView(items: SongListItem.samples)
+                SongListView()
             }
         case .uploadSong:
             NavigationStack {

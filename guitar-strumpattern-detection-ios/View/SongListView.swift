@@ -7,16 +7,16 @@ import SwiftUI
 
 // MARK: - Song List View
 struct SongListView: View {
-    let items: [SongListItem]
     var onMenuTapped: ((SongListItem) -> Void)? = nil
     var onAddTapped: (() -> Void)? = nil
 
     // State untuk Search dan UI
     @State private var searchText = ""
     @State private var showEmptyState = false
-    
+
     // State Navigasi Global
     @AppStorage("appState") private var appState: AppState = .songList
+    @Environment(SavedSong.self) private var savedSong
 
     private var filteredItems: [SongListItem] {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -28,6 +28,10 @@ struct SongListView: View {
         }
     }
 
+    private var items: [SongListItem] {
+        savedSong.songs
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             
@@ -37,7 +41,7 @@ struct SongListView: View {
                 .padding(.bottom, Spacing.md)
             
             // 2. Area Konten Utama
-            if showEmptyState {
+            if items.isEmpty {
                 // Tampilan Empty State
                 VStack {
                     Spacer()
@@ -60,6 +64,9 @@ struct SongListView: View {
                     .padding(.top, Spacing.sm)
                     .padding(.horizontal, Spacing.xl)
                     .padding(.bottom, Spacing.md)
+                }
+                Button("Reset") {
+                    appState = .onboarding
                 }
             }
         }
@@ -139,6 +146,7 @@ struct SongListView: View {
 #Preview {
     // Dibungkus NavigationStack agar toolbar dan navigasinya ter-render di Canvas
     NavigationStack {
-        SongListView(items: SongListItem.samples)
+        SongListView()
+            .environment(SavedSong())
     }
 }

@@ -10,6 +10,7 @@ import SwiftUI
 
 struct PrepareYourGuitarView: View {
     @State private var navigateToChoosePattern = false
+    @AppStorage("appState") private var appState: AppState = .onboarding
 
     var body: some View {
         ZStack {
@@ -48,7 +49,7 @@ struct PrepareYourGuitarView: View {
                         navigateToChoosePattern = true
                     }
                     Button(action: {
-                        navigateToChoosePattern = true
+                        appState = .songList
                     }) {
                         Text("Skip for Now")
                             .font(AppFont.bodyRegular)

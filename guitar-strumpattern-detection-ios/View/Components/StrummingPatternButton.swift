@@ -32,7 +32,7 @@ struct StrummingPatternButton: View {
 #Preview {
     VStack(spacing: Spacing.md) {
         StrummingPatternButton(label: "DUUD - DDUUU")
-        StrummingPatternButton(label: "DUUD - DDUUU")
+        StrummingPatternButton(label: "DUUD - DUUD")
     }
     .padding(.horizontal, Spacing.xl)
     .background(Color.bgPrimary)

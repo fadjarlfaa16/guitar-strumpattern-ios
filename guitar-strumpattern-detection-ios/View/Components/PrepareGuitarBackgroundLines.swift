@@ -1,3 +1,12 @@
+//
+//  PrepareGuitarBackgroundLines.swift
+//  guitar-strumpattern-detection-ios
+//
+//  Created by muhammad aqil zaki on 10/06/26.
+//
+import SwiftUI
+
+
 // MARK: - Decorative Background Lines
 struct PrepareGuitarBackgroundLines: View {
     var body: some View {
@@ -37,4 +46,7 @@ struct PrepareGuitarBackgroundLines: View {
             }
         }
     }
+}
+#Preview {
+    PrepareGuitarBackgroundLines()
 }

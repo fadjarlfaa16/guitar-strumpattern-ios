@@ -29,8 +29,17 @@ final class ChordMapping {
 
     // Loads chord mapping from chord_mapping_submission.json
     static func load() throws -> ChordMapping {
-        guard let url = Bundle.main.url(forResource: "chord_mapping_submission", withExtension: "json")
-                     ?? Bundle.main.url(forResource: "chord_mapping_submission", withExtension: "json", subdirectory: "Core/Utils/ChordClassifier") else {
+        let mappingSubdirs = [
+            "Core/Utils/Preprocessing",
+            nil as String?,
+        ]
+        let url = mappingSubdirs.lazy.compactMap { sub -> URL? in
+            if let sub {
+                return Bundle.main.url(forResource: "chord_mapping_submission", withExtension: "json", subdirectory: sub)
+            }
+            return Bundle.main.url(forResource: "chord_mapping_submission", withExtension: "json")
+        }.first
+        guard let url else {
             throw NSError(domain: "ChordMapping", code: 1,
                           userInfo: [NSLocalizedDescriptionKey: "chord_mapping_submission.json not found in bundle."])
         }

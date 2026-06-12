@@ -14,9 +14,13 @@ import Foundation
 final class HybridCQT {
 
     // MARK: - Singleton
-    static let shared: HybridCQT = {
+    // Menggunakan optional agar tidak fatalError jika filterbank files missing dari bundle
+    static let shared: HybridCQT? = {
         do { return try HybridCQT() }
-        catch { fatalError("HybridCQT failed to load filterbanks: \(error)") }
+        catch {
+            print("[HybridCQT] Failed to load filterbanks: \(error)")
+            return nil
+        }
     }()
 
     // MARK: - Filterbank structures
@@ -43,6 +47,7 @@ final class HybridCQT {
     private let sliceStart = 18
     private let sliceEnd   = 270
     private let outBins    = 252
+    private static let preprocessingSubdirectory = "Core/Utils/Preprocessing"
 
     // FFT plans (one per unique n_fft size)
     private let fftSetup512: FFTSetup
@@ -55,8 +60,8 @@ final class HybridCQT {
         // Load per-octave filterbanks
         var octs: [OctaveFilter] = []
         for i in 0..<7 {
-            let jsonURL = try Self.bundleURL("cqt_vqt\(i)", ext: "json", folder: "Core/Extractors")
-            let binURL  = try Self.bundleURL("cqt_vqt\(i)", ext: "bin",  folder: "Core/Extractors")
+            let jsonURL = try Self.preprocessingURL("cqt_vqt\(i)", ext: "json")
+            let binURL  = try Self.preprocessingURL("cqt_vqt\(i)", ext: "bin")
 
             let meta    = try Self.loadJSON(jsonURL)
             guard let hop       = meta["hop"]       as? Int,
@@ -85,14 +90,14 @@ final class HybridCQT {
         self.octaveFilters = octs
 
         // Load pseudo filterbank
-        let pBin  = try Self.bundleURL("cqt_pseudo_mag", ext: "bin",  folder: "Core/Extractors")
+        let pBin  = try Self.preprocessingURL("cqt_pseudo_mag", ext: "bin")
         self.pseudoFilter = try Self.loadBin(pBin)
         guard pseudoFilter.count >= pseudoNBins * pseudoNHalf else {
             throw makeError("cqt_pseudo_mag.bin too small")
         }
 
         // Load full-scale normalization
-        let sBin = try Self.bundleURL("cqt_full_scale", ext: "bin", folder: "Core/Extractors")
+        let sBin = try Self.preprocessingURL("cqt_full_scale", ext: "bin")
         self.fullScale = try Self.loadBin(sBin)
         guard fullScale.count >= 238 else { throw makeError("cqt_full_scale.bin too small") }
 
@@ -245,7 +250,7 @@ final class HybridCQT {
         return result
     }
 
-    // MARK: - Matrix Multiplication (replaces deprecated cblas_sgemm)
+    // MARK: - Matrix Multiplication
 
     /// Performs row-major matrix multiplication: C = alpha * A @ B^T + beta * C
     /// - Parameters:
@@ -261,23 +266,22 @@ final class HybridCQT {
                           alpha: Float, A: UnsafePointer<Float>, strideA: Int,
                           B: UnsafePointer<Float>, strideB: Int,
                           beta: Float, C: UnsafeMutablePointer<Float>, strideC: Int) {
-        if beta != 1.0 {
-            for i in 0..<(m * n) {
-                C[i] *= beta
-            }
-        }
-
-        // C += alpha * (A @ B^T)
-        // For row-major: C[i,j] += alpha * sum_l(A[i,l] * B[j,l])
-        for i in 0..<m {
-            for j in 0..<n {
-                var sum: Float = 0.0
-                for l in 0..<k {
-                    sum += A[i * strideA + l] * B[j * strideB + l]
-                }
-                C[i * strideC + j] += alpha * sum
-            }
-        }
+        cblas_sgemm(
+            CblasRowMajor,
+            CblasNoTrans,
+            CblasTrans,
+            Int32(m),
+            Int32(n),
+            Int32(k),
+            alpha,
+            A,
+            Int32(strideA),
+            B,
+            Int32(strideB),
+            beta,
+            C,
+            Int32(strideC)
+        )
     }
 
     private func stft(signal: [Float], nFFT: Int, hop: Int,
@@ -440,15 +444,21 @@ final class HybridCQT {
     }
 
 
-    private static func bundleURL(_ name: String, ext: String, folder: String) throws -> URL {
-        if let url = Bundle.main.url(forResource: name, withExtension: ext) {
-            return url
+    private static func preprocessingURL(_ name: String, ext: String) throws -> URL {
+        let subdirectories = [
+            preprocessingSubdirectory,
+            nil as String?,
+        ]
+        for sub in subdirectories {
+            if let sub,
+               let url = Bundle.main.url(forResource: name, withExtension: ext, subdirectory: sub) {
+                return url
+            }
+            if sub == nil, let url = Bundle.main.url(forResource: name, withExtension: ext) {
+                return url
+            }
         }
-
-        if let url = Bundle.main.url(forResource: name, withExtension: ext, subdirectory: folder) {
-            return url
-        }
-        throw makeError("\(name).\(ext) not found in bundle (tried root and \(folder)/)")
+        throw makeError("\(name).\(ext) not found in bundle.")
     }
 
     private static func loadBin(_ url: URL) throws -> [Float] {

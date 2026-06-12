@@ -22,6 +22,8 @@ final class AudioPlayerManager: NSObject, ObservableObject {
     private var displayLink: CADisplayLink?
     
     private let updateInterval: TimeInterval = 0.016  // ~60 FPS
+    /// When true, audio session allows simultaneous mic input for strum validation.
+    var enablesMicrophoneInput: Bool = false
     
     override init() {
         super.init()
@@ -38,7 +40,15 @@ final class AudioPlayerManager: NSObject, ObservableObject {
     private func setupAudioSession() {
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playback, mode: .default, options: [])
+            if enablesMicrophoneInput {
+                try audioSession.setCategory(
+                    .playAndRecord,
+                    mode: .measurement,
+                    options: [.defaultToSpeaker, .allowBluetooth]
+                )
+            } else {
+                try audioSession.setCategory(.playback, mode: .default, options: [])
+            }
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             playerError = "Failed to setup audio session: \(error.localizedDescription)"

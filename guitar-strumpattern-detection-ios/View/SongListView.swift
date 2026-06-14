@@ -19,8 +19,9 @@ struct SongListView: View {
     @State private var editTarget: SongListItem? = nil
     @State private var editTitle = ""
     @State private var deleteTarget: SongListItem? = nil
-    @AppStorage("isFirstTime") private var isFirstTime: Bool = true
-    @AppStorage("appState") private var navRoot: NavRoot = .onboarding
+    @State private var showCalibrate = false
+
+    @AppStorage("appState") private var appState: AppState = .songList
     @Environment(SavedSong.self) private var savedSong
 
 
@@ -170,6 +171,9 @@ struct SongListView: View {
         .navigationDestination(for: UUID.self) { songID in
             songDetailView(for: songID)
         }
+        .navigationDestination(isPresented: $showCalibrate) {
+            CalibrateView()
+        }
     }
 
     // MARK: - Song List
@@ -203,6 +207,14 @@ struct SongListView: View {
                 .bold()
 
             Spacer()
+
+            Button {
+                showCalibrate = true
+            } label: {
+                Label("Kalibrasi", systemImage: "applewatch")
+                    .font(AppFont.bodyRegular)
+                    .foregroundStyle(.textPrimaryWhite)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

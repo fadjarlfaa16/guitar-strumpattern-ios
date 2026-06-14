@@ -43,6 +43,7 @@ struct PlayingSessionView: View {
 
     @StateObject private var vm: RhythmGameViewModel
     @StateObject private var audioPlayer = AudioPlayerManager()
+    @StateObject private var strumValidator = StrumInputValidator()
     @State private var screenWidth: CGFloat = 0
     @AppStorage("appState") private var navRoot: NavRoot = .onboarding
     @State private var tutorialPauseStep: Int = 0
@@ -94,6 +95,8 @@ struct PlayingSessionView: View {
 
     private func handleStrumUp()   { vm.onAction(direction: "up") }
     private func handleStrumDown() { vm.onAction(direction: "down") }
+
+    private var usesStrumValidator: Bool { !autoPlay }
 
     private var hitZoneX: CGFloat { screenWidth * RhythmGameViewModel.hitZoneFraction }
 
@@ -155,7 +158,7 @@ struct PlayingSessionView: View {
                 }
                 .padding(.horizontal, 28)
                 
-                if !autoPlay {
+                if !autoPlay && !usesStrumValidator {
                     strumButtons
                         .padding(.horizontal, 28)
                         .padding(.vertical, 12)
@@ -212,19 +215,21 @@ struct PlayingSessionView: View {
         .onReceive(NotificationCenter.default.publisher(for: StrumNotifier.strumDownNotification)) { _ in
             handleStrumDown()
         }
-        .onAppear { 
+        .onAppear {
             lockToLandscape()
-            
-            // Setup audio player if URL provided
+
             if let audioURL = audioURL {
+                audioPlayer.enablesMicrophoneInput = usesStrumValidator
                 audioPlayer.setupPlayer(with: audioURL)
                 vm.audioPlayer = audioPlayer
             }
-            
-            vm.startGame() 
+
+            setupStrumValidator()
+            vm.startGame()
         }
-        .onDisappear { 
+        .onDisappear {
             unlockOrientation()
+            strumValidator.stop()
             vm.stopGame()
             audioPlayer.stop()
         }
@@ -236,6 +241,15 @@ struct PlayingSessionView: View {
     // ──────────────────────────────────────────────────────────────────
     // MARK: - Orientation
     // ──────────────────────────────────────────────────────────────────
+
+    private func setupStrumValidator() {
+        guard usesStrumValidator else { return }
+        strumValidator.allowsPlayback = audioURL != nil
+        strumValidator.onStrumConfirmed = { direction in
+            vm.onAction(direction: direction)
+        }
+        strumValidator.start()
+    }
 
     private func lockToLandscape() {
         AppDelegate.orientationLock = .landscape

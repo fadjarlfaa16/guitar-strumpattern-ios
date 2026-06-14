@@ -5,6 +5,7 @@
 
 import Foundation
 
+/// Ringan untuk list + NavigationLink. Chord segments di-load dari storage saat navigasi.
 struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
     let id: UUID
     let bpm: Int
@@ -12,8 +13,15 @@ struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
     let title: String
     let artist: String
     let scorePercent: Int
+    let sandboxFileName: String?
 
-    var displayTitle: String { "\(title) - \(artist)" }
+    var displayTitle: String {
+        title.isEmpty ? "Untitled" : title
+    }
+
+    var isAnalyzed: Bool {
+        bpm > 0 && timeSignature != "-"
+    }
 
     init(
         id: UUID = UUID(),
@@ -21,7 +29,8 @@ struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
         timeSignature: String,
         title: String,
         artist: String,
-        scorePercent: Int
+        scorePercent: Int,
+        sandboxFileName: String? = nil
     ) {
         self.id = id
         self.bpm = bpm
@@ -29,5 +38,6 @@ struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
         self.title = title
         self.artist = artist
         self.scorePercent = scorePercent
+        self.sandboxFileName = sandboxFileName
     }
 }

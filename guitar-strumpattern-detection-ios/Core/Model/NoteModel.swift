@@ -164,8 +164,10 @@ extension ChordGroup {
     ) -> [ChordGroup] {
         guard !chords.isEmpty, !pattern.isEmpty, bpm > 0 else { return [] }
 
-        let (_, denom) = parseTimeSignature(timeSignature)
+        let (numerator, denom) = parseTimeSignature(timeSignature)
         let beatDuration = (60.0 / Double(bpm)) * (4.0 / Double(denom))
+        let measureDuration = beatDuration * Double(numerator)
+        let slotDuration = measureDuration / Double(pattern.count)
         var groups: [ChordGroup] = []
         
         let durationTime = duration.flatMap { parseDuration($0) }
@@ -199,36 +201,41 @@ extension ChordGroup {
             let gid = UUID()
             var notes: [NoteInput] = []
             
-            // Snap the start time to the nearest beat on the global grid
-            // This prevents chords that fall on half-beats (like 3.5s at 60 BPM) 
-            // from forcing the strum pattern completely off-beat.
+            guard segment.label != "N" else { continue }
+
+            // Snap chord boundaries to the global strum grid so the chosen pattern
+            // keeps moving through chord changes instead of restarting stiffly.
             let relative = segment.startTime - firstStart
-            let beatsElapsed = round(relative / beatDuration)
-            var clock = firstStart + beatsElapsed * beatDuration
+            let slotsElapsed = max(0, Int(round(relative / slotDuration)))
+            var slotIndex = slotsElapsed
+            var clock = firstStart + Double(slotIndex) * slotDuration
             
             var idx = 0
 
-            // The boundary: notes must not reach into the next chord's territory
+            // The boundary: notes must not reach into the next chord's territory.
             let nextStart: TimeInterval
             if segIdx + 1 < processedChords.count {
                 let nextRelative = processedChords[segIdx + 1].startTime - firstStart
-                let nextBeats = round(nextRelative / beatDuration)
-                nextStart = firstStart + nextBeats * beatDuration
+                let nextSlots = round(nextRelative / slotDuration)
+                nextStart = firstStart + nextSlots * slotDuration
             } else {
-                nextStart = .infinity   // last segment — no limit
+                let segmentEndRelative = segment.endTime - firstStart
+                let endSlots = round(segmentEndRelative / slotDuration)
+                nextStart = firstStart + endSlots * slotDuration
             }
 
-            for beat in pattern {
+            while clock < nextStart {
                 // Stop if this note would visually overlap with the next
                 // chord group. Uses a fixed 0.3s buffer (≈ one block width
                 // in time on typical screens) — unlike the old beatDuration
                 // guard which was too aggressive at slow BPMs.
-                let minGroupGap: TimeInterval = 0.3
+                let minGroupGap: TimeInterval = min(0.3, slotDuration * 0.45)
                 if clock + minGroupGap >= nextStart { break }
                 
                 // Stop if we exceed the requested duration
                 if let limit = durationTime, clock >= limit { break }
 
+                let beat = pattern[slotIndex % pattern.count]
                 if let dir = beat.direction {
                     notes.append(NoteInput(
                         time: clock,
@@ -240,7 +247,8 @@ extension ChordGroup {
                     ))
                     idx += 1
                 }
-                clock += beatDuration
+                slotIndex += 1
+                clock += slotDuration
             }
 
             if !notes.isEmpty {

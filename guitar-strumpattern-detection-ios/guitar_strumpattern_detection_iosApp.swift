@@ -11,7 +11,8 @@ import SwiftUI
 struct guitar_strumpattern_detection_iosApp: App {
     // Wire up AppDelegate so orientation locking works per-screen.
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @State private var savedSong = AppState()
+    @State private var savedSong = SavedSong()
+    @State private var appState = AppState()
     @State private var router = Routes()
 
     var body: some Scene {
@@ -19,6 +20,7 @@ struct guitar_strumpattern_detection_iosApp: App {
             ContentView()
                 .preferredColorScheme(.dark)
                 .environment(savedSong)
+                .environment(appState)
                 .environment(router)
         }
     }

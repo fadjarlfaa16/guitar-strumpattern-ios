@@ -299,7 +299,7 @@ struct PlayingSessionView: View {
 
                 if isFirstTime {
                     Button {
-                        appState = .uploadSong
+                        navRoot = .uploadSong
 
                     } label: {
                         Text("Skip")

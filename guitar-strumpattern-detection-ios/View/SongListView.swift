@@ -19,10 +19,10 @@ struct SongListView: View {
     @State private var editTarget: SongListItem? = nil
     @State private var editTitle = ""
     @State private var deleteTarget: SongListItem? = nil
-
-
-    @AppStorage("appState") private var appState: AppState = .songList
+    @AppStorage("isFirstTime") private var isFirstTime: Bool = true
+    @AppStorage("appState") private var navRoot: NavRoot = .onboarding
     @Environment(SavedSong.self) private var savedSong
+
 
 
     private var filteredItems: [SongListItem] {
@@ -406,6 +406,6 @@ private struct AnalyzeTarget: Identifiable {
 #Preview {
     NavigationStack {
         SongListView()
-            .environment(AppState())
+            .environment(SavedSong())
     }
 }

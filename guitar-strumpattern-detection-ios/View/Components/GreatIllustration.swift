@@ -45,15 +45,10 @@ struct FileUploadIcon: View {
     }
 }
 
-// Segitiga untuk efek lipatan
-struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.maxX, y: 0))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: 0, y: rect.maxY))
-        path.closeSubpath()
-        return path
+                Image("AddSong")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 140, height: 120)
     }
 }
 

@@ -1,0 +1,121 @@
+
+[
+    {
+        "id": 1,
+        "pattern": "D D D D",
+        "bpm": [
+            60,
+            180
+        ],
+        "chord_rate_min": 2,
+        "chord_rate_max": 4
+    },
+    {
+        "id": 2,
+        "pattern": "D – D U D – D U",
+        "bpm": [
+            120,
+            160
+        ],
+        "chord_rate_min": 1,
+        "chord_rate_max": 2
+    },
+    {
+        "id": 3,
+        "pattern": "D U D U D U D U",
+        "bpm": [
+            80,
+            120
+        ],
+        "chord_rate_min": 1,
+        "chord_rate_max": 2
+    },
+    {
+        "id": 4,
+        "pattern": "D D U - U D",
+        "bpm": [
+            80,
+            110
+        ],
+        "chord_rate_min": 1,
+        "chord_rate_max": 2
+    },
+    {
+        "id": 5,
+        "pattern": "D D U D D U",
+        "bpm": [
+            60,
+            80
+        ],
+        "chord_rate_min": 1,
+        "chord_rate_max": 2
+    },
+    {
+        "id": 6,
+        "pattern": "D - U D - U",
+        "bpm": [
+            60,
+            100
+        ],
+        "chord_rate_min": 1,
+        "chord_rate_max": 2
+    },
+    {
+        "id": 7,
+        "pattern": "D D U D U D D",
+        "bpm": [
+            85,
+            120
+        ],
+        "chord_rate_min": 1,
+        "chord_rate_max": 2
+    },
+    {
+        "id": 8,
+        "pattern": "D U D U",
+        "bpm": [
+            100,
+            144
+        ],
+        "chord_rate": 2
+    },
+    {
+        "id": 9,
+        "pattern": "D U U",
+        "bpm": [
+            100,
+            120
+        ],
+        "chord_rate_min": 2,
+        "chord_rate_max": 4
+    },
+    {
+        "id": 10,
+        "pattern": "D - D - U - U",
+        "bpm": [
+            60,
+            90
+        ],
+        "chord_rate_min": 2,
+        "chord_rate_max": 4
+    },
+    {
+        "id": 11,
+        "pattern": "D U - U D U - U",
+        "bpm": [
+            90,
+            120
+        ],
+        "chord_rate_min": 2,
+        "chord_rate_max": 4
+    },
+    {
+        "pattern": "D - U U D - U U",
+        "bpm": [
+            80,
+            110
+        ],
+        "chord_rate_min": 1,
+        "chord_rate_max": 2
+    }
+]

@@ -18,6 +18,8 @@ struct PlayingSessionView: View {
     var chords: [ChordSegment]
     /// Repeating pattern applied once per chord.
     var pattern: [StrumBeat]
+    /// Human-readable strumming pattern notation shown in the session HUD.
+    var patternNotation: String
     /// Beats per minute — controls spacing between notes.
     var bpm: Int
     /// Time signature, e.g. "4/4", "3/4", "6/8".
@@ -27,14 +29,26 @@ struct PlayingSessionView: View {
     var duration: String?
     
     /// If true, delays the first notes by 3 seconds and shows a tutorial prompt.
+
     var isFirstTime: Bool
+    
+    /// Audio file URL untuk playback
+    var audioURL: URL?
+
+    /// Runs the lane without requiring strum input.
+    var autoPlay: Bool
+
 
     // MARK: - ViewModel & State
 
     @StateObject private var vm: RhythmGameViewModel
+    @StateObject private var audioPlayer = AudioPlayerManager()
+    @StateObject private var strumValidator = StrumInputValidator()
     @State private var screenWidth: CGFloat = 0
-    @AppStorage("appState") private var appState: AppState = .onboarding
+    @AppStorage("appState") private var navRoot: NavRoot = .onboarding
     @State private var tutorialPauseStep: Int = 0
+    @Environment(AppState.self) private var appState
+    @Environment(Routes.self) private var routes
 
     // MARK: - Init
     init(
@@ -43,13 +57,21 @@ struct PlayingSessionView: View {
         bpm:           Int            = 120,
         timeSignature: String         = ChordGroup.sampleTimeSignature,
         duration:      String?        = nil,
-        isFirstTime:   Bool           = false
+        isFirstTime:   Bool           = false,
+        audioURL:      URL?           = nil,
+        autoPlay:      Bool           = false,
+        patternNotation: String?      = nil
     ) {
+        let safeBPM = bpm > 0 ? bpm : 120
         self.pattern       = pattern
-        self.bpm           = bpm
+        self.patternNotation = patternNotation ?? pattern.map(\.rawValue).joined()
+        self.bpm           = safeBPM
         self.timeSignature = timeSignature
         self.duration      = duration
+
         self.isFirstTime   = isFirstTime
+        self.audioURL      = audioURL
+        self.autoPlay      = autoPlay
         self._tutorialPauseStep = State(initialValue: isFirstTime ? 1 : 0)
         
         var processedChords = chords
@@ -64,15 +86,17 @@ struct PlayingSessionView: View {
 
         let groups = ChordGroup.build(
             chords: processedChords, pattern: pattern,
-            bpm: bpm, timeSignature: timeSignature, duration: duration
+            bpm: safeBPM, timeSignature: timeSignature, duration: duration
         )
-        _vm = StateObject(wrappedValue: RhythmGameViewModel(chordGroups: groups, bpm: bpm))
+        _vm = StateObject(wrappedValue: RhythmGameViewModel(chordGroups: groups, bpm: safeBPM, autoPlay: autoPlay))
     }
 
     // MARK: - Actions
 
     private func handleStrumUp()   { vm.onAction(direction: "up") }
     private func handleStrumDown() { vm.onAction(direction: "down") }
+
+    private var usesStrumValidator: Bool { !autoPlay }
 
     private var hitZoneX: CGFloat { screenWidth * RhythmGameViewModel.hitZoneFraction }
 
@@ -90,7 +114,7 @@ struct PlayingSessionView: View {
                 ZStack(alignment: .top) {
                     rhythmLane
                     
-                    if isFirstTime && !vm.hasPassedFirstNote {
+                    if appState.isFirstTime && !vm.hasPassedFirstNote {
                         Text("Let’s get started by strumming according to the arrow on the screen.")
                             .font(AppFont.bodyRegular)
                             .foregroundStyle(.textPrimaryWhite)
@@ -134,9 +158,11 @@ struct PlayingSessionView: View {
                 }
                 .padding(.horizontal, 28)
                 
-                strumButtons
-                    .padding(.horizontal, 28)
-                    .padding(.vertical, 12)
+                if !autoPlay && !usesStrumValidator {
+                    strumButtons
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 12)
+                }
             }
             
             // Feedback overlay removed
@@ -189,11 +215,24 @@ struct PlayingSessionView: View {
         .onReceive(NotificationCenter.default.publisher(for: StrumNotifier.strumDownNotification)) { _ in
             handleStrumDown()
         }
-        .onAppear { 
+        .onAppear {
             lockToLandscape()
-            vm.startGame() 
+
+            if let audioURL = audioURL {
+                audioPlayer.enablesMicrophoneInput = usesStrumValidator
+                audioPlayer.setupPlayer(with: audioURL)
+                vm.audioPlayer = audioPlayer
+            }
+
+            setupStrumValidator()
+            vm.startGame()
         }
-        .onDisappear { unlockOrientation(); vm.stopGame() }
+        .onDisappear {
+            unlockOrientation()
+            strumValidator.stop()
+            vm.stopGame()
+            audioPlayer.stop()
+        }
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
         .navigationBarBackButtonHidden(true)
@@ -202,6 +241,15 @@ struct PlayingSessionView: View {
     // ──────────────────────────────────────────────────────────────────
     // MARK: - Orientation
     // ──────────────────────────────────────────────────────────────────
+
+    private func setupStrumValidator() {
+        guard usesStrumValidator else { return }
+        strumValidator.allowsPlayback = audioURL != nil
+        strumValidator.onStrumConfirmed = { direction in
+            vm.onAction(direction: direction)
+        }
+        strumValidator.start()
+    }
 
     private func lockToLandscape() {
         AppDelegate.orientationLock = .landscape
@@ -255,14 +303,23 @@ struct PlayingSessionView: View {
                 Text(timeSignature)
                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.brandColorAccentGreen.opacity(0.8))
+                Text("·").foregroundStyle(.brandColorAccentGreen.opacity(0.5))
+                Text(patternNotation)
+                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(.textPrimaryWhite.opacity(0.85))
+                    .lineLimit(1)
                 }
                 Spacer()
-                Button {
-                    appState = .uploadSong
-                } label: {
-                    Text("Skip")
-                        .font(AppFont.bodyBold)
-                        .foregroundStyle(.textPrimaryWhite)
+
+                if isFirstTime {
+                    Button {
+                        navRoot = .uploadSong
+
+                    } label: {
+                        Text("Skip")
+                            .font(AppFont.bodyBold)
+                            .foregroundStyle(.textPrimaryWhite)
+                    }
                 }
             }
             .padding(.horizontal, 14).padding(.vertical, 5)
@@ -455,24 +512,6 @@ struct PlayingSessionView: View {
 
                 HStack(spacing: 24) {
                     Button { 
-                        // Change Pattern placeholder
-                    } label: {
-                        VStack(spacing: 8) {
-                            Image(systemName: "music.note.list").font(.system(size: 24, weight: .bold))
-                            Text("CHANGE PATTERN").font(.system(size: 12, weight: .bold, design: .monospaced))
-                        }
-                        .foregroundStyle(.white.opacity(0.7))
-                        .frame(width: 140)
-                        .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14)
-                                .fill(.white.opacity(0.05))
-                                .strokeBorder(.white.opacity(0.15), lineWidth: 1)
-                        )
-                    }
-                    .buttonStyle(StrumButtonStyle())
-
-                    Button { 
                         vm.startGame() 
                     } label: {
                         VStack(spacing: 8) {
@@ -494,8 +533,14 @@ struct PlayingSessionView: View {
                     }
                     .buttonStyle(StrumButtonStyle())
 
-                    Button { 
-                        appState = .uploadSong
+                    Button {
+                        if(appState.isFirstTime) {
+                            navRoot = .uploadSong
+                            print("isFirstTime")
+                        } else {
+                            routes.songLibraryRoute = NavigationPath()
+                            print(navRoot.rawValue)
+                        }
                     } label: {
                         VStack(spacing: 8) {
                             Image(systemName: "arrow.right").font(.system(size: 24, weight: .bold))
@@ -529,7 +574,7 @@ extension PlayingSessionView {
             
             HStack {
                 Button {
-                    dismiss()
+                    routes.songLibraryRoute = NavigationPath()
                 } label: {
                     VStack {
                         Image.arrowBackward
@@ -544,7 +589,12 @@ extension PlayingSessionView {
                 }
                 Spacer()
                 Button {
-                    
+                    vm.startGame()
+
+                    if tutorialPauseStep == 2 {
+                        withAnimation { tutorialPauseStep = 0 }
+                    }
+
                 } label: {
                     VStack {
                         Image.replay
@@ -557,9 +607,10 @@ extension PlayingSessionView {
                             .foregroundStyle(.textPrimaryWhite)
                     }
                 }
+
                 Spacer()
                 Button {
-                    
+                    dismiss()
                 } label: {
                     VStack {
                         Image.musicnotelist
@@ -572,6 +623,7 @@ extension PlayingSessionView {
                             .foregroundStyle(.textPrimaryWhite)
                     }
                 }
+
             }
             
             .frame(maxWidth: .infinity)

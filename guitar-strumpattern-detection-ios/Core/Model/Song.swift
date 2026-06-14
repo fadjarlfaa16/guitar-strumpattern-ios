@@ -30,6 +30,7 @@ struct Song: Identifiable, Codable {
         addedAt: Date = .now,
         bpm: Int? = nil,
         timeSignature: String? = nil,
+        chordChangeRate: Double? = nil,
         chordSegments: [StoredChordSegment]? = nil
     ) {
         self.id = id
@@ -44,7 +45,7 @@ struct Song: Identifiable, Codable {
     }
 }
 
-struct StoredChordSegment: Codable {
+struct StoredChordSegment: Codable, Equatable, Hashable {
     let startTime: TimeInterval
     let endTime: TimeInterval
     let label: String

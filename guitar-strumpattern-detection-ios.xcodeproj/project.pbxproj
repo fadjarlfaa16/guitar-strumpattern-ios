@@ -6,16 +6,43 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5E9D3F6A2FDC0884005DAE06 /* MotionDetector Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 5E9D3F602FDC0883005DAE06 /* MotionDetector Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5E9D3F682FDC0884005DAE06 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 31FEC76D2FD2ACF600FE28F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5E9D3F5F2FDC0883005DAE06;
+			remoteInfo = "MotionDetector Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		5E9D3F6E2FDC0884005DAE06 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				5E9D3F6A2FDC0884005DAE06 /* MotionDetector Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		31FEC7752FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "guitar-strumpattern-detection-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5E9D3F602FDC0883005DAE06 /* MotionDetector Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MotionDetector Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		6F58F0182FD2BD4D00A7E379 /* Exceptions for "guitar-strumpattern-detection-ios" folder in "guitar-strumpattern-detection-ios" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Core/Model/.gitkeep,
-				Core/Utils/ChordClassifier/.gitkeep,
 				Core/ViewModel/Dummy/.gitkeep,
 			);
 			target = 31FEC7742FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios */;
@@ -27,8 +54,6 @@
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			buildPhase = 31FEC7712FD2ACF600FE28F6 /* Sources */;
 			membershipExceptions = (
-				Core/Model/.gitkeep,
-				Core/Utils/ChordClassifier/.gitkeep,
 				Core/ViewModel/Dummy/.gitkeep,
 			);
 		};
@@ -44,10 +69,22 @@
 			path = "guitar-strumpattern-detection-ios";
 			sourceTree = "<group>";
 		};
+		5E9D3F612FDC0883005DAE06 /* MotionDetector Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "MotionDetector Watch App";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		31FEC7722FD2ACF600FE28F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5E9D3F5D2FDC0883005DAE06 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -61,6 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				31FEC7772FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios */,
+				5E9D3F612FDC0883005DAE06 /* MotionDetector Watch App */,
 				31FEC7762FD2ACF600FE28F6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -69,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				31FEC7752FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios.app */,
+				5E9D3F602FDC0883005DAE06 /* MotionDetector Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,10 +122,12 @@
 				31FEC7712FD2ACF600FE28F6 /* Sources */,
 				31FEC7722FD2ACF600FE28F6 /* Frameworks */,
 				31FEC7732FD2ACF600FE28F6 /* Resources */,
+				5E9D3F6E2FDC0884005DAE06 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				5E9D3F692FDC0884005DAE06 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				31FEC7772FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios */,
@@ -96,6 +137,28 @@
 			);
 			productName = "guitar-strumpattern-detection-ios";
 			productReference = 31FEC7752FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5E9D3F5F2FDC0883005DAE06 /* MotionDetector Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5E9D3F6B2FDC0884005DAE06 /* Build configuration list for PBXNativeTarget "MotionDetector Watch App" */;
+			buildPhases = (
+				5E9D3F5C2FDC0883005DAE06 /* Sources */,
+				5E9D3F5D2FDC0883005DAE06 /* Frameworks */,
+				5E9D3F5E2FDC0883005DAE06 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5E9D3F612FDC0883005DAE06 /* MotionDetector Watch App */,
+			);
+			name = "MotionDetector Watch App";
+			packageProductDependencies = (
+			);
+			productName = "MotionDetector Watch App";
+			productReference = 5E9D3F602FDC0883005DAE06 /* MotionDetector Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -109,6 +172,9 @@
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
 					31FEC7742FD2ACF600FE28F6 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					5E9D3F5F2FDC0883005DAE06 = {
 						CreatedOnToolsVersion = 26.5;
 					};
 				};
@@ -128,12 +194,20 @@
 			projectRoot = "";
 			targets = (
 				31FEC7742FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios */,
+				5E9D3F5F2FDC0883005DAE06 /* MotionDetector Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		31FEC7732FD2ACF600FE28F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5E9D3F5E2FDC0883005DAE06 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -150,7 +224,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5E9D3F5C2FDC0883005DAE06 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5E9D3F692FDC0884005DAE06 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5E9D3F5F2FDC0883005DAE06 /* MotionDetector Watch App */;
+			targetProxy = 5E9D3F682FDC0884005DAE06 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		31FEC77E2FD2ACF700FE28F6 /* Debug */ = {
@@ -279,22 +368,16 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-				DEVELOPMENT_TEAM = YC8SS4YRCV;
-=======
 				DEVELOPMENT_TEAM = 549WDU3BYN;
->>>>>>> Stashed changes
-=======
-				DEVELOPMENT_TEAM = 549WDU3BYN;
->>>>>>> Stashed changes
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -319,22 +402,16 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-				DEVELOPMENT_TEAM = YC8SS4YRCV;
-=======
 				DEVELOPMENT_TEAM = 549WDU3BYN;
->>>>>>> Stashed changes
-=======
-				DEVELOPMENT_TEAM = 549WDU3BYN;
->>>>>>> Stashed changes
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -349,6 +426,72 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5E9D3F6C2FDC0884005DAE06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 549WDU3BYN;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "pacemodddd.guitar-strumpattern-detection-ios.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		5E9D3F6D2FDC0884005DAE06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 549WDU3BYN;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "pacemodddd.guitar-strumpattern-detection-ios.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
 			};
 			name = Release;
 		};
@@ -369,6 +512,15 @@
 			buildConfigurations = (
 				31FEC7812FD2ACF700FE28F6 /* Debug */,
 				31FEC7822FD2ACF700FE28F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5E9D3F6B2FDC0884005DAE06 /* Build configuration list for PBXNativeTarget "MotionDetector Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E9D3F6C2FDC0884005DAE06 /* Debug */,
+				5E9D3F6D2FDC0884005DAE06 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

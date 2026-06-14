@@ -5,22 +5,25 @@
 
 import SwiftUI
 
-enum AppState: String {
+enum NavRoot: String {
     case onboarding
     case songList
     case uploadSong
 }
 
 struct ContentView: View {
-    @AppStorage("appState") private var appState: AppState = .onboarding
+    @AppStorage("appState") private var appState: NavRoot = .onboarding
+    @Environment(Routes.self) private var routes
 
     var body: some View {
+        @Bindable var routes = routes
+        
         switch appState {
         case .onboarding:
             OnboardingWelcome()
         case .songList:
-            NavigationStack {
-                SongListView(items: SongListItem.samples)
+            NavigationStack(path: $routes.songLibraryRoute) {
+                SongListView()
             }
         case .uploadSong:
             NavigationStack {

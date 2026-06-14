@@ -20,14 +20,10 @@ struct SongListView: View {
     @State private var editTitle = ""
     @State private var deleteTarget: SongListItem? = nil
 
-<<<<<<< HEAD
-    // State Navigasi Global
-    @AppStorage("appState") private var navRoot: NavRoot = .songList
-    @Environment(AppState.self) private var appState
-=======
+
     @AppStorage("appState") private var appState: AppState = .songList
     @Environment(SavedSong.self) private var savedSong
->>>>>>> chord-detection-feature
+
 
     private var filteredItems: [SongListItem] {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -39,10 +35,7 @@ struct SongListView: View {
         }
     }
 
-<<<<<<< HEAD
-    private var items: [SongListItem] {
-        appState.savedSongs
-=======
+
     private var editAlertBinding: Binding<Bool> {
         Binding(
             get: { editTarget != nil },
@@ -64,7 +57,7 @@ struct SongListView: View {
                 }
             }
         )
->>>>>>> chord-detection-feature
+
     }
 
     var body: some View {
@@ -72,46 +65,7 @@ struct SongListView: View {
             headerView
                 .padding(.horizontal, Spacing.xl)
                 .padding(.bottom, Spacing.md)
-<<<<<<< HEAD
-            
-            // 2. Area Konten Utama
-            if items.isEmpty {
-                // Tampilan Empty State
-                VStack {
-                    Spacer()
-                    emptyStateView
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                
-            } else if(appState.isFirstTime) {
-                VStack {
-                    Spacer()
-                    firstTimeView
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                // Tampilan List Lagu Asli
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: Spacing.md) {
-                        ForEach(filteredItems) { item in
-                            SongRow(
-                                item: item,
-                                onMenuTapped: { onMenuTapped?(item) }
-                            )
-                        }
-                    }
-                    .padding(.top, Spacing.sm)
-                    .padding(.horizontal, Spacing.xl)
-                    .padding(.bottom, Spacing.md)
-                }
-                Button("Reset") {
-                    appState.savedSongs.removeAll()
-                    appState.isFirstTime = true
-                    navRoot = .onboarding
-                }
-=======
+
 
             if savedSong.songs.isEmpty {
                 Spacer()
@@ -123,7 +77,7 @@ struct SongListView: View {
                 Spacer()
             } else {
                 songList
->>>>>>> chord-detection-feature
+
             }
         }
         .toolbar {
@@ -131,16 +85,9 @@ struct SongListView: View {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Button {
-<<<<<<< HEAD
-                    if(appState.savedSongs.isEmpty) {
-                        appState.savedSongs.append(contentsOf: SongListItem.samples)
-                    } else {
-                        appState.savedSongs.removeAll()
-                    }
-                    onAddTapped?()
-=======
+
                     showFilePicker = true
->>>>>>> chord-detection-feature
+
                 } label: {
                     Image(systemName: "plus")
                 }

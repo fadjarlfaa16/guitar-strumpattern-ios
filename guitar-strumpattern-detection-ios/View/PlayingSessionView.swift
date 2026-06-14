@@ -29,8 +29,7 @@ struct PlayingSessionView: View {
     var duration: String?
     
     /// If true, delays the first notes by 3 seconds and shows a tutorial prompt.
-<<<<<<< HEAD
-=======
+
     var isFirstTime: Bool
     
     /// Audio file URL untuk playback
@@ -38,7 +37,7 @@ struct PlayingSessionView: View {
 
     /// Runs the lane without requiring strum input.
     var autoPlay: Bool
->>>>>>> chord-detection-feature
+
 
     // MARK: - ViewModel & State
 
@@ -68,12 +67,10 @@ struct PlayingSessionView: View {
         self.bpm           = safeBPM
         self.timeSignature = timeSignature
         self.duration      = duration
-<<<<<<< HEAD
-=======
+
         self.isFirstTime   = isFirstTime
         self.audioURL      = audioURL
         self.autoPlay      = autoPlay
->>>>>>> chord-detection-feature
         self._tutorialPauseStep = State(initialValue: isFirstTime ? 1 : 0)
         
         var processedChords = chords
@@ -299,15 +296,11 @@ struct PlayingSessionView: View {
                     .lineLimit(1)
                 }
                 Spacer()
-<<<<<<< HEAD
-                if(appState.isFirstTime) {
-                    Button {
-                        navRoot = .uploadSong
-=======
+
                 if isFirstTime {
                     Button {
                         appState = .uploadSong
->>>>>>> chord-detection-feature
+
                     } label: {
                         Text("Skip")
                             .font(AppFont.bodyBold)
@@ -583,12 +576,11 @@ extension PlayingSessionView {
                 Spacer()
                 Button {
                     vm.startGame()
-<<<<<<< HEAD
-=======
+
                     if tutorialPauseStep == 2 {
                         withAnimation { tutorialPauseStep = 0 }
                     }
->>>>>>> chord-detection-feature
+
                 } label: {
                     VStack {
                         Image.replay
@@ -601,7 +593,7 @@ extension PlayingSessionView {
                             .foregroundStyle(.textPrimaryWhite)
                     }
                 }
-<<<<<<< HEAD
+
                 Spacer()
                 Button {
                     dismiss()
@@ -617,8 +609,7 @@ extension PlayingSessionView {
                             .foregroundStyle(.textPrimaryWhite)
                     }
                 }
-=======
->>>>>>> chord-detection-feature
+
             }
             
             .frame(maxWidth: .infinity)

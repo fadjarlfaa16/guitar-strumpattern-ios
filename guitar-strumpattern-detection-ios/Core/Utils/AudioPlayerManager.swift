@@ -21,16 +21,13 @@ final class AudioPlayerManager: NSObject, ObservableObject {
     private var timeObserver: Any?
     private var displayLink: CADisplayLink?
     
-    private let updateInterval: TimeInterval = 0.016  // ~60 FPS
+    private let updateInterval: TimeInterval = 0.016  
     
     override init() {
         super.init()
-        // Jangan aktivasi audio session di sini — hanya saat play() dipanggil
     }
     
     deinit {
-        // Cleanup dipanggil secara eksplisit via stop() di onDisappear
-        // Tidak bisa panggil @MainActor method dari deinit
     }
     
     // MARK: - Setup

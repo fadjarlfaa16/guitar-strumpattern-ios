@@ -15,6 +15,7 @@ import SwiftUI
 struct StrummingPatternList: View {
     let patterns: [StrummingPattern]
     @Binding var selectedPatternID: UUID?
+    var onPatternTap: ((StrummingPattern) -> Void)? = nil
 
     var body: some View {
         VStack(spacing: Spacing.md) {
@@ -24,6 +25,7 @@ struct StrummingPatternList: View {
                     isSelected: selectedPatternID == pattern.id
                 ) {
                     selectedPatternID = pattern.id
+                    onPatternTap?(pattern)
                 }
             }
         }
@@ -36,7 +38,7 @@ struct StrummingPatternList: View {
     @Previewable @State var selectedID: UUID? = nil
 
     StrummingPatternList(
-        patterns: StrummingPattern.samples,
+        patterns: Array(StrumPatternLibrary.allPatterns().prefix(4)),
         selectedPatternID: $selectedID
     )
     .background(Color.backgroundPrimaryBlack)

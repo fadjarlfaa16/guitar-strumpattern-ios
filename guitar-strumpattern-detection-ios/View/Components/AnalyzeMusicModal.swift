@@ -190,8 +190,8 @@ struct AnalyzeMusicModal: View {
     private func runAnalysis() async {
         isAnalyzing = true
         analysisError = nil
-        progress = 0
-        analysisStage = "Analyzing BPM & Time Signature..."
+        withAnimation(.easeOut(duration: 0.3)) { progress = 0 }
+        analysisStage = "Validating audio file..."
 
         do {
             let audioURL = SongLibraryStore.audioDirectory.appendingPathComponent(song.sandboxFileName)
@@ -210,24 +210,53 @@ struct AnalyzeMusicModal: View {
                 )
             }
 
-            progress = 0.15
-            analysisStage = "Running full-song CQT & CoreML inference..."
+            withAnimation(.easeOut(duration: 0.3)) { progress = 0.04 }
+            analysisStage = "Starting analysis pipeline..."
 
-            // Pipeline berat di background thread — jangan blokir main thread / UI.
-            let result = try await withAnalysisTimeout(600) {
-                try await Task.detached(priority: .userInitiated) {
-                    try await ChordAnalyzer.shared.analyze(audioURL: audioURL)
-                }.value
+            // Buat AsyncStream sebagai jembatan antara background task (sync)
+            // dan main actor (SwiftUI). Setiap onProgress callback dari ChordAnalyzer
+            // di-yield ke stream, lalu dikonsumsi di main actor dengan animasi smooth.
+            var progressContinuation: AsyncStream<(Double, String)>.Continuation?
+            let progressStream = AsyncStream<(Double, String)> { cont in
+                progressContinuation = cont
+            }
+            let continuation = progressContinuation!
+
+            // Jalankan analisis di background thread
+            let analysisTask = Task.detached(priority: .userInitiated) {
+                let r = Result {
+                    try ChordAnalyzer.shared.analyze(audioURL: audioURL) { prog, stage in
+                        continuation.yield((prog, stage))
+                    }
+                }
+                continuation.finish()
+                return r
             }
 
-            progress = 0.8
+            // Timeout: cancel task jika terlalu lama
+            let timeoutTask = Task {
+                try? await Task.sleep(nanoseconds: 600 * 1_000_000_000)
+                analysisTask.cancel()
+                continuation.finish()
+            }
+
+            // Konsumsi progress update di main actor dengan animasi smooth
+            for await (prog, stage) in progressStream {
+                withAnimation(.easeInOut(duration: 0.5)) { progress = prog }
+                analysisStage = stage
+            }
+
+            timeoutTask.cancel()
+
+            // Ambil hasil dari background task
+            let result = try await analysisTask.value.get()
+
+            withAnimation(.easeInOut(duration: 0.4)) { progress = 0.97 }
             analysisStage = "Processing results..."
+            try await Task.sleep(nanoseconds: 200_000_000)
 
-            try await Task.sleep(nanoseconds: 300_000_000)
-
-            progress = 1.0
+            withAnimation(.easeOut(duration: 0.5)) { progress = 1.0 }
             analysisStage = "Complete!"
-
             try await Task.sleep(nanoseconds: 500_000_000)
 
             analysisResult = result
@@ -239,30 +268,6 @@ struct AnalyzeMusicModal: View {
         } catch {
             analysisError = getErrorMessage(error)
             isAnalyzing = false
-        }
-    }
-
-    private func withAnalysisTimeout<T>(
-        _ seconds: Int,
-        operation: @escaping () async throws -> T
-    ) async throws -> T {
-        try await withThrowingTaskGroup(of: T.self) { group in
-            group.addTask { try await operation() }
-            group.addTask {
-                try await Task.sleep(nanoseconds: UInt64(seconds) * 1_000_000_000)
-                throw NSError(
-                    domain: "AnalyzeMusicModal", code: -2,
-                    userInfo: [NSLocalizedDescriptionKey: "Analisis timeout setelah \(seconds)s. File mungkin terlalu panjang."]
-                )
-            }
-            if let result = try await group.next() {
-                group.cancelAll()
-                return result
-            }
-            throw NSError(
-                domain: "AnalyzeMusicModal", code: -3,
-                userInfo: [NSLocalizedDescriptionKey: "Analisis gagal."]
-            )
         }
     }
 

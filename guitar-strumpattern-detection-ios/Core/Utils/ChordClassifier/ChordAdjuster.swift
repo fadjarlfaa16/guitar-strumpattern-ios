@@ -20,23 +20,8 @@ enum ChordAdjuster {
 
         let quality = String(parts[1])
 
-        if quality.hasPrefix("min7") {
-            return "\(root)m7"
-        }
-        if quality.hasPrefix("maj7") {
-            return "\(root)maj7"
-        }
-        if quality == "7" || quality.hasPrefix("9") || quality.hasPrefix("11") || quality.hasPrefix("13") {
-            return "\(root)7"
-        }
         if quality.hasPrefix("min") {
             return "\(root)m"
-        }
-        if quality.hasPrefix("maj")
-            || quality.hasPrefix("sus")
-            || quality.hasPrefix("dim")
-            || quality.hasPrefix("aug") {
-            return root
         }
 
         return root

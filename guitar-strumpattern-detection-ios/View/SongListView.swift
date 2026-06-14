@@ -367,10 +367,15 @@ struct SongListView: View {
                !chordSegments.isEmpty {
                 let audioURL = SongLibraryStore.audioDirectory
                     .appendingPathComponent(stored.sandboxFileName)
+                let recommendedPatterns = StrumPatternLibrary.recommendations(
+                    bpm: bpm,
+                    timeSignature: timeSignature,
+                    chordSegments: chordSegments
+                )
                 ChooseStrummingPatternView(
                     bpm: bpm,
                     rhythm: timeSignature,
-                    patterns: StrummingPattern.samples,
+                    patterns: recommendedPatterns,
                     chordSegments: chordSegments,
                     audioURL: audioURL
                 )

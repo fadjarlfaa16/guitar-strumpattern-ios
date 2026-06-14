@@ -87,18 +87,21 @@ struct ChooseStrummingPatternView: View {
     private var patternList: some View {
         StrummingPatternList(
             patterns: patterns,
-            selectedPatternID: $selectedPatternID
+            selectedPatternID: $selectedPatternID,
+            onPatternTap: selectPattern
         )
         .padding(.top, Spacing.sm)
-        .onChange(of: selectedPatternID) { _, newID in
-            guard let newID,
-                  let pattern = patterns.first(where: { $0.id == newID })
-            else { return }
-            selectedPattern = pattern
-            onPatternSelected?(pattern)
-            navigateToSession = true
+        .onAppear {
+            selectedPatternID = nil
         }
         .padding(.top, Spacing.sm)
+    }
+
+    private func selectPattern(_ pattern: StrummingPattern) {
+        selectedPatternID = pattern.id
+        selectedPattern = pattern
+        onPatternSelected?(pattern)
+        navigateToSession = true
     }
 
     // MARK: - Decorative Background
@@ -147,7 +150,7 @@ private struct WaveShape: Shape {
         ChooseStrummingPatternView(
             bpm: 120,
             rhythm: "4/4",
-            patterns: StrummingPattern.samples,
+            patterns: Array(StrumPatternLibrary.allPatterns().prefix(4)),
             chordSegments: nil
         )
     }

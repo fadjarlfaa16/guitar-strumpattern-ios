@@ -2,6 +2,14 @@
 //  SongListFirstTimeView.swift
 //  guitar-strumpattern-detection-ios
 //
+//  Created by muhammad aqil zaki on 14/06/26.
+//
+
+
+//
+//  SongListFirstTimeView.swift
+//  guitar-strumpattern-detection-ios
+//
 
 import SwiftUI
 

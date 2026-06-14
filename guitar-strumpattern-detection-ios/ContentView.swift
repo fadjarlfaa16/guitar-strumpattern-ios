@@ -13,11 +13,14 @@ enum AppState: String {
 
 struct ContentView: View {
     @AppStorage("appState") private var appState: AppState = .onboarding
+    @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
 
     var body: some View {
         switch appState {
         case .onboarding:
-            OnboardingWelcome()
+            NavigationStack {
+                PrepareYourGuitarView()
+            }
         case .songList:
             NavigationStack {
                 SongListView()

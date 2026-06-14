@@ -83,6 +83,7 @@ struct PlayingSessionView: View {
             chords: processedChords, pattern: pattern,
             bpm: safeBPM, timeSignature: timeSignature, duration: duration
         )
+        
         _vm = StateObject(wrappedValue: RhythmGameViewModel(chordGroups: groups, bpm: safeBPM, autoPlay: autoPlay))
     }
 

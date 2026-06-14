@@ -9,6 +9,7 @@ struct GreatPageView: View {
     @AppStorage("appState") private var appState: AppState = .onboarding
     @Environment(SavedSong.self) private var savedSong
     var songListSample: [SongListItem] = []
+    @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
 
     var body: some View {
         ZStack {
@@ -39,9 +40,11 @@ struct GreatPageView: View {
                     onAddSong: {
                         savedSong.songs.append(contentsOf: SongListItem.samples)
                         appState = .songList
+                        isFirstLaunch = false
                     },
                     onSkip: {
                         appState = .songList
+                        isFirstLaunch = false
                     }
                 )
             }

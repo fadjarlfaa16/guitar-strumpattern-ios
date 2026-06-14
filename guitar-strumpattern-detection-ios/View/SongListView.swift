@@ -10,7 +10,6 @@ import AVFoundation
 struct SongListView: View {
     var onMenuTapped: ((SongListItem) -> Void)? = nil
     var onAddTapped: (() -> Void)? = nil
-    let isFirstTime: Bool = false
 
     @State private var searchText = ""
     @State private var showFilePicker = false
@@ -23,6 +22,7 @@ struct SongListView: View {
     @State private var showCalibrate = false
 
     @AppStorage("appState") private var appState: AppState = .songList
+    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @Environment(SavedSong.self) private var savedSong
 
     private var filteredItems: [SongListItem] {
@@ -63,14 +63,16 @@ struct SongListView: View {
             headerView
                 .padding(.horizontal, Spacing.xl)
                 .padding(.bottom, Spacing.md)
-
-            if savedSong.songs.isEmpty {
-                Spacer()
-                emptyStateView
-                Spacer()
-            } else if isFirstTime {
+            WatchStatusView()
+                .padding(.horizontal, Spacing.xl)
+                .padding(.bottom, Spacing.md)
+            if isFirstTime {
                 Spacer()
                 firstTimeView
+                Spacer()
+            } else if savedSong.songs.isEmpty {
+                Spacer()
+                emptyStateView
                 Spacer()
             } else {
                 songList
@@ -85,6 +87,7 @@ struct SongListView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
+                .disabled(isFirstTime)
             }
         }
         .sheet(isPresented: $showFilePicker) {
@@ -201,13 +204,13 @@ struct SongListView: View {
 
             Spacer()
 
-            Button {
-                showCalibrate = true
-            } label: {
-                Label("Kalibrasi", systemImage: "applewatch")
-                    .font(AppFont.bodyRegular)
-                    .foregroundStyle(.textPrimaryWhite)
-            }
+//            Button {
+//                showCalibrate = true
+//            } label: {
+//                Label("Kalibrasi", systemImage: "applewatch")
+//                    .font(AppFont.bodyRegular)
+//                    .foregroundStyle(.textPrimaryWhite)
+//            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

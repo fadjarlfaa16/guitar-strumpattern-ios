@@ -21,6 +21,7 @@ struct SongListView: View {
     @State private var deleteTarget: SongListItem? = nil
     @State private var showCalibrate = false
 
+
     @AppStorage("navRoot") private var navRoot: NavRoot = .songList
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @Environment(SavedSong.self) private var savedSong
@@ -75,6 +76,7 @@ struct SongListView: View {
                 emptyStateView
                 Spacer()
             } else {
+
                 songList
             }
         }
@@ -164,6 +166,7 @@ struct SongListView: View {
         .searchable(text: $searchText, prompt: "Search")
         .toolbar(.hidden, for: .navigationBar)
         .background(Color.bgPrimary)
+
         .navigationDestination(for: UUID.self) { songID in
             songDetailView(for: songID)
         }
@@ -399,6 +402,49 @@ struct SongListView: View {
 
 private struct AnalyzeTarget: Identifiable {
     let id: UUID
+}
+
+// MARK: - Edit Song Sheet
+struct EditSongSheet: View {
+    let initialSong: SongListItem
+    var onSave: (String, String) -> Void
+    var onCancel: () -> Void
+    
+    @State private var title: String
+    @State private var artist: String
+    
+    
+    init(initialSong: SongListItem, onSave: @escaping (String, String) -> Void, onCancel: @escaping () -> Void) {
+        self.initialSong = initialSong
+        self.onSave = onSave
+        self.onCancel = onCancel
+        _title = State(initialValue: initialSong.title)
+        _artist = State(initialValue: initialSong.artist)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(header: Text("Song Details")) {
+                    TextField("Title", text: $title)
+                    TextField("Artist", text: $artist)
+                }
+            }
+            .navigationTitle("Edit Song")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { onCancel() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        onSave(title, artist)
+                    }
+                }
+            }
+            .preferredColorScheme(.dark)
+        }
+    }
 }
 
 // MARK: - Preview

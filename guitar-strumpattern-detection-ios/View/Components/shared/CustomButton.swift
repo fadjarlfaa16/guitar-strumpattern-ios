@@ -16,11 +16,15 @@ struct CustomButton: View {
             action()
         } label: {
             Text(title)
+                .font(AppFont.headlineSemibold)
+                .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
+                .padding(.vertical, Spacing.md)
+                
         }
+
         .disabled(isDisabled)
-        .tint(Color.brandColorPrimaryPurple)
+        .tint(.brandColorPrimaryPurple2)
         .buttonStyle(.glassProminent)
     }
 }

@@ -114,8 +114,8 @@ struct PlayingSessionView: View {
 
                 ZStack(alignment: .top) {
                     rhythmLane
-                    
-                    if appState.isFirstTime && !vm.hasPassedFirstNote {
+
+                    if isFirstTime && !vm.hasPassedFirstNote {
                         Text("Let’s get started by strumming according to the arrow on the screen.")
                             .font(AppFont.bodyRegular)
                             .foregroundStyle(.textPrimaryWhite)
@@ -273,14 +273,7 @@ struct PlayingSessionView: View {
     // ──────────────────────────────────────────────────────────────────
 
     private var backgroundGradient: some View {
-        LinearGradient(
-            colors: [
-                .backgroundPrimaryBlack,
-                Color.init(hex: "282138"),
-            ],
-            startPoint: .bottom,
-            endPoint: .top
-        )
+                Color(hex: "170C2F")
         .ignoresSafeArea()
     }
 
@@ -291,16 +284,15 @@ struct PlayingSessionView: View {
     private var hudBar: some View {
         ZStack {
             // BPM + time signature badge
-            HStack(spacing: 8) {
-                Spacer()
+            HStack(spacing: Spacing.sm) {
                 HStack {
                     Image(systemName: "metronome.fill")
-                        .foregroundStyle(.brandColorAccentGreen)
-                        .font(.system(size: 12))
+                        .foregroundStyle(.textPrimaryWhite)
+                        .font(AppFont.bodyBold)
                 Text("\(bpm) BPM")
-                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(.brandColorAccentGreen)
-                Text("·").foregroundStyle(.brandColorAccentGreen.opacity(0.5))
+                        .font(AppFont.bodyBold)
+                    .foregroundStyle(.textPrimaryWhite)
+                Text("·").foregroundStyle(.textPrimaryWhite.opacity(0.5))
                 Text(timeSignature)
                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.brandColorAccentGreen.opacity(0.8))
@@ -309,6 +301,7 @@ struct PlayingSessionView: View {
                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.textPrimaryWhite.opacity(0.85))
                     .lineLimit(1)
+
                 }
                 Spacer()
 
@@ -403,12 +396,10 @@ struct PlayingSessionView: View {
     // MARK: Lane Background
 
     private func laneBackground(width: CGFloat, height: CGFloat) -> some View {
-        ZStack {
-            Rectangle().fill(Color.white.opacity(0.025))
-            Rectangle().fill(.textPrimaryWhite.opacity(0.3))
-        }
-        .frame(width: width, height: height)
-    }
+        Rectangle()
+               .fill(Color(hex: "9E9E9E").opacity(0.06))
+               .frame(width: width, height: height)
+       }
 
     // MARK: Hit Zone Line
 
@@ -685,5 +676,6 @@ struct StrumButtonStyle: ButtonStyle {
         duration: "0:10",
         isFirstTime: true
     )
+    .environment(Routes())
     
 }

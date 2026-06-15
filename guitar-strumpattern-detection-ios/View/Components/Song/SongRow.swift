@@ -136,8 +136,8 @@ struct SongRow: View {
         SongRow(item: SongListItem(
             bpm: 120,
             timeSignature: "4/4",
-            title: "Song title",
-            artist: "Artist",
+            title: "The World Is Ugly",
+            artist: "My Chemical Romance",
             scorePercent: 90
         ))
     }

@@ -72,10 +72,6 @@ struct ChooseStrummingPatternView: View {
                 .foregroundColor(.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            HStack(spacing: Spacing.lg) {
-                metadataLabel("BPM: \(bpm)")
-                metadataLabel("Rhythm: \(rhythm)")
-            }
         }
     }
 
@@ -133,6 +129,12 @@ struct ChooseStrummingPatternView: View {
         }
         .allowsHitTesting(false)
     }
+}
+
+func metadataLabel(_ text: String) -> some View {
+    Text(text)
+        .font(AppFont.bodyRegular)
+        .foregroundColor(.brandColorSecondaryPink)
 }
 
 #Preview {

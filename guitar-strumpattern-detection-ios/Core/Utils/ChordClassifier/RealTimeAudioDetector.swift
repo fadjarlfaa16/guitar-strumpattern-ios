@@ -57,6 +57,11 @@ final class RealTimeAudioDetector {
         }
         converter = nil
         targetFormat = nil
+
+        try? AVAudioSession.sharedInstance().setActive(
+            false,
+            options: .notifyOthersOnDeactivation
+        )
     }
 
     private func process(buffer: AVAudioPCMBuffer) {

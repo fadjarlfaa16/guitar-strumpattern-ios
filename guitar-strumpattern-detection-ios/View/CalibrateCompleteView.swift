@@ -9,59 +9,58 @@ import SwiftUI
 
 struct CalibrateCompleteView: View {
     @State private var navigateToTryWatchView = false
-    @State private var strumDirection: StrumBeat = .up
+    var onReset: () -> Void = {}
 
     var body: some View {
-        ZStack {
-            // Background
-            Color.backgroundPrimaryBlack
-                .ignoresSafeArea()
-            
-            // Main Content
-            VStack {
-                // Header Section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("You're all set")
-                        .font(AppFont.largeTitleBold)
-                        .foregroundStyle(.textPrimaryWhite)
-                    
-                    Text("Your watch is ready to go.")
-                        .font(AppFont.title3Regular)
-                        .foregroundColor(.textPrimaryWhite)
+        VStack {
+            // Header Section
+            VStack(alignment: .leading, spacing: 8) {
+                Text("You're all set")
+                    .font(AppFont.largeTitleBold)
+                    .foregroundStyle(.textPrimaryWhite)
+
+                Text("Your watch is ready to go.")
+                    .font(AppFont.title3Regular)
+                    .foregroundColor(.textPrimaryWhite)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Spacer()
+
+            Image(systemName: "checkmark.circle.fill")
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(.brandColorAccentGreen)
+                .frame(width: 200)
+                .fontWeight(.bold)
+                .symbolRenderingMode(.hierarchical)
+
+            Spacer()
+
+            VStack(spacing: 12) {
+                CustomButton(title: "Next") {
+                    navigateToTryWatchView = true
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Spacer()
-                
-                Image(systemName: "checkmark.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(.brandColorAccentGreen)
-                    .frame(width: 200)
-                    .fontWeight(.bold)
-                    .symbolRenderingMode(.hierarchical)
-                
-                
-                Spacer()
-                
-                // Next Button
-                VStack(spacing: 12) {
-                    // TODO: Buat kalau belum selesai disabled
-                    CustomButton(title: "Next") {
-                        navigateToTryWatchView = true
-                    }
-                }
-                .navigationDestination(isPresented: $navigateToTryWatchView) {
-                    TryDemoSongView()
+
+                Button(action: onReset) {
+                    Text("Reset")
+                        .font(AppFont.bodyRegular)
+                        .foregroundColor(.brandColorPrimaryPurple)
                 }
             }
-            .padding(.horizontal, 24)
+            .navigationDestination(isPresented: $navigateToTryWatchView) {
+                TryDemoSongView()
+            }
         }
     }
 }
 
 #Preview {
-    CalibrateCompleteView()
+    ZStack {
+        Color.backgroundPrimaryBlack.ignoresSafeArea()
+        CalibrateCompleteView()
+            .padding(.horizontal, 24)
+    }
 }
 
 

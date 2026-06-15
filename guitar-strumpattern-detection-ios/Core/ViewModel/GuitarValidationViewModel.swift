@@ -9,7 +9,7 @@ final class GuitarValidationViewModel: ObservableObject {
         case playing
     }
 
-    let receiver = WatchReceiver()
+    let receiver = WatchReceiver.shared
     let chordVM = RealTimeChordViewModel()
 
     @Published private(set) var phase: Phase = .calibration
@@ -28,7 +28,6 @@ final class GuitarValidationViewModel: ObservableObject {
             receiver.micBaseThreshold = thresholds.base
             receiver.micSpikeThreshold = thresholds.spike
             phase = .playing
-            enterPlayingPhase()
         }
 
         receiver.objectWillChange
@@ -83,6 +82,11 @@ final class GuitarValidationViewModel: ObservableObject {
 
     func recalibrate() {
         startCalibration()
+    }
+
+    func stop() {
+        chordVM.stopListening()
+        receiver.switchToChordAudioMode()
     }
 
     private func handleCalibrationUpdate(status: String, isCalibrating: Bool) {

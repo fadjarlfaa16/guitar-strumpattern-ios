@@ -96,6 +96,12 @@ class AudioMonitor: ObservableObject {
         audioRecorder?.stop()
         audioRecorder = nil
         isGateOpen = false
+        currentDecibels = -160.0
+
+        try? AVAudioSession.sharedInstance().setActive(
+            false,
+            options: .notifyOthersOnDeactivation
+        )
     }
     
     func isSoundDetected() -> Bool {

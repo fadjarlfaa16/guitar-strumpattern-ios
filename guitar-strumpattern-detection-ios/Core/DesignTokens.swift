@@ -107,4 +107,3 @@ extension Image {
     static let replay : Image = Image(systemName: "arrow.trianglehead.counterclockwise")
         .resizable()
 }
-

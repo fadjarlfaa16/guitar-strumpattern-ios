@@ -8,8 +8,12 @@
 import SwiftUI
 
 struct ArrowIcon: View {
-    var foregroundStyle: Color = .gray
     let direction: StrumBeat
+    var isCompleted: Bool = false
+    
+    private var foregroundStyle: Color {
+        isCompleted ? .brandColorAccentGreen : .gray
+    }
     
     var body: some View {
         Image(systemName: direction == .up ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
@@ -18,7 +22,7 @@ struct ArrowIcon: View {
             .fontWeight(.bold)
             .foregroundStyle(foregroundStyle)
             .symbolRenderingMode(.hierarchical)
-            .animation(.easeInOut(duration: 0.3), value: foregroundStyle)
+            .animation(.easeInOut(duration: 0.3), value: isCompleted)
     }
 }
 

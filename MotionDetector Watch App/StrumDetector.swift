@@ -239,7 +239,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
         WKInterfaceDevice.current().play(.success)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.calibrationStatusText = "Ready (Calibrated)"
+//            self.calibrationStatusText = "Ready (Calibrated)"
             self.currentWatchState = .waitingForSong
             self.syncCalibrationStateToiPhone()
         }

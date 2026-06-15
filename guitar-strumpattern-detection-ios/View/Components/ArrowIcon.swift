@@ -25,7 +25,7 @@ struct ArrowIcon: View {
             .animation(.easeInOut(duration: 0.3), value: isCompleted)
     }
 }
-
+//
 #Preview {
     ArrowIcon(direction: .up)
 }

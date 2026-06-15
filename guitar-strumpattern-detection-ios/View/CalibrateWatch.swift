@@ -69,8 +69,15 @@ struct CalibrateWatchView: View {
                     .scaledToFit()
                     .foregroundStyle(.brandColorAccentGreen)
                     .frame(width: 168)
-                        .fontWeight(.bold)
-                        .symbolRenderingMode(.hierarchical)
+                    .fontWeight(.bold)
+                    .symbolRenderingMode(.hierarchical)
+                    .scaleEffect(y: -1) // Membalik secara vertikal
+                    .scaleEffect(
+                            x: strumDirection == .up ? -1 : 1,
+                            y: strumDirection == .up ? 1 : -1
+                        )
+                        .animation(.easeInOut(duration: 0.3), value: strumDirection)
+                    
                     
                     VStack(spacing: Spacing.sm) {
                         Text(receiver.calibrationStatusText)
@@ -121,6 +128,6 @@ struct CalibrateWatchView: View {
     }
 }
 
-//#Preview {
-//    CalibrateWatchView()
-//}
+#Preview {
+    CalibrateWatchView()
+}

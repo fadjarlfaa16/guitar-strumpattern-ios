@@ -50,10 +50,6 @@ struct StrumBlock: View {
             .font(.system(size: 55).bold())
             .padding()
             .foregroundStyle(blockColor)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(.brandColorPrimaryPurple.opacity(0.35))
-            )
             .scaleEffect(noteState == .successState ? 1.12 : 1.0)
             .animation(.spring(response: 0.25, dampingFraction: 0.5), value: noteState)
     }

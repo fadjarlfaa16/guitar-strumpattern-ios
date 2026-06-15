@@ -8,7 +8,7 @@ import SwiftUI
 
 struct MusicPlayer: View {
     var body: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: Spacing.md) {
             Image(systemName: "play.circle.fill")
                 .foregroundColor(.brandColorPrimaryPurple)
                 .font(.system(size: 33))

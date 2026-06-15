@@ -56,7 +56,6 @@ struct CalibrateCompleteView: View {
                         bpm: 120,
                         rhythm: "4/4",
                         patterns: Array(StrumPatternLibrary.allPatterns().prefix(4)),
-                        isFirstTime: true
                     )
                 }
             }

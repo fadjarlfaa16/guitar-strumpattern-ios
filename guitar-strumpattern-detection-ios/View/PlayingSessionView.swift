@@ -50,6 +50,7 @@ struct PlayingSessionView: View {
     @AppStorage("appState") private var navRoot: NavRoot = .onboarding
     @State private var tutorialPauseStep: Int = 0
     @State private var lastWatchSyncTime: TimeInterval = 0
+    @Environment(AppState.self) private var appState
     @Environment(Routes.self) private var routes
 
     // MARK: - Init
@@ -706,6 +707,7 @@ struct StrumButtonStyle: ButtonStyle {
         bpm:           120,
         timeSignature: "4/4",
         duration: "0:10",
+      
     )
     .environment(Routes())
     

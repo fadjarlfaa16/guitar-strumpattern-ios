@@ -12,7 +12,8 @@ enum NavRoot: String {
 }
 
 struct ContentView: View {
-    @AppStorage("appState") private var appState: NavRoot = .onboarding
+    @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
+    @AppStorage("navRoot") private var appState: NavRoot = .onboarding
     @Environment(Routes.self) private var routes
 
     var body: some View {
@@ -20,7 +21,9 @@ struct ContentView: View {
         
         switch appState {
         case .onboarding:
-            OnboardingWelcome()
+            NavigationStack {
+                PrepareYourGuitarView()
+            }
         case .songList:
             NavigationStack(path: $routes.songLibraryRoute) {
                 SongListView()

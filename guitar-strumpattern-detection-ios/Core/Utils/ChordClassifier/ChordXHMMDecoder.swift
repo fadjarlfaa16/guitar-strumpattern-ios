@@ -60,6 +60,11 @@ final class ChordXHMMDecoder {
         let eleventhPtr   = floatPtr(eleventh)
         let thirteenthPtr = floatPtr(thirteenth)
 
+        // Guard: jika model tidak return float32, return nil daripada crash
+        guard let triadPtr, let bassPtr, let seventhPtr,
+              let ninthPtr, let eleventhPtr, let thirteenthPtr
+        else { return nil }
+
         let logFloor: Float = 1e-10
         let negInf: Float = -.greatestFiniteMagnitude
 
@@ -172,10 +177,11 @@ final class ChordXHMMDecoder {
         return nil
     }
 
-    private func floatPtr(_ array: MLMultiArray) -> UnsafePointer<Float> {
-        if array.dataType == .float32 {
-            return UnsafePointer(array.dataPointer.bindMemory(to: Float.self, capacity: array.count))
+    private func floatPtr(_ array: MLMultiArray) -> UnsafePointer<Float>? {
+        guard array.dataType == .float32 else {
+            print("[ChordXHMMDecoder] Expected float32 MLMultiArray, got \(array.dataType)")
+            return nil
         }
-        fatalError("ChordXHMMDecoder: expected float32 MLMultiArray")
+        return UnsafePointer(array.dataPointer.bindMemory(to: Float.self, capacity: array.count))
     }
 }

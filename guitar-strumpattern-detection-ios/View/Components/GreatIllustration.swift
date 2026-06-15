@@ -30,10 +30,6 @@ struct FileUploadIcon: View {
                 .frame(width: 72, height: 84)
                 .clipShape(FoldedCorner(cornerSize: 18))
 
-            // Segitiga lipatan di sudut kanan atas
-            Triangle()
-                .fill(Color.brandColorPrimaryPurple)
-                .frame(width: 18, height: 18)
 
             // Panah upload di tengah
             Image(systemName: "arrow.up")

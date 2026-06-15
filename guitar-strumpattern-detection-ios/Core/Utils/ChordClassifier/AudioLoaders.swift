@@ -9,17 +9,13 @@ import AVFoundation
 
 enum AudioLoader {
 
-    static let targetSampleRate: Double = 22050
+    nonisolated static let targetSampleRate: Double = 22050
 
-    static func load(url: URL) async throws -> [Float] {
-        try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                continuation.resume(with: Result { try AudioLoader.loadSync(url: url) })
-            }
-        }
+    nonisolated static func load(url: URL) throws -> [Float] {
+        try AudioLoader.loadSync(url: url)
     }
 
-    private static func loadSync(url: URL) throws -> [Float] {
+    private nonisolated static func loadSync(url: URL) throws -> [Float] {
         let sourceFile = try AVAudioFile(forReading: url)
         let sourceFmt  = sourceFile.processingFormat
 
@@ -43,7 +39,7 @@ enum AudioLoader {
             throw makeError("Could not allocate source PCM buffer (\(sourceFrameCount) frames).")
         }
         try sourceFile.read(into: sourceBuf)
-        sourceBuf.frameLength = sourceFrameCount
+
 
         let ratio = targetSampleRate / sourceFmt.sampleRate
         let outputCapacity = AVAudioFrameCount(Double(sourceFrameCount) * ratio) + 512
@@ -52,16 +48,10 @@ enum AudioLoader {
         }
 
         var conversionError: NSError?
-        var sourceConsumed = false
+        let inputState = AudioConverterInputState(buffer: sourceBuf)
 
         let inputBlock: AVAudioConverterInputBlock = { _, outStatus in
-            if sourceConsumed {
-                outStatus.pointee = .noDataNow
-                return nil
-            }
-            outStatus.pointee = .haveData
-            sourceConsumed = true
-            return sourceBuf
+            inputState.nextBuffer(outStatus: outStatus)
         }
 
         let status = converter.convert(to: outputBuf, error: &conversionError, withInputFrom: inputBlock)
@@ -75,8 +65,31 @@ enum AudioLoader {
         return Array(UnsafeBufferPointer(start: channelData[0], count: frameLength))
     }
 
-    private static func makeError(_ msg: String) -> NSError {
+    private nonisolated static func makeError(_ msg: String) -> NSError {
         NSError(domain: "AudioLoader", code: -1, userInfo: [NSLocalizedDescriptionKey: msg])
     }
 }
 
+private final class AudioConverterInputState: @unchecked Sendable {
+    private let buffer: AVAudioPCMBuffer
+    private let lock = NSLock()
+    private var consumed = false
+
+    init(buffer: AVAudioPCMBuffer) {
+        self.buffer = buffer
+    }
+
+    func nextBuffer(outStatus: UnsafeMutablePointer<AVAudioConverterInputStatus>) -> AVAudioBuffer? {
+        lock.lock()
+        defer { lock.unlock() }
+
+        if consumed {
+            outStatus.pointee = .endOfStream
+            return nil
+        }
+
+        consumed = true
+        outStatus.pointee = .haveData
+        return buffer
+    }
+}

@@ -9,8 +9,8 @@ import SwiftUI
 
 
 struct PrepareYourGuitarView: View {
-    @State private var navigateToChoosePattern = false
-    @AppStorage("appState") private var navRoot: NavRoot = .onboarding
+    @State private var navigateToWatchCheck = false
+    @AppStorage("navRoot") private var navRoot: NavRoot = .songList
 
     var body: some View {
         ZStack {
@@ -37,7 +37,12 @@ struct PrepareYourGuitarView: View {
                 // Next Button
                 VStack(spacing: Spacing.sm) {
                     CustomButton(title: "Next") {
-                        navigateToChoosePattern = true
+                        navigateToWatchCheck = true
+                    }
+                    .navigationDestination(isPresented: $navigateToWatchCheck) {
+                        AppleWatchCheckView(
+                            isWatchConnected: true
+                        )
                     }
                     Button(action: {
                         navRoot = .songList
@@ -47,20 +52,11 @@ struct PrepareYourGuitarView: View {
                             .foregroundColor(.brandColorPrimaryPurple)
                     }
                 }
-                .navigationDestination(isPresented: $navigateToChoosePattern) {
-                    ChooseStrummingPatternView(
-                        bpm: 120,
-                        rhythm: "4/4",
-                        patterns: StrummingPattern.samples,
-                        isFirstTime: true
-                    )
                 }
+            .padding(.horizontal, 24)
             }
-            .padding(.horizontal, Spacing.xl)
-            .padding(.bottom, Spacing.sm)
         }
     }
-}
 
 // MARK: - Decorative Background Lines
 struct PrepareGuitarBackgroundLines: View {

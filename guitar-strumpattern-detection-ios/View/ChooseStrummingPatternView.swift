@@ -10,7 +10,9 @@ struct ChooseStrummingPatternView: View {
     let bpm: Int
     let rhythm: String
     let patterns: [StrummingPattern]
-    var isFirstTime: Bool = false
+    var chordSegments: [StoredChordSegment]? = nil
+    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
+    var audioURL: URL?
     var onPatternSelected: ((StrummingPattern) -> Void)? = nil
     @State private var selectedPatternID: UUID? = nil
     @State private var selectedPattern: StrummingPattern? = nil
@@ -38,11 +40,21 @@ struct ChooseStrummingPatternView: View {
         }
         .navigationDestination(isPresented: $navigateToSession) {
             let beats = selectedPattern?.beats ?? []
+            let chords = chordSegments?.map { segment in
+                ChordSegment(
+                    startTime: segment.startTime,
+                    endTime: segment.endTime,
+                    label: segment.label
+                )
+            } ?? ChordGroup.sampleSegments
+            
             PlayingSessionView(
+                chords: chords,
                 pattern: beats.isEmpty ? ChordGroup.samplePattern : beats,
                 bpm: bpm,
                 timeSignature: rhythm,
-                isFirstTime: isFirstTime
+                audioURL: audioURL,
+                patternNotation: selectedPattern?.notation
             )
         }
     }
@@ -59,6 +71,11 @@ struct ChooseStrummingPatternView: View {
                 .font(AppFont.bodyRegular)
                 .foregroundColor(.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: Spacing.lg) {
+                metadataLabel("BPM: \(bpm)")
+                metadataLabel("Rhythm: \(rhythm)")
+            }
         }
     }
 
@@ -69,16 +86,21 @@ struct ChooseStrummingPatternView: View {
         StrummingPatternList(
             bpm: bpm, rhythm: rhythm,
             patterns: patterns,
-            selectedPatternID: $selectedPatternID
+            selectedPatternID: $selectedPatternID,
+            onPatternTap: selectPattern
         )
-        .onChange(of: selectedPatternID) { _, newID in
-            guard let newID,
-                  let pattern = patterns.first(where: { $0.id == newID })
-            else { return }
-            selectedPattern = pattern
-            onPatternSelected?(pattern)
-            navigateToSession = true
+
+        .padding(.top, Spacing.sm)
+        .onAppear {
+            selectedPatternID = nil
         }
+    }
+
+    private func selectPattern(_ pattern: StrummingPattern) {
+        selectedPatternID = pattern.id
+        selectedPattern = pattern
+        onPatternSelected?(pattern)
+        navigateToSession = true
     }
 
     // MARK: - Decorative Background
@@ -118,7 +140,8 @@ struct ChooseStrummingPatternView: View {
         ChooseStrummingPatternView(
             bpm: 120,
             rhythm: "4/4",
-            patterns: StrummingPattern.samples
+            patterns: Array(StrumPatternLibrary.allPatterns().prefix(4)),
+            chordSegments: nil
         )
     }
 }

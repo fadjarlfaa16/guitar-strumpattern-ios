@@ -34,6 +34,7 @@ class RhythmGameViewModel: ObservableObject {
     // MARK: Configuration
     var bpm: Int
     private(set) var chordGroups: [ChordGroup]
+    private let autoPlay: Bool
 
     // MARK: Layout Constants
     /// How many seconds before its hit time a note appears at the right edge.
@@ -60,10 +61,17 @@ class RhythmGameViewModel: ObservableObject {
     /// Groups waiting to be spawned, sorted by startTime ascending.
     private var pendingGroups:     [ChordGroup]       = []
     private var feedbackResetTask: Task<Void, Never>? = nil
+    /// Optional audio player for timing sync
+    var audioPlayer: AudioPlayerManager?
+    /// Flag untuk track jika timing dari audio atau local timer
+    private var useAudioTiming: Bool = false
+    
+    private var cancellables: Set<AnyCancellable> = []
 
-    init(chordGroups: [ChordGroup]? = nil, bpm: Int = 120) {
-        self.chordGroups = chordGroups ?? ChordGroup.sampleGroups
+    init(chordGroups: [ChordGroup] = ChordGroup.sampleGroups, bpm: Int = 120, autoPlay: Bool = false) {
+        self.chordGroups = chordGroups
         self.bpm         = bpm
+        self.autoPlay    = autoPlay
     }
 
     // MARK: - Game Control
@@ -71,16 +79,27 @@ class RhythmGameViewModel: ObservableObject {
     func startGame() {
         reset()
         pendingGroups = chordGroups.sorted { $0.startTime < $1.startTime }
-        startDate     = Date()
-        isPlaying     = true
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in self?.tick() }
+        
+        // Setup audio timing if available
+        if let audioPlayer = audioPlayer {
+            useAudioTiming = true
+            setupAudioTimeObserver()
+            audioPlayer.play()
+        } else {
+            // Fallback ke local timer
+            useAudioTiming = false
+            startDate = Date()
+            startLocalTimer()
         }
+        
+        isPlaying = true
     }
 
     func stopGame() {
         timer?.invalidate()
         timer = nil
+        audioPlayer?.stop()
+        cancellables.removeAll()
         isPlaying = false
     }
 
@@ -105,6 +124,7 @@ class RhythmGameViewModel: ObservableObject {
         pausedTime = currentTime
         timer?.invalidate()
         timer = nil
+        audioPlayer?.pause()
     }
 
     func resumeGame() {
@@ -115,21 +135,59 @@ class RhythmGameViewModel: ObservableObject {
         // It will restart naturally when they strum correctly in onAction().
         if isPausedForInput { return }
         
-        // Recalculate startDate so currentTime picks up where it left off
-        startDate = Date().addingTimeInterval(-pausedTime)
+        if useAudioTiming {
+            audioPlayer?.resume()
+        } else {
+            // Recalculate startDate so currentTime picks up where it left off
+            startDate = Date().addingTimeInterval(-pausedTime)
+            startLocalTimer()
+        }
+    }
+    
+    // MARK: - Private Timer Methods
+    
+    private func startLocalTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in self?.tick() }
         }
+    }
+    
+    private func setupAudioTimeObserver() {
+        guard let audioPlayer = audioPlayer else { return }
+        
+        // Subscribe to audio player's currentTime updates
+        audioPlayer.$currentTime
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] time in
+                self?.currentTime = time
+                self?.tick()
+            }
+            .store(in: &cancellables)
+        
+        // Monitor isPlaying
+        audioPlayer.$isPlaying
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isPlaying in
+                if !isPlaying && self?.isPlaying == true && self?.isPaused == false {
+                    // Audio finished
+                    self?.tick()
+                }
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Game Loop
 
     private func tick() {
-        guard let startDate else { return }
-        currentTime = Date().timeIntervalSince(startDate)
+        // Saat audio timing: currentTime sudah di-set oleh Combine subscriber sebelum tick() dipanggil
+        // Saat local timer: hitung dari startDate
+        if !useAudioTiming {
+            guard let startDate else { return }
+            currentTime = Date().timeIntervalSince(startDate)
+        }
 
         // ── Auto Pause on Miss ──
-        if !isPausedForInput {
+        if !autoPlay && !isPausedForInput {
             // Find the earliest unhit note
             let unhitNotes = activeNotes.filter { !$0.isHit && !$0.isExpired }
             if let earliest = unhitNotes.min(by: { $0.input.time < $1.input.time }) {
@@ -140,8 +198,19 @@ class RhythmGameViewModel: ObservableObject {
                     pausedTime = currentTime
                     timer?.invalidate()
                     timer = nil
+                    audioPlayer?.pause() // pause audio saat note terlewat
                     return // pause the game visually and mechanically
                 }
+            }
+        }
+
+        if autoPlay {
+            for idx in activeNotes.indices {
+                guard !activeNotes[idx].isExpired,
+                      currentTime >= activeNotes[idx].input.time else { continue }
+                activeNotes[idx].isHit = true
+                activeNotes[idx].isExpired = true
+                if !hasPassedFirstNote { hasPassedFirstNote = true }
             }
         }
 
@@ -214,9 +283,11 @@ class RhythmGameViewModel: ObservableObject {
                 if !hasPassedFirstNote { hasPassedFirstNote = true }
                 
                 isPausedForInput = false
-                startDate = Date().addingTimeInterval(-pausedTime)
-                timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
-                    Task { @MainActor [weak self] in self?.tick() }
+                if useAudioTiming {
+                    audioPlayer?.resume() // resume audio saat strum benar
+                } else {
+                    startDate = Date().addingTimeInterval(-pausedTime)
+                    startLocalTimer()
                 }
             }
             // If wrong strum while paused, do nothing (stay paused)

@@ -17,12 +17,12 @@ struct StrummingPatternButton: View {
         } label: {
             Text(label)
                 .font(AppFont.headlineSemibold)
-                .foregroundColor(isSelected ? .black : .textPrimaryWhite)
+                .foregroundColor(.textPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.lg)
                 .background(
                     Capsule()
-                        .fill(isSelected ? Color.accentGreen : Color.brandColorPrimaryPurple2)
+                        .fill(isSelected ? Color.brandColorSecondaryPink : Color.accentPurple)
                 )
         }
         .buttonStyle(.plain)

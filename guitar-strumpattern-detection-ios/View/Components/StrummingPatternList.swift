@@ -17,12 +17,14 @@ struct StrummingPatternList: View {
     let rhythm: String
     let patterns: [StrummingPattern]
     @Binding var selectedPatternID: UUID?
+    var onPatternTap: ((StrummingPattern) -> Void)? = nil
 
     private func metadataLabel(_ text: String) -> some View {
         Text(text)
             .font(AppFont.bodyRegular)
             .foregroundColor(.brandColorSecondaryPink)
     }
+    
     var body: some View {
         VStack(spacing: Spacing.lg) {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.lg) {
@@ -39,6 +41,7 @@ struct StrummingPatternList: View {
                     isSelected: selectedPatternID == pattern.id
                 ) {
                     selectedPatternID = pattern.id
+                    onPatternTap?(pattern)
                 }
             }
         }
@@ -49,9 +52,10 @@ struct StrummingPatternList: View {
 // MARK: - Preview
 #Preview {
     @Previewable @State var selectedID: UUID? = nil
-
-    StrummingPatternList(bpm: 120, rhythm:"4/4",  
-        patterns: StrummingPattern.samples,
+    StrummingPatternList(
+        bpm: 120,
+        rhythm: "4/4",
+        patterns: Array(StrumPatternLibrary.allPatterns().prefix(4)),
         selectedPatternID: $selectedID
     )
     .background(Color.backgroundPrimaryBlack)

@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PrepareYourGuitarView: View {
     @State private var navigateToWatchCheck = false
-    @AppStorage("appState") private var appState: AppState = .songList
+    @AppStorage("navRoot") private var navRoot: NavRoot = .songList
 
     var body: some View {
         ZStack {
@@ -54,7 +54,7 @@ struct PrepareYourGuitarView: View {
                         )
                     }
                     Button(action: {
-                        appState = .songList
+                        navRoot = .songList
                     }) {
                         Text("Skip for Now")
                             .font(AppFont.bodyRegular)

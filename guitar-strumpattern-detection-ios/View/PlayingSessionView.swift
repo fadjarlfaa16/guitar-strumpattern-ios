@@ -33,6 +33,7 @@ struct PlayingSessionView: View {
 
     /// Runs the lane without requiring strum input.
     var autoPlay: Bool
+    
 
     // MARK: - ViewModel & State
 
@@ -40,9 +41,10 @@ struct PlayingSessionView: View {
     @StateObject private var audioPlayer = AudioPlayerManager()
     @StateObject private var strumValidator = StrumInputValidator()
     @State private var screenWidth: CGFloat = 0
-    @AppStorage("appState") private var appState: AppState = .onboarding
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
+    @AppStorage("navRoot") private var navRoot: NavRoot = .onboarding
     @State private var tutorialPauseStep: Int = 0
+    @Environment(Routes.self) private var routes
 
     // MARK: - Init
     init(
@@ -51,7 +53,6 @@ struct PlayingSessionView: View {
         bpm:           Int            = 120,
         timeSignature: String         = ChordGroup.sampleTimeSignature,
         duration:      String?        = nil,
-        isFirstTime:   Bool           = false,
         audioURL:      URL?           = nil,
         autoPlay:      Bool           = false,
         patternNotation: String?      = nil
@@ -311,7 +312,7 @@ struct PlayingSessionView: View {
                 Spacer()
                 if isFirstTime {
                     Button {
-                        appState = .uploadSong
+                        navRoot = .uploadSong
                     } label: {
                         Text("Skip")
                             .font(AppFont.bodyBold)
@@ -530,8 +531,14 @@ struct PlayingSessionView: View {
                     }
                     .buttonStyle(StrumButtonStyle())
 
-                    Button { 
-                        appState = .uploadSong
+                    Button {
+                        if(isFirstTime) {
+                            navRoot = .uploadSong
+                            print("isFirstTime")
+                        } else {
+                            routes.songLibraryRoute = NavigationPath()
+                            print(navRoot.rawValue)
+                        }
                     } label: {
                         VStack(spacing: 8) {
                             Image(systemName: "arrow.right").font(.system(size: 24, weight: .bold))
@@ -565,7 +572,7 @@ extension PlayingSessionView {
             
             HStack {
                 Button {
-                    dismiss()
+                    routes.songLibraryRoute = NavigationPath()
                 } label: {
                     VStack {
                         Image.arrowBackward
@@ -592,6 +599,21 @@ extension PlayingSessionView {
                             .frame(height: 24)
                             .foregroundStyle(.textPrimaryWhite)
                         Text("Replay")
+                            .font(.caption)
+                            .foregroundStyle(.textPrimaryWhite)
+                    }
+                }
+                Spacer()
+                Button {
+                    dismiss()
+                } label: {
+                    VStack {
+                        Image.musicnotelist
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 24)
+                            .foregroundStyle(.textPrimaryWhite)
+                        Text("Change Pattern")
                             .font(.caption)
                             .foregroundStyle(.textPrimaryWhite)
                     }
@@ -654,7 +676,6 @@ struct StrumButtonStyle: ButtonStyle {
         bpm:           120,
         timeSignature: "4/4",
         duration: "0:10",
-        isFirstTime: true
     )
     
 }

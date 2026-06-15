@@ -21,7 +21,7 @@ struct SongListView: View {
     @State private var deleteTarget: SongListItem? = nil
     @State private var showCalibrate = false
 
-    @AppStorage("appState") private var appState: AppState = .songList
+    @AppStorage("navRoot") private var navRoot: NavRoot = .songList
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @Environment(SavedSong.self) private var savedSong
 
@@ -250,7 +250,7 @@ struct SongListView: View {
                 .padding(.top, Spacing.xs)
 
             CustomButton(title: "Do Tutorial") {
-                appState = .onboarding
+                navRoot = .onboarding
             }
             .padding(.horizontal, Spacing.xxl)
             .padding(.top, Spacing.sm)
@@ -414,6 +414,5 @@ private struct AnalyzeTarget: Identifiable {
 #Preview {
     NavigationStack {
         SongListView()
-            .environment(SavedSong())
     }
 }

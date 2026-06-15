@@ -11,7 +11,6 @@ struct SongListView: View {
     var onMenuTapped: ((SongListItem) -> Void)? = nil
     var onAddTapped: (() -> Void)? = nil
 
-    // MARK: - State
     @State private var searchText = ""
     @State private var showFilePicker = false
     @State private var uploadError: String? = nil
@@ -22,12 +21,9 @@ struct SongListView: View {
     @State private var deleteTarget: SongListItem? = nil
     @State private var showCalibrate = false
 
-
-    @AppStorage("appState") private var appState: AppState = .songList
+    @AppStorage("navRoot") private var navRoot: NavRoot = .songList
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @Environment(SavedSong.self) private var savedSong
-
-    // MARK: - Filtered Items
 
     private var filteredItems: [SongListItem] {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -39,27 +35,32 @@ struct SongListView: View {
         }
     }
 
-    // MARK: - Alert Bindings
-
     private var editAlertBinding: Binding<Bool> {
         Binding(
             get: { editTarget != nil },
-            set: { if !$0 { editTarget = nil; editTitle = "" } }
+            set: { isPresented in
+                if !isPresented {
+                    editTarget = nil
+                    editTitle = ""
+                }
+            }
         )
     }
 
     private var deleteAlertBinding: Binding<Bool> {
         Binding(
             get: { deleteTarget != nil },
-            set: { if !$0 { deleteTarget = nil } }
+            set: { isPresented in
+                if !isPresented {
+                    deleteTarget = nil
+                }
+            }
         )
     }
 
-    // MARK: - Body
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            SongListHeader(onCalibrateTapped: { showCalibrate = true })
+            headerView
                 .padding(.horizontal, Spacing.xl)
                 .padding(.bottom, Spacing.md)
             WatchStatusView()
@@ -71,24 +72,19 @@ struct SongListView: View {
                 Spacer()
             } else if savedSong.songs.isEmpty {
                 Spacer()
-
                 emptyStateView
                 Spacer()
             } else {
-                SongListContent(
-                    items: filteredItems,
-                    onMenuTapped: onMenuTapped,
-                    onEditTapped: { openEditSong(for: $0) },
-                    onDeleteTapped: { openDeleteSong(for: $0) },
-                    onAnalyzeTapped: { openAnalysis(for: $0.id) }
-                )
+                songList
             }
         }
         .toolbar {
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
-                Button { showFilePicker = true } label: {
+                Button {
+                    showFilePicker = true
+                } label: {
                     Image(systemName: "plus")
                 }
                 .disabled(isFirstTime)
@@ -105,24 +101,39 @@ struct SongListView: View {
             }
         }
         .alert("Upload Error", isPresented: $showUploadError) {
-            Button("OK") { uploadError = nil; showUploadError = false }
+            Button("OK") {
+                uploadError = nil
+                showUploadError = false
+            }
         } message: {
-            if let error = uploadError { Text(error) }
+            if let error = uploadError {
+                Text(error)
+            }
         }
         .alert("Edit Song Name", isPresented: editAlertBinding) {
             TextField("Song name", text: $editTitle)
-            Button("Cancel", role: .cancel) { editTarget = nil; editTitle = "" }
+            Button("Cancel", role: .cancel) {
+                editTarget = nil
+                editTitle = ""
+            }
             Button("Save") {
-                if let editTarget { savedSong.renameSong(id: editTarget.id, title: editTitle) }
-                editTarget = nil; editTitle = ""
+                if let editTarget {
+                    savedSong.renameSong(id: editTarget.id, title: editTitle)
+                }
+                editTarget = nil
+                editTitle = ""
             }
         } message: {
             Text("Update the title shown in your song library.")
         }
         .alert("Delete Song?", isPresented: deleteAlertBinding) {
-            Button("Cancel", role: .cancel) { deleteTarget = nil }
+            Button("Cancel", role: .cancel) {
+                deleteTarget = nil
+            }
             Button("Delete", role: .destructive) {
-                if let deleteTarget { savedSong.deleteSong(id: deleteTarget.id) }
+                if let deleteTarget {
+                    savedSong.deleteSong(id: deleteTarget.id)
+                }
                 deleteTarget = nil
             }
         } message: {
@@ -144,7 +155,9 @@ struct SongListView: View {
                             savedSong.loadFromStorage()
                         }
                     },
-                    onDismiss: { analyzeTarget = nil }
+                    onDismiss: {
+                        analyzeTarget = nil
+                    }
                 )
             }
         }
@@ -237,7 +250,7 @@ struct SongListView: View {
                 .padding(.top, Spacing.xs)
 
             CustomButton(title: "Do Tutorial") {
-                appState = .onboarding
+                navRoot = .onboarding
             }
             .padding(.horizontal, Spacing.xxl)
             .padding(.top, Spacing.sm)
@@ -266,8 +279,6 @@ struct SongListView: View {
         item.title.isEmpty ? "Untitled" : item.title
     }
 
-    // MARK: - Audio Upload
-
     @MainActor
     private func performAudioUpload(_ pickedURL: URL) async -> UUID? {
         uploadError = nil
@@ -278,19 +289,33 @@ struct SongListView: View {
         let sandboxFileName = "\(UUID().uuidString).\(ext)"
         let destination = SongLibraryStore.audioDirectory.appendingPathComponent(sandboxFileName)
 
+        UploadLogger.log("Target sandbox: \(destination.path)")
+
         let didStartAccessing = pickedURL.startAccessingSecurityScopedResource()
-        defer { if didStartAccessing { pickedURL.stopAccessingSecurityScopedResource() } }
+        UploadLogger.log("Security-scoped access: \(didStartAccessing ? "granted" : "not needed/failed")")
+        defer {
+            if didStartAccessing {
+                pickedURL.stopAccessingSecurityScopedResource()
+                UploadLogger.log("Security-scoped access released")
+            }
+        }
 
         do {
+            UploadLogger.log("copyItem mulai…")
             try FileManager.default.copyItem(at: pickedURL, to: destination)
+            let size = (try? FileManager.default.attributesOfItem(atPath: destination.path)[.size] as? Int64) ?? 0
+            UploadLogger.log("copyItem berhasil — \(size) bytes")
         } catch {
+            UploadLogger.error("copyItem gagal", error: error)
             uploadError = "Gagal menyalin file: \(error.localizedDescription)"
             showUploadError = true
             return nil
         }
 
         let audioURL = SongLibraryStore.audioDirectory.appendingPathComponent(sandboxFileName)
+        UploadLogger.log("Membaca durasi audio (timeout 8s)…")
         let duration = await loadAudioDuration(url: audioURL, timeoutSeconds: 8)
+        UploadLogger.log("Durasi: \(duration)s")
 
         let newSong = Song(
             title: filename,
@@ -298,59 +323,87 @@ struct SongListView: View {
             sandboxFileName: sandboxFileName,
             duration: duration
         )
+
         savedSong.addSong(newSong)
+        UploadLogger.log("Upload sukses — lagu '\(filename)' ada di library, lanjut analisis")
         return newSong.id
     }
 
+    /// AVURLAsset.load(.duration) bisa hang pada beberapa format — pakai timeout.
     private func loadAudioDuration(url: URL, timeoutSeconds: Int) async -> TimeInterval {
-        enum R { case value(TimeInterval), timeout, failed(Error) }
-        let result = await withTaskGroup(of: R.self) { group in
+        enum DurationResult {
+            case value(TimeInterval)
+            case timeout
+            case failed(Error)
+        }
+
+        let result = await withTaskGroup(of: DurationResult.self) { group in
             group.addTask {
-                do { return .value(try await AVURLAsset(url: url).load(.duration).seconds) }
-                catch { return .failed(error) }
+                do {
+                    let seconds = try await AVURLAsset(url: url).load(.duration).seconds
+                    return .value(seconds)
+                } catch {
+                    return .failed(error)
+                }
             }
             group.addTask {
                 try? await Task.sleep(nanoseconds: UInt64(timeoutSeconds) * 1_000_000_000)
                 return .timeout
             }
+
             let first = await group.next() ?? .timeout
             group.cancelAll()
             return first
         }
+
         switch result {
-        case .value(let s) where s.isFinite && s >= 0: return s
-        default: return 0
+        case .value(let seconds):
+            guard seconds.isFinite, seconds >= 0 else {
+                UploadLogger.log("Durasi tidak valid, pakai 0")
+                return 0
+            }
+            return seconds
+        case .timeout:
+            UploadLogger.log("Durasi timeout setelah \(timeoutSeconds)s — pakai 0")
+            return 0
+        case .failed(let error):
+            UploadLogger.error("Durasi gagal dibaca", error: error)
+            return 0
         }
     }
 
-    // MARK: - Song Detail
-
     @ViewBuilder
     private func songDetailView(for songID: UUID) -> some View {
-        if let stored = SongLibraryStore.shared.load().first(where: { $0.id == songID }),
-           let bpm = stored.bpm, bpm > 0,
-           let timeSignature = stored.timeSignature,
-           let chordSegments = stored.chordSegments, !chordSegments.isEmpty {
-            let audioURL = SongLibraryStore.audioDirectory.appendingPathComponent(stored.sandboxFileName)
-            let recommendedPatterns = StrumPatternLibrary.recommendations(
-                bpm: bpm, timeSignature: timeSignature, chordSegments: chordSegments
-            )
-            ChooseStrummingPatternView(
-                bpm: bpm,
-                rhythm: timeSignature,
-                patterns: recommendedPatterns,
-                chordSegments: chordSegments,
-                audioURL: audioURL
-            )
-        } else if SongLibraryStore.shared.load().first(where: { $0.id == songID }) != nil {
-            ContentUnavailableView("Analyze Song First", systemImage: "waveform.circle")
+        if let stored = SongLibraryStore.shared.load().first(where: { $0.id == songID }) {
+            if let bpm = stored.bpm,
+               bpm > 0,
+               let timeSignature = stored.timeSignature,
+               let chordSegments = stored.chordSegments,
+               !chordSegments.isEmpty {
+                let audioURL = SongLibraryStore.audioDirectory
+                    .appendingPathComponent(stored.sandboxFileName)
+                let recommendedPatterns = StrumPatternLibrary.recommendations(
+                    bpm: bpm,
+                    timeSignature: timeSignature,
+                    chordSegments: chordSegments
+                )
+                ChooseStrummingPatternView(
+                    bpm: bpm,
+                    rhythm: timeSignature,
+                    patterns: recommendedPatterns,
+                    chordSegments: chordSegments,
+                    audioURL: audioURL
+                )
+            } else {
+                ContentUnavailableView("Analyze Song First", systemImage: "waveform.circle")
+            }
         } else {
             ContentUnavailableView("Song Not Found", systemImage: "music.note.list")
         }
     }
 }
 
-// MARK: - Analyze Target
+// MARK: - Analyze Target (ringan untuk fullScreenCover)
 
 private struct AnalyzeTarget: Identifiable {
     let id: UUID
@@ -361,6 +414,5 @@ private struct AnalyzeTarget: Identifiable {
 #Preview {
     NavigationStack {
         SongListView()
-            .environment(SavedSong())
     }
 }

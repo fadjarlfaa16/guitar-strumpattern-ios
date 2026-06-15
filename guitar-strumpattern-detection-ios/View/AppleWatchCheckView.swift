@@ -10,7 +10,7 @@ import SwiftUI
 
 struct AppleWatchCheckView: View {
     @State private var navigateToCalibrateWatch = false
-    @AppStorage("appState") private var appState: AppState = .onboarding
+    @AppStorage("appState") private var appState: NavRoot = .onboarding
     let isWatchConnected: Bool
 
     var body: some View {

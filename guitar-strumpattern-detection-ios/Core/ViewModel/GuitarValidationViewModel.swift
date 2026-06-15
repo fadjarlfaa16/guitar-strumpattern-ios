@@ -9,7 +9,7 @@ final class GuitarValidationViewModel: ObservableObject {
         case playing
     }
 
-    let receiver = WatchReceiver()
+    let receiver = WatchReceiver.shared
     let chordVM = RealTimeChordViewModel()
 
     @Published private(set) var phase: Phase = .calibration

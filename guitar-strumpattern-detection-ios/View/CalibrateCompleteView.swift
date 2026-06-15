@@ -8,7 +8,7 @@ import SwiftUI
 
 
 struct CalibrateCompleteView: View {
-    @State private var navigateToWatchCheck = false
+    @State private var navigateToTryWatchView = false
     @State private var strumDirection: StrumBeat = .up
 
     var body: some View {
@@ -48,16 +48,11 @@ struct CalibrateCompleteView: View {
                 VStack(spacing: 12) {
                     // TODO: Buat kalau belum selesai disabled
                     CustomButton(title: "Next") {
-                        navigateToWatchCheck = true
+                        navigateToTryWatchView = true
                     }
                 }
-                .navigationDestination(isPresented: $navigateToWatchCheck) {
-                    ChooseStrummingPatternView(
-                        bpm: 120,
-                        rhythm: "4/4",
-                        patterns: Array(StrumPatternLibrary.allPatterns().prefix(4)),
-                        isFirstTime: true
-                    )
+                .navigationDestination(isPresented: $navigateToTryWatchView) {
+                    TryDemoSongView()
                 }
             }
             .padding(.horizontal, 24)

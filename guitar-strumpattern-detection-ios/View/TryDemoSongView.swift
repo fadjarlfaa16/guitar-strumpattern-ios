@@ -5,9 +5,8 @@ struct TryDemoSongView: View {
     @State private var navigateToChoosePattern = false
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Background
+        ZStack {
+            // Background
                 Color.backgroundPrimaryBlack
                     .ignoresSafeArea()
                 
@@ -47,7 +46,6 @@ struct TryDemoSongView: View {
                 .padding(.horizontal, 24)
             }
             .preferredColorScheme(.dark)
-        }
     }
 }
 

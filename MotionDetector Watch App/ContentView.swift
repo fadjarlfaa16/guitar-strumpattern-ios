@@ -44,3 +44,7 @@ struct ContentView: View {
         .onDisappear { detector.stopDetecting() }
     }
 }
+
+#Preview {
+    ContentView()
+}

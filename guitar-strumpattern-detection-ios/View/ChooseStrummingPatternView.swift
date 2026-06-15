@@ -70,6 +70,7 @@ struct ChooseStrummingPatternView: View {
                 .foregroundColor(.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
 
+            
             HStack(spacing: Spacing.lg) {
                 metadataLabel("BPM: \(bpm)")
                 metadataLabel("Rhythm: \(rhythm)")

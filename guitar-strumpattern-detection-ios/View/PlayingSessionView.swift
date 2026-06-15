@@ -28,9 +28,6 @@ struct PlayingSessionView: View {
     /// Duration limit for repeating the sequence (e.g. "3:00"). If nil, plays once.
     var duration: String?
     
-    /// If true, delays the first notes by 3 seconds and shows a tutorial prompt.
-    var isFirstTime: Bool
-    
     /// Audio file URL untuk playback
     var audioURL: URL?
 
@@ -44,6 +41,7 @@ struct PlayingSessionView: View {
     @StateObject private var strumValidator = StrumInputValidator()
     @State private var screenWidth: CGFloat = 0
     @AppStorage("appState") private var appState: AppState = .onboarding
+    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @State private var tutorialPauseStep: Int = 0
 
     // MARK: - Init
@@ -64,7 +62,6 @@ struct PlayingSessionView: View {
         self.bpm           = safeBPM
         self.timeSignature = timeSignature
         self.duration      = duration
-        self.isFirstTime   = isFirstTime
         self.audioURL      = audioURL
         self.autoPlay      = autoPlay
         self._tutorialPauseStep = State(initialValue: isFirstTime ? 1 : 0)
@@ -148,6 +145,12 @@ struct PlayingSessionView: View {
                         if let dur = duration {
                             Text(" / \(dur)")
                                 .foregroundStyle(.white.opacity(0.5))
+                        } else {
+                            let maxT = vm.chordGroups.last?.endTime ?? 0
+                            if maxT > 0 {
+                                Text(" / \(formatTime(maxT))")
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
                         }
                     }
                     .font(.system(size: 14, weight: .bold, design: .monospaced))

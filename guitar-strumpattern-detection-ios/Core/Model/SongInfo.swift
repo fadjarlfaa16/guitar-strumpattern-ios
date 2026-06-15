@@ -1,24 +1,24 @@
+////
+////  SongInfo.swift
+////  guitar-strumpattern-detection-ios
+////
+////  Created by muhammad aqil zaki on 06/06/26.
+////
 //
-//  SongInfo.swift
-//  guitar-strumpattern-detection-ios
+//import Foundation
 //
-//  Created by muhammad aqil zaki on 06/06/26.
+//struct SongInfo: Sendable, Equatable {
+//    let bpm: Int
+//    let timeSignature: String
+//    let displayTitle: String
+//    let displayArtist: String
+//}
 //
-
-import Foundation
-
-struct SongInfo: Sendable, Equatable {
-    let bpm: Int
-    let timeSignature: String
-    let displayTitle: String
-    let displayArtist: String
-}
-
-extension SongInfo {
-    static let sample = SongInfo(
-        bpm: 120,
-        timeSignature: "4/4",
-        displayTitle: "Backburner",
-        displayArtist: "Niki"
-    )
-}
+//extension SongInfo {
+//    static let sample = SongInfo(
+//        bpm: 120,
+//        timeSignature: "4/4",
+//        displayTitle: "Backburner",
+//        displayArtist: "Niki"
+//    )
+//}

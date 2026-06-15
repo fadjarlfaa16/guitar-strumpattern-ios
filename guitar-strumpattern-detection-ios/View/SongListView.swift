@@ -203,15 +203,7 @@ struct SongListView: View {
                 .bold()
 
             Spacer()
-
-//            Button {
-//                showCalibrate = true
-//            } label: {
-//                Label("Kalibrasi", systemImage: "applewatch")
-//                    .font(AppFont.bodyRegular)
-//                    .foregroundStyle(.textPrimaryWhite)
-//            }
-        }
+}
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 

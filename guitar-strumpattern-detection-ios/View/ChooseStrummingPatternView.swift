@@ -20,19 +20,22 @@ struct ChooseStrummingPatternView: View {
 
     var body: some View {
         ZStack {
-            Color.bgPrimary
+            Color.backgroundPrimaryBlack
                 .ignoresSafeArea()
 
             decorativeBackground
 
             ScrollView {
-                VStack(alignment: .leading, spacing: Spacing.lg) {
+                VStack(alignment: .leading, spacing: Spacing.xl) {
                     headerSection
+                        .padding(.vertical, Spacing.xs)
                     patternList
+                    .padding(.top, Spacing.md)
                 }
                 .padding(.horizontal, Spacing.xl)
-                .padding(.top, Spacing.xxl)
-                .padding(.bottom, Spacing.xl)
+                .padding(.top, Spacing.md)
+                .padding(.bottom, Spacing.md)
+
             }
         }
         .navigationDestination(isPresented: $navigateToSession) {
@@ -59,7 +62,7 @@ struct ChooseStrummingPatternView: View {
     // MARK: - Header
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: Spacing.md) {
-            Text("Choose Your Preffered Strumming Pattern")
+            Text("Choose Your Preferred Strumming Pattern")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.textPrimary)
@@ -69,32 +72,24 @@ struct ChooseStrummingPatternView: View {
                 .foregroundColor(.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            
-            HStack(spacing: Spacing.lg) {
-                metadataLabel("BPM: \(bpm)")
-                metadataLabel("Rhythm: \(rhythm)")
-            }
         }
     }
 
-    private func metadataLabel(_ text: String) -> some View {
-        Text(text)
-            .font(AppFont.caption1Regular)
-            .foregroundColor(.brandColorSecondaryPink)
-    }
+   
 
     // MARK: - Pattern List
     private var patternList: some View {
         StrummingPatternList(
+            bpm: bpm, rhythm: rhythm,
             patterns: patterns,
             selectedPatternID: $selectedPatternID,
             onPatternTap: selectPattern
         )
+
         .padding(.top, Spacing.sm)
         .onAppear {
             selectedPatternID = nil
         }
-        .padding(.top, Spacing.sm)
     }
 
     private func selectPattern(_ pattern: StrummingPattern) {
@@ -106,43 +101,40 @@ struct ChooseStrummingPatternView: View {
 
     // MARK: - Decorative Background
     private var decorativeBackground: some View {
-        ZStack {
-            Circle()
-                .fill(Color.accentGreen.opacity(0.35))
-                .frame(width: 220, height: 220)
-                .offset(x: -120, y: -280)
-
-            decorativeWave
-                .stroke(Color.accentPurple.opacity(0.8), lineWidth: 2)
-                .frame(width: 180, height: 80)
-                .offset(x: 140, y: 320)
+        GeometryReader { geometry in
+            let width = geometry.size.width
+            let height = geometry.size.height
+            
+            ZStack {
+                // Top-Left Green Circle
+                Circle()
+                    .fill(Color.brandColorAccentGreen.opacity(0.25))
+                    .frame(width: width * 1.3, height: width * 0.9)
+                    .position(x: width * 0.1, y: height * 0)
+                
+                // Bottom-Right Purple Wavy Line
+                Path { path in
+                    path.move(to: CGPoint(x: width * 0.18, y: height + 20))
+                    path.addCurve(
+                        to: CGPoint(x: width + 20, y: height * 0.81),
+                        control1: CGPoint(x: width * 0.18, y: height * 0.87),
+                        control2: CGPoint(x: width * 0.60, y: height * 0.94)
+                    )
+                }
+                .stroke(
+                    Color .brandColorSecondaryPink.opacity(0.2),
+                    style: StrokeStyle(lineWidth: 7 , lineCap: .round, lineJoin: .round)
+                )
+            }
         }
         .allowsHitTesting(false)
     }
-
-    private var decorativeWave: some Shape {
-        WaveShape()
-    }
 }
 
-// MARK: - Wave Shape
-private struct WaveShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let midY = rect.midY
-        path.move(to: CGPoint(x: 0, y: midY))
-        path.addCurve(
-            to: CGPoint(x: rect.width * 0.5, y: midY - 20),
-            control1: CGPoint(x: rect.width * 0.15, y: midY + 30),
-            control2: CGPoint(x: rect.width * 0.35, y: midY - 40)
-        )
-        path.addCurve(
-            to: CGPoint(x: rect.width, y: midY),
-            control1: CGPoint(x: rect.width * 0.65, y: midY + 40),
-            control2: CGPoint(x: rect.width * 0.85, y: midY - 30)
-        )
-        return path
-    }
+func metadataLabel(_ text: String) -> some View {
+    Text(text)
+        .font(AppFont.bodyRegular)
+        .foregroundColor(.brandColorSecondaryPink)
 }
 
 #Preview {

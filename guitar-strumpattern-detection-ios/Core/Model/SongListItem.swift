@@ -15,6 +15,7 @@ struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
     let scorePercent: Int
     let sandboxFileName: String?
 
+
     var displayTitle: String {
         title.isEmpty ? "Untitled" : title
     }
@@ -22,7 +23,7 @@ struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
     var isAnalyzed: Bool {
         bpm > 0 && timeSignature != "-"
     }
-
+ 
     init(
         id: UUID = UUID(),
         bpm: Int,

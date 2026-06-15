@@ -26,7 +26,7 @@ struct HeroHeader: View {
             Text(subtitle)
                 .font(AppFont.bodyRegular)
                 .foregroundColor(.textPrimaryWhite.opacity(0.7))
-        }
+            }
         }
     }
 

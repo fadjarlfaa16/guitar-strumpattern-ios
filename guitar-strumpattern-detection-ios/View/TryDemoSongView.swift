@@ -15,7 +15,7 @@ struct TryDemoSongView: View {
                     .ignoresSafeArea()
                 
                 // Main Content
-                VStack {
+                VStack (spacing: 0) {
                     // Header Section
                     
                     HeroHeader(title: "Let's Try a Demo Song", subtitle: "Get familiar with strumming detection before you start practicing.")
@@ -23,14 +23,17 @@ struct TryDemoSongView: View {
                     
                     
                     // Music Info Section
-                    VStack(spacing: 12) {
+                    VStack(spacing: Spacing.lg) {
                         // Play Button + Metadata
                         // Headphone Icon
                         Image("beatsHeadphones")
+                            .scaledToFit()
+                            .frame(width: 160, height: 160)
                             .foregroundColor(.brandColorAccentGreen)
                         MusicPlayer()
                         
                     }
+                    .padding(.horizontal, Spacing .md)
                     
                     Spacer()
                     // Next Button
@@ -43,7 +46,8 @@ struct TryDemoSongView: View {
                         )
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, Spacing.xl)
+                .padding(.bottom, Spacing.sm)
             }
             .preferredColorScheme(.dark)
     }
@@ -67,8 +71,8 @@ struct WelcomeBackgroundLines: View {
                     )
                 }
                 .stroke(
-                    Color.brandColorAccentGreen.opacity(0.35),
-                    style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round)
+                    Color.brandColorAccentGreen.opacity(0.2),
+                    style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round)
                 )
                 
                 // Bottom Purple Line (Valley near middle, peak near right-middle, exiting bottom)
@@ -81,8 +85,8 @@ struct WelcomeBackgroundLines: View {
                     )
                 }
                 .stroke(
-                    Color.brandColorSecondaryPink.opacity(0.35),
-                    style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round)
+                    Color.brandColorSecondaryPink.opacity(0.20),
+                    style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round)
                 )
             }
         }

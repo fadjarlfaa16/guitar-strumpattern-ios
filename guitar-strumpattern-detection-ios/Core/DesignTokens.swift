@@ -107,3 +107,13 @@ extension Image {
     static let replay : Image = Image(systemName: "arrow.trianglehead.counterclockwise")
         .resizable()
 }
+
+enum AppColor {
+    static let brandPrimaryPurple = Color(
+            red: 161 / 255,
+            green: 122 / 255,
+            blue: 225 / 255,
+            opacity: 0.7
+        )
+    }
+

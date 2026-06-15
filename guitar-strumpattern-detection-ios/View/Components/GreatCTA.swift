@@ -39,12 +39,14 @@ struct AddSongButton: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.md)
-                .background(
-                    Capsule()
-                        .fill(Color.brandColorPrimaryPurple)
-                )
+                
         }
         .buttonStyle(.plain)
+        .glassEffect()
+        .background(
+            Capsule()
+                .fill(Color.brandColorPrimaryPurple2)
+        )
     }
 }
 
@@ -57,7 +59,7 @@ struct SkipButton: View {
             action?()
         } label: {
             Text("Skip for now")
-                .font(AppFont.caption1Regular)
+                .font(AppFont.bodyRegular)
                 .foregroundColor(Color.brandColorPrimaryPurple)
         }
         .buttonStyle(.plain)

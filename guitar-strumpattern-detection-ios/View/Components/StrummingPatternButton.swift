@@ -35,5 +35,5 @@ struct StrummingPatternButton: View {
         StrummingPatternButton(label: "DUUD - DDUUU")
     }
     .padding(.horizontal, Spacing.xl)
-    .background(Color.bgPrimary)
+    .background(Color.backgroundPrimaryBlack)
 }

@@ -11,7 +11,7 @@ struct ChooseStrummingPatternView: View {
     let rhythm: String
     let patterns: [StrummingPattern]
     var chordSegments: [StoredChordSegment]? = nil
-    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
+    var isFirstTime: Bool = false
     var audioURL: URL?
     var onPatternSelected: ((StrummingPattern) -> Void)? = nil
     @State private var selectedPatternID: UUID? = nil
@@ -50,6 +50,7 @@ struct ChooseStrummingPatternView: View {
                 pattern: beats.isEmpty ? ChordGroup.samplePattern : beats,
                 bpm: bpm,
                 timeSignature: rhythm,
+                isFirstTime: isFirstTime,
                 audioURL: audioURL,
                 patternNotation: selectedPattern?.notation
             )
@@ -69,7 +70,6 @@ struct ChooseStrummingPatternView: View {
                 .foregroundColor(.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            
             HStack(spacing: Spacing.lg) {
                 metadataLabel("BPM: \(bpm)")
                 metadataLabel("Rhythm: \(rhythm)")

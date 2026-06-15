@@ -24,12 +24,6 @@ struct GreatIllustration: View {
 struct FileUploadIcon: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            // Body dokumen dengan sudut terpotong
-            Rectangle()
-                .fill(Color.brandColorSecondaryPink)
-                .frame(width: 72, height: 84)
-                .clipShape(FoldedCorner(cornerSize: 18))
-
 
             // Panah upload di tengah
             Image(systemName: "arrow.up")
@@ -41,17 +35,7 @@ struct FileUploadIcon: View {
     }
 }
 
-// Segitiga untuk efek lipatan
-struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.maxX, y: 0))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: 0, y: rect.maxY))
-        path.closeSubpath()
-        return path
-    }
-}
+          
 
 
 

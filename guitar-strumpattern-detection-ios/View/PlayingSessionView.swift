@@ -28,12 +28,16 @@ struct PlayingSessionView: View {
     /// Duration limit for repeating the sequence (e.g. "3:00"). If nil, plays once.
     var duration: String?
     
+    /// If true, delays the first notes by 3 seconds and shows a tutorial prompt.
+
+    var isFirstTime: Bool
+    
     /// Audio file URL untuk playback
     var audioURL: URL?
 
     /// Runs the lane without requiring strum input.
     var autoPlay: Bool
-    
+
 
     // MARK: - ViewModel & State
 
@@ -41,9 +45,9 @@ struct PlayingSessionView: View {
     @StateObject private var audioPlayer = AudioPlayerManager()
     @StateObject private var strumValidator = StrumInputValidator()
     @State private var screenWidth: CGFloat = 0
-    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
-    @AppStorage("navRoot") private var navRoot: NavRoot = .onboarding
+    @AppStorage("appState") private var navRoot: NavRoot = .onboarding
     @State private var tutorialPauseStep: Int = 0
+    @Environment(AppState.self) private var appState
     @Environment(Routes.self) private var routes
 
     // MARK: - Init
@@ -53,6 +57,7 @@ struct PlayingSessionView: View {
         bpm:           Int            = 120,
         timeSignature: String         = ChordGroup.sampleTimeSignature,
         duration:      String?        = nil,
+        isFirstTime:   Bool           = false,
         audioURL:      URL?           = nil,
         autoPlay:      Bool           = false,
         patternNotation: String?      = nil
@@ -63,17 +68,14 @@ struct PlayingSessionView: View {
         self.bpm           = safeBPM
         self.timeSignature = timeSignature
         self.duration      = duration
+
+        self.isFirstTime   = isFirstTime
         self.audioURL      = audioURL
         self.autoPlay      = autoPlay
-        // Determine first launch status locally to avoid capturing `self` before initialization
-        let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
-        let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
-
-        self._tutorialPauseStep = State(initialValue: isFirst ? 1 : 0)
+        self._tutorialPauseStep = State(initialValue: isFirstTime ? 1 : 0)
         
         var processedChords = chords
-        if isFirst {
-            
+        if isFirstTime {
             // Give it 2.0s of clean slide-in time before it hits the line and pauses
             let delay: TimeInterval = 2.0
             processedChords = chords.map {
@@ -113,7 +115,7 @@ struct PlayingSessionView: View {
                 ZStack(alignment: .top) {
                     rhythmLane
                     
-                    if isFirstTime && !vm.hasPassedFirstNote {
+                    if appState.isFirstTime && !vm.hasPassedFirstNote {
                         Text("Let’s get started by strumming according to the arrow on the screen.")
                             .font(AppFont.bodyRegular)
                             .foregroundStyle(.textPrimaryWhite)
@@ -151,12 +153,6 @@ struct PlayingSessionView: View {
                         if let dur = duration {
                             Text(" / \(dur)")
                                 .foregroundStyle(.white.opacity(0.5))
-                        } else {
-                            let maxT = vm.chordGroups.last?.endTime ?? 0
-                            if maxT > 0 {
-                                Text(" / \(formatTime(maxT))")
-                                    .foregroundStyle(.white.opacity(0.5))
-                            }
                         }
                     }
                     .font(.system(size: 14, weight: .bold, design: .monospaced))
@@ -221,10 +217,6 @@ struct PlayingSessionView: View {
             handleStrumDown()
         }
         .onAppear {
-            let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
-            let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
-            print("isFirstTime is \(isFirst)")
-            
             lockToLandscape()
 
             if let audioURL = audioURL {
@@ -319,9 +311,11 @@ struct PlayingSessionView: View {
                     .lineLimit(1)
                 }
                 Spacer()
+
                 if isFirstTime {
                     Button {
                         navRoot = .uploadSong
+
                     } label: {
                         Text("Skip")
                             .font(AppFont.bodyBold)
@@ -541,7 +535,7 @@ struct PlayingSessionView: View {
                     .buttonStyle(StrumButtonStyle())
 
                     Button {
-                        if(isFirstTime) {
+                        if(appState.isFirstTime) {
                             navRoot = .uploadSong
                             print("isFirstTime")
                         } else {
@@ -597,9 +591,11 @@ extension PlayingSessionView {
                 Spacer()
                 Button {
                     vm.startGame()
+
                     if tutorialPauseStep == 2 {
                         withAnimation { tutorialPauseStep = 0 }
                     }
+
                 } label: {
                     VStack {
                         Image.replay
@@ -612,6 +608,7 @@ extension PlayingSessionView {
                             .foregroundStyle(.textPrimaryWhite)
                     }
                 }
+
                 Spacer()
                 Button {
                     dismiss()
@@ -627,6 +624,7 @@ extension PlayingSessionView {
                             .foregroundStyle(.textPrimaryWhite)
                     }
                 }
+
             }
             
             .frame(maxWidth: .infinity)
@@ -685,6 +683,7 @@ struct StrumButtonStyle: ButtonStyle {
         bpm:           120,
         timeSignature: "4/4",
         duration: "0:10",
+        isFirstTime: true
     )
     
 }

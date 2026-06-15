@@ -16,31 +16,25 @@ struct OnboardingWelcome: View {
                     .ignoresSafeArea()
                 
                 // Main Content
-                VStack {
+                VStack (spacing: 0) {
                     // Header Section
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Welcome")
-                            .font(AppFont.largeTitleBold)
-                            .foregroundStyle(.textPrimaryWhite)
-                        
-                        Text("Let's try our demo song first")
-                            .font(AppFont.title3Regular)
-                            .foregroundColor(.textPrimaryWhite)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    
+                    WelcomeHeader()
+                       
                     Spacer()
                     
                     
                     // Music Info Section
-                    VStack(spacing: 12) {
+                    VStack(spacing: Spacing.lg) {
                         // Play Button + Metadata
                         // Headphone Icon
                         Image("beatsHeadphones")
+                            .scaledToFit()
+                            .frame(width: 160, height: 160)
                             .foregroundColor(.brandColorAccentGreen)
                         MusicPlayer()
                         
                     }
+                    .padding(.horizontal, Spacing .md)
                     
                     Spacer()
                     // Next Button
@@ -51,7 +45,8 @@ struct OnboardingWelcome: View {
                         PrepareYourGuitarView()
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, Spacing.xl)
+                .padding(.bottom, Spacing.sm)
             }
             .preferredColorScheme(.dark)
         }
@@ -76,8 +71,8 @@ struct WelcomeBackgroundLines: View {
                     )
                 }
                 .stroke(
-                    Color.brandColorAccentGreen.opacity(0.35),
-                    style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round)
+                    Color.brandColorAccentGreen.opacity(0.2),
+                    style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round)
                 )
                 
                 // Bottom Purple Line (Valley near middle, peak near right-middle, exiting bottom)
@@ -90,8 +85,8 @@ struct WelcomeBackgroundLines: View {
                     )
                 }
                 .stroke(
-                    Color.brandColorSecondaryPink.opacity(0.35),
-                    style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round)
+                    Color.brandColorSecondaryPink.opacity(0.20),
+                    style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round)
                 )
             }
         }

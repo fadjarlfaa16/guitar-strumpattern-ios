@@ -13,7 +13,7 @@ struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
     let artist: String
     let scorePercent: Int
 
-    var displayTitle: String { "\(title) - \(artist)" }
+    var displayTitle: String {title}
 
     init(
         id: UUID = UUID(),

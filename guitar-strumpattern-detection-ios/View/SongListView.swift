@@ -13,6 +13,7 @@ struct SongListView: View {
     // State untuk Search dan UI
     @State private var searchText = ""
     @State private var showEmptyState = false
+    @State private var songToEdit: SongListItem? = nil
 
     // State Navigasi Global
     @AppStorage("appState") private var navRoot: NavRoot = .songList
@@ -60,12 +61,38 @@ struct SongListView: View {
             } else {
                 // Tampilan List Lagu Asli
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: Spacing.md) {
+                    LazyVStack(alignment: .leading, spacing: 0) {
                         ForEach(filteredItems) { item in
                             SongRow(
                                 item: item,
-                                onMenuTapped: { onMenuTapped?(item) }
+                                onMenuTapped: {
+                                    // Tindakan asli tidak diperlukan karena akan ditangkap oleh overlay Menu di bawahnya
+                                    onMenuTapped?(item)
+                                }
                             )
+                            .overlay(alignment: .trailing) {
+                                // Invisible Menu overlay di atas tombol ellipsis
+                                Menu {
+                                    Button {
+                                        // Aksi Edit
+                                        songToEdit = item
+                                    } label: {
+                                        Label("Edit", systemImage: "pencil")
+                                    }
+                                    Button(role: .destructive) {
+                                        // Aksi Delete
+                                        if let index = appState.savedSongs.firstIndex(where: { $0.id == item.id }) {
+                                            appState.savedSongs.remove(at: index)
+                                        }
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                } label: {
+                                    Color.white.opacity(0.001) // transparan tapi bisa di-tap
+                                        .frame(width: 60, height: 80)
+                                }
+                                .offset(y: -8) // adjust sedikit ke atas karena ada divider di bawah SongRow
+                            }
                         }
                     }
                     .padding(.top, Spacing.sm)
@@ -98,6 +125,24 @@ struct SongListView: View {
         .searchable(text: $searchText, prompt: "Search")
         .toolbar(.hidden, for: .navigationBar)
         .background(Color.bgPrimary)
+        .sheet(item: $songToEdit) { song in
+            EditSongSheet(initialSong: song) { newTitle, newArtist in
+                if let index = appState.savedSongs.firstIndex(where: { $0.id == song.id }) {
+                    let updatedSong = SongListItem(
+                        id: song.id,
+                        bpm: appState.savedSongs[index].bpm,
+                        timeSignature: appState.savedSongs[index].timeSignature,
+                        title: newTitle,
+                        artist: newArtist,
+                        scorePercent: song.scorePercent
+                    )
+                    appState.savedSongs[index] = updatedSong
+                }
+                songToEdit = nil
+            } onCancel: {
+                songToEdit = nil
+            }
+        }
         .navigationDestination(for: SongListItem.self) { song in
             ChooseStrummingPatternView(
                 bpm: song.bpm,
@@ -174,6 +219,49 @@ struct SongListView: View {
             .padding(.top, Spacing.sm)
         }
         .padding(.horizontal, Spacing.xl)
+    }
+}
+
+// MARK: - Edit Song Sheet
+struct EditSongSheet: View {
+    let initialSong: SongListItem
+    var onSave: (String, String) -> Void
+    var onCancel: () -> Void
+    
+    @State private var title: String
+    @State private var artist: String
+    
+    
+    init(initialSong: SongListItem, onSave: @escaping (String, String) -> Void, onCancel: @escaping () -> Void) {
+        self.initialSong = initialSong
+        self.onSave = onSave
+        self.onCancel = onCancel
+        _title = State(initialValue: initialSong.title)
+        _artist = State(initialValue: initialSong.artist)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(header: Text("Song Details")) {
+                    TextField("Title", text: $title)
+                    TextField("Artist", text: $artist)
+                }
+            }
+            .navigationTitle("Edit Song")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { onCancel() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        onSave(title, artist)
+                    }
+                }
+            }
+            .preferredColorScheme(.dark)
+        }
     }
 }
 

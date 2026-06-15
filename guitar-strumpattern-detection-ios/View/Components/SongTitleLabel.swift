@@ -23,3 +23,4 @@ struct SongTitleLabel: View {
 #Preview {
     SongTitleLabel(title: "Sunny - Yorushika")
 }
+

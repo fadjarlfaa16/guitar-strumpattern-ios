@@ -25,16 +25,7 @@ struct PrepareYourGuitarView: View {
             // Main Content
             VStack {
                 // Header Section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Prepare Your Guitar")
-                        .font(AppFont.largeTitleBold)
-                        .foregroundStyle(.textPrimaryWhite)
-                    
-                    Text("You’ll need a guitar to practice and follow the  preffered strumming pattern")
-                        .font(AppFont.title3Regular)
-                        .foregroundColor(.textPrimaryWhite)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                PrepareHeader()
                 
                 Spacer()
                 
@@ -44,7 +35,7 @@ struct PrepareYourGuitarView: View {
                 Spacer()
                 
                 // Next Button
-                VStack(spacing: 12) {
+                VStack(spacing: Spacing.sm) {
                     CustomButton(title: "Next") {
                         navigateToChoosePattern = true
                     }
@@ -65,7 +56,8 @@ struct PrepareYourGuitarView: View {
                     )
                 }
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, Spacing.xl)
+            .padding(.bottom, Spacing.sm)
         }
     }
 }
@@ -88,8 +80,8 @@ struct PrepareGuitarBackgroundLines: View {
                     )
                 }
                 .stroke(
-                    Color.brandColorAccentGreen.opacity(0.35),
-                    style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round)
+                    Color.brandColorAccentGreen.opacity(0.2),
+                    style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round)
                 )
                 
                 // Bottom Purple Line (U-shape dipping below screen, exiting right)
@@ -102,8 +94,8 @@ struct PrepareGuitarBackgroundLines: View {
                     )
                 }
                 .stroke(
-                    Color.brandColorSecondaryPink.opacity(0.35),
-                    style: StrokeStyle(lineWidth: 10
+                    Color.brandColorSecondaryPink.opacity(0.2),
+                    style: StrokeStyle(lineWidth: 7
                                        , lineCap: .round, lineJoin: .round)
                 )
             }

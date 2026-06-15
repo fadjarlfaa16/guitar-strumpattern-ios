@@ -61,8 +61,8 @@ class RhythmGameViewModel: ObservableObject {
     private var pendingGroups:     [ChordGroup]       = []
     private var feedbackResetTask: Task<Void, Never>? = nil
 
-    init(chordGroups: [ChordGroup] = ChordGroup.sampleGroups, bpm: Int = 120) {
-        self.chordGroups = chordGroups
+    init(chordGroups: [ChordGroup]? = nil, bpm: Int = 120) {
+        self.chordGroups = chordGroups ?? ChordGroup.sampleGroups
         self.bpm         = bpm
     }
 

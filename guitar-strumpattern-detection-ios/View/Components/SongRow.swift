@@ -11,36 +11,29 @@ struct SongRow: View {
     var onMenuTapped: (() -> Void)? = nil
 
     var body: some View {
-        HStack(spacing: Spacing.md) {
-            NavigationLink(value: item) {
-                VStack(alignment: .leading, spacing: Spacing.xs) {
+        VStack(spacing: 0) {
+            // Main Row
+            HStack(spacing: Spacing.md) {
+                VStack(alignment: .leading, spacing: Spacing.sm) {
+                    // Title
                     titleRow
+                    
+                    // Metadata (BPM & Time Signature)
                     metadataRow
+                    
+                    // Artist/Album
+                    artistRow
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                
+                // Menu Button
+                menuButton
             }
-            .buttonStyle(.plain)
-
-            menuButton
-        }
-    }
-
-    // MARK: - Metadata Row
-    private var metadataRow: some View {
-        HStack(spacing: Spacing.md) {
-            metadataLabel(icon: "stopwatch.fill", text: "= \(item.bpm) bpm")
-            metadataLabel(icon: "metronome.fill", text: "= \(item.timeSignature)")
-        }
-    }
-
-    private func metadataLabel(icon: String, text: String) -> some View {
-        HStack(spacing: Spacing.xs) {
-            Image(systemName: icon)
-                .font(.system(size: 12))
-                .foregroundColor(.textPrimaryWhite)
-            Text(text)
-                .font(AppFont.caption1Regular.self)
-                .foregroundColor(.textPrimaryWhite)
+            .padding(.vertical, Spacing.sm)
+            
+            // Divider
+            Divider()
+                .background(Color.textPrimaryWhite.opacity(0.5))
         }
     }
 
@@ -49,8 +42,35 @@ struct SongRow: View {
         Text(item.displayTitle)
             .font(AppFont.bodyRegular)
             .foregroundColor(.textPrimaryWhite)
+            .lineLimit(2)
+            .truncationMode(.tail)
+    }
 
-            .lineLimit(1)
+    // MARK: - Metadata Row
+    private var metadataRow: some View {
+        HStack(spacing: Spacing.md) {
+            metadataLabel(icon: "clock.fill", text: "= \(item.bpm) bpm")
+            metadataLabel(icon: "metronome", text: "= \(item.timeSignature)")
+        }
+    }
+
+    private func metadataLabel(icon: String, text: String) -> some View {
+        HStack(spacing: Spacing.xs) {
+            Image(systemName: icon)
+                .font(AppFont.bodyBold)
+                .foregroundColor(.textPrimaryWhite)
+            Text(text)
+                .font(AppFont.bodyBold)
+                .foregroundColor(.textPrimaryWhite)
+        }
+    }
+
+    // MARK: - Artist Row
+    private var artistRow: some View {
+        Text(item.artist)
+            .font(AppFont.bodyRegular)
+            .foregroundColor(.textPrimaryWhite)
+            .lineLimit(2)
             .truncationMode(.tail)
     }
 
@@ -69,29 +89,31 @@ struct SongRow: View {
 }
 
 #Preview {
-    VStack(spacing: Spacing.md) {
+    VStack(spacing: 0) {
         SongRow(item: SongListItem(
             bpm: 120,
             timeSignature: "4/4",
-            title: "Song title",
-            artist: "Artist",
+            title: "The World Is Ugly",
+            artist: "My Chemical Romance",
             scorePercent: 90
         ))
+        
         SongRow(item: SongListItem(
             bpm: 120,
             timeSignature: "4/4",
-            title: "Song title",
-            artist: "Artist",
+            title: "The Fate Of Ophelia",
+            artist: "Taylor Swift",
             scorePercent: 50
         ))
+        
         SongRow(item: SongListItem(
             bpm: 120,
             timeSignature: "4/4",
-            title: "Song title",
-            artist: "Artist",
+            title: "Untungnya, Hidup Harus Terus Berjalan",
+            artist: "Bernadya",
             scorePercent: 20
         ))
     }
-    .padding(.horizontal, 29)
+    .padding(.horizontal, Spacing.xl)
     .background(Color.backgroundPrimaryBlack)
 }

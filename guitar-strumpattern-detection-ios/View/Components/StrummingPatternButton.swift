@@ -17,12 +17,12 @@ struct StrummingPatternButton: View {
         } label: {
             Text(label)
                 .font(AppFont.headlineSemibold)
-                .foregroundColor(isSelected ? .black : .textPrimary)
+                .foregroundColor(isSelected ? .black : .textPrimaryWhite)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.lg)
                 .background(
                     Capsule()
-                        .fill(isSelected ? Color.accentGreen : Color.accentPurple)
+                        .fill(isSelected ? Color.accentGreen : Color.brandColorPrimaryPurple2)
                 )
         }
         .buttonStyle(.plain)
@@ -35,5 +35,5 @@ struct StrummingPatternButton: View {
         StrummingPatternButton(label: "DUUD - DDUUU")
     }
     .padding(.horizontal, Spacing.xl)
-    .background(Color.bgPrimary)
+    .background(Color.backgroundPrimaryBlack)
 }

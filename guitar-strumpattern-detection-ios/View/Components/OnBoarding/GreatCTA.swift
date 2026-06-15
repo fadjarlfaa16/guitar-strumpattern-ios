@@ -45,7 +45,7 @@ struct AddSongButton: View {
         .glassEffect()
         .background(
             Capsule()
-                .fill(Color.brandColorPrimaryPurple2)
+                .fill(Color.brandColorPrimaryPurple)
         )
     }
 }

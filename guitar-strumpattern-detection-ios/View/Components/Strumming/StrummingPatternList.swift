@@ -19,7 +19,7 @@ struct StrummingPatternList: View {
     @Binding var selectedPatternID: UUID?
     var onPatternTap: ((StrummingPattern) -> Void)? = nil
 
-    private func metadataLabel(_ text: String) -> some View {
+     private func metadataLabel(_ text: String) -> some View {
         Text(text)
             .font(AppFont.bodyRegular)
             .foregroundColor(.brandColorSecondaryPink)

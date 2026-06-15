@@ -24,7 +24,7 @@ struct CustomButton: View {
         }
 
         .disabled(isDisabled)
-        .tint(.brandColorPrimaryPurple2)
+        .tint(.brandColorPrimaryPurple)
         .buttonStyle(.glassProminent)
     }
 }

@@ -18,6 +18,12 @@ struct ChooseStrummingPatternView: View {
     @State private var selectedPattern: StrummingPattern? = nil
     @State private var navigateToSession = false
 
+    private func metadataLabel(_ text: String) -> some View {
+       Text(text)
+           .font(AppFont.bodyRegular)
+           .foregroundColor(.brandColorSecondaryPink)
+   }
+    
     var body: some View {
         ZStack {
             Color.backgroundPrimaryBlack

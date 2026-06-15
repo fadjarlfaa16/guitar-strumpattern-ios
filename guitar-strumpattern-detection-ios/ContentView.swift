@@ -19,20 +19,32 @@ struct ContentView: View {
     var body: some View {
         @Bindable var routes = routes
         
-        switch appState {
-        case .onboarding:
-            NavigationStack {
-                PrepareYourGuitarView()
-            }
-        case .songList:
-            NavigationStack(path: $routes.songLibraryRoute) {
-                SongListView()
-            }
-        case .uploadSong:
-            NavigationStack {
-                GreatPageView()
+        Group {
+            switch appState {
+            case .onboarding:
+                NavigationStack {
+                    PrepareYourGuitarView()
+                }
+            case .songList:
+                NavigationStack(path: $routes.songLibraryRoute) {
+                    SongListView()
+                }
+            case .uploadSong:
+                NavigationStack {
+                    GreatPageView()
+                }
             }
         }
+        .onChange(of: appState) { _, newState in
+            broadcastWatchState(newState)
+        }
+        .onAppear {
+            broadcastWatchState(appState)
+        }
+    }
+
+    private func broadcastWatchState(_ state: NavRoot) {
+        WatchReceiver.shared.syncAppState(state: "waitingForSong")
     }
 }
 

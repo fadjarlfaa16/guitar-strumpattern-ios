@@ -9,7 +9,7 @@ import Foundation
 @MainActor
 final class StrumInputValidator: ObservableObject {
 
-    let receiver = WatchReceiver()
+    let receiver = WatchReceiver.shared
 
     private var cancellables = Set<AnyCancellable>()
     private var isActive = false

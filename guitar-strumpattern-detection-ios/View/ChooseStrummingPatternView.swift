@@ -11,6 +11,7 @@ struct ChooseStrummingPatternView: View {
     let rhythm: String
     let patterns: [StrummingPattern]
     var chordSegments: [StoredChordSegment]? = nil
+    var songTitle: String = "Demo Song"
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     var audioURL: URL?
     var onPatternSelected: ((StrummingPattern) -> Void)? = nil
@@ -50,6 +51,7 @@ struct ChooseStrummingPatternView: View {
                 pattern: beats.isEmpty ? ChordGroup.samplePattern : beats,
                 bpm: bpm,
                 timeSignature: rhythm,
+                songTitle: songTitle,
                 audioURL: audioURL,
                 patternNotation: selectedPattern?.notation
             )

@@ -15,6 +15,13 @@ enum CalibrationState {
     case idle, calibratingDown, calibratingUp
 }
 
+enum WatchAppState: Equatable {
+    case disconnected
+    case calibrating
+    case waitingForSong
+    case playing
+}
+
 class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
     
     let motionManager = CMMotionManager()
@@ -22,6 +29,13 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
     
     @Published var currentYAxis: Double = 0.0
     @Published var lastStrum: String = "Diam"
+    
+    // UI State
+    @Published var currentWatchState: WatchAppState = .disconnected
+    @Published var songTitle: String = ""
+    @Published var currentTime: Double = 0.0
+    @Published var maxTime: Double = 0.0
+    @Published var isPlayingPaused: Bool = false
     
     @Published var calibrationState: CalibrationState = .idle
     @Published var calibrationStatusText: String = "Siap"
@@ -57,6 +71,24 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
                         self.processApprovedCalibrationSample(yAxis: yAxisValue)
                     }
                 }
+                else if command == "syncAppState" {
+                    if let stateStr = message["state"] as? String {
+                        switch stateStr {
+                        case "calibrating": self.currentWatchState = .calibrating
+                        case "waitingForSong": self.currentWatchState = .waitingForSong
+                        case "playing": self.currentWatchState = .playing
+                        case "disconnected": self.currentWatchState = .disconnected
+                        default: break
+                        }
+                    }
+                }
+                else if command == "syncPlaying" {
+                    self.currentWatchState = .playing
+                    if let t = message["title"] as? String { self.songTitle = t }
+                    if let c = message["currentTime"] as? Double { self.currentTime = c }
+                    if let m = message["maxTime"] as? Double { self.maxTime = m }
+                    if let p = message["isPaused"] as? Bool { self.isPlayingPaused = p }
+                }
             }
         }
     }
@@ -89,7 +121,8 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
         self.temporaryCalibrationSamples.removeAll()
         self.recordedSamplesCount = 0
         self.calibrationState = .calibratingDown
-        self.calibrationStatusText = "Lakukan 5x Downstroke Kuat"
+        self.calibrationStatusText = "Strum Down"
+        self.currentWatchState = .calibrating
         
         syncCalibrationStateToiPhone()
         WKInterfaceDevice.current().play(.start)
@@ -178,7 +211,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
         recordedSamplesCount = 0
         
         self.calibrationState = .calibratingUp
-        self.calibrationStatusText = "Lakukan 5x Upstroke Kuat"
+        self.calibrationStatusText = "Strum Up"
         
         syncCalibrationStateToiPhone()
         WKInterfaceDevice.current().play(.success)
@@ -189,13 +222,14 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
         self.upThreshold = average * sensitivityFactor
         
         self.calibrationState = .idle
-        self.calibrationStatusText = "Kalibrasi Selesai ✅"
+        self.calibrationStatusText = "Calibration Complete ✅"
         
         syncCalibrationStateToiPhone()
         WKInterfaceDevice.current().play(.success)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             self.calibrationStatusText = "Ready (Calibrated)"
+            self.currentWatchState = .waitingForSong
             self.syncCalibrationStateToiPhone()
         }
     }
@@ -211,6 +245,14 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
         isCooldown = true
         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
             self.isCooldown = false
+        }
+    }
+    
+    func togglePauseFromWatch() {
+        // Immediately toggle local state so the Watch UI responds instantly
+        isPlayingPaused.toggle()
+        if session.isReachable {
+            session.sendMessage(["command": "togglePauseFromWatch"], replyHandler: nil, errorHandler: nil)
         }
     }
     

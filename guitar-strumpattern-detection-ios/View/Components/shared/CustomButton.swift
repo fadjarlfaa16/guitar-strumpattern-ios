@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CustomButton: View {
     let title: String
+    var isDisabled: Bool = false
     var action: (() -> Void) = {}
     var body: some View {
         Button {
@@ -18,6 +19,7 @@ struct CustomButton: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
         }
+        .disabled(isDisabled)
         .tint(Color.brandColorPrimaryPurple)
         .buttonStyle(.glassProminent)
     }

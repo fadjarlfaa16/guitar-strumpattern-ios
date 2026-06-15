@@ -21,8 +21,9 @@ final class AudioPlayerManager: NSObject, ObservableObject {
     private var timeObserver: Any?
     private var displayLink: CADisplayLink?
     
-    private let updateInterval: TimeInterval = 0.016  // ~60 FPS
-    /// When true, audio session allows simultaneous mic input for strum validation.
+
+    private let updateInterval: TimeInterval = 0.016
+
     var enablesMicrophoneInput: Bool = false
     
     override init() {

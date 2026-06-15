@@ -1,8 +1,8 @@
 import SwiftUI
 
 
-struct OnboardingWelcome: View {
-    @State private var navigateToPrepare = false
+struct TryDemoSongView: View {
+    @State private var navigateToChoosePattern = false
 
     var body: some View {
         NavigationStack {
@@ -18,17 +18,8 @@ struct OnboardingWelcome: View {
                 // Main Content
                 VStack {
                     // Header Section
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Welcome")
-                            .font(AppFont.largeTitleBold)
-                            .foregroundStyle(.textPrimaryWhite)
-                        
-                        Text("Let's try our demo song first")
-                            .font(AppFont.title3Regular)
-                            .foregroundColor(.textPrimaryWhite)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     
+                    HeroHeader(title: "Let's Try a Demo Song", subtitle: "Get familiar with strumming detection before you start practicing.")
                     Spacer()
                     
                     
@@ -45,10 +36,12 @@ struct OnboardingWelcome: View {
                     Spacer()
                     // Next Button
                     CustomButton(title: "Next") {
-                        navigateToPrepare = true
+                        navigateToChoosePattern = true
                     }
-                    .navigationDestination(isPresented: $navigateToPrepare) {
-                        PrepareYourGuitarView()
+                    .navigationDestination(isPresented: $navigateToChoosePattern) {
+                        ChooseStrummingPatternView(
+                            bpm: 120, rhythm: "4/4", patterns: Array(StrumPatternLibrary.allPatterns().prefix(4))
+                        )
                     }
                 }
                 .padding(.horizontal, 24)
@@ -98,6 +91,6 @@ struct WelcomeBackgroundLines: View {
     }
 }
 #Preview {
-    OnboardingWelcome()
+    TryDemoSongView()
 }
     

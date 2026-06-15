@@ -24,10 +24,19 @@ struct GreatIllustration: View {
 struct FileUploadIcon: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            Image("AddSong")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 140, height: 120)
+
+            // Body dokumen dengan sudut terpotong
+            Rectangle()
+                .fill(Color.brandColorSecondaryPink)
+                .frame(width: 72, height: 84)
+                .clipShape(FoldedCorner(cornerSize: 18))
+
+            // Panah upload di tengah
+            Image(systemName: "arrow.up")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.white)
+                .frame(width: 72, height: 84)
+                .offset(y: 6)
         }
     }
 }

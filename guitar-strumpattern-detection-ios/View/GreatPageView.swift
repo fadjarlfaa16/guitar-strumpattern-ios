@@ -9,6 +9,7 @@ struct GreatPageView: View {
     @AppStorage("appState") private var navRoot: NavRoot = .onboarding
     @Environment(AppState.self) private var appState
     var songListSample: [SongListItem] = []
+    @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
 
     var body: some View {
         ZStack {
@@ -37,13 +38,13 @@ struct GreatPageView: View {
                 // 4. CTA: Add Song + Skip for now
                 GreatCTA(
                     onAddSong: {
-                        appState.savedSongs.append(contentsOf: SongListItem.samples)
-                        appState.isFirstTime = false
-                        navRoot = .songList
+                        savedSong.songs.append(contentsOf: SongListItem.samples)
+                        appState = .songList
+                        isFirstLaunch = false
                     },
                     onSkip: {
-                        appState.isFirstTime = false
-                        navRoot = .songList
+                        appState = .songList
+                        isFirstLaunch = false
                     }
                 )
             }

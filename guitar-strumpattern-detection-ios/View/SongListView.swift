@@ -22,8 +22,9 @@ struct SongListView: View {
     @State private var deleteTarget: SongListItem? = nil
     @State private var showCalibrate = false
 
-    @AppStorage("isFirstTime") private var isFirstTime: Bool = true
-    @AppStorage("appState") private var navRoot: NavRoot = .songList
+
+    @AppStorage("appState") private var appState: AppState = .songList
+    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @Environment(SavedSong.self) private var savedSong
 
     // MARK: - Filtered Items
@@ -61,14 +62,17 @@ struct SongListView: View {
             SongListHeader(onCalibrateTapped: { showCalibrate = true })
                 .padding(.horizontal, Spacing.xl)
                 .padding(.bottom, Spacing.md)
+            WatchStatusView()
+                .padding(.horizontal, Spacing.xl)
+                .padding(.bottom, Spacing.md)
+            if isFirstTime {
+                Spacer()
+                firstTimeView
+                Spacer()
+            } else if savedSong.songs.isEmpty {
+                Spacer()
 
-            if savedSong.songs.isEmpty {
-                Spacer()
-                SongListEmptyState()
-                Spacer()
-            } else if isFirstTime {
-                Spacer()
-                SongListFirstTimeView(onDoTutorial: { navRoot = .onboarding })
+                emptyStateView
                 Spacer()
             } else {
                 SongListContent(
@@ -87,6 +91,7 @@ struct SongListView: View {
                 Button { showFilePicker = true } label: {
                     Image(systemName: "plus")
                 }
+                .disabled(isFirstTime)
             }
         }
         .sheet(isPresented: $showFilePicker) {
@@ -146,8 +151,98 @@ struct SongListView: View {
         .searchable(text: $searchText, prompt: "Search")
         .toolbar(.hidden, for: .navigationBar)
         .background(Color.bgPrimary)
-        .navigationDestination(for: UUID.self) { songDetailView(for: $0) }
-        .navigationDestination(isPresented: $showCalibrate) { CalibrateView() }
+        .navigationDestination(for: UUID.self) { songID in
+            songDetailView(for: songID)
+        }
+        .navigationDestination(isPresented: $showCalibrate) {
+            CalibrateView()
+        }
+    }
+
+    // MARK: - Song List
+
+    private var songList: some View {
+        List {
+            ForEach(filteredItems) { item in
+                SongRow(
+                    item: item,
+                    isNavigationEnabled: item.isAnalyzed,
+                    onMenuTapped: { onMenuTapped?(item) },
+                    onEditTapped: { openEditSong(for: item) },
+                    onDeleteTapped: { openDeleteSong(for: item) },
+                    onAnalyzeTapped: { openAnalysis(for: item.id) }
+                )
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+    }
+
+    // MARK: - Header
+
+    private var headerView: some View {
+        HStack {
+            Text("Song Library")
+                .font(.largeTitle)
+                .foregroundColor(.textPrimaryWhite)
+                .bold()
+
+            Spacer()
+
+//            Button {
+//                showCalibrate = true
+//            } label: {
+//                Label("Kalibrasi", systemImage: "applewatch")
+//                    .font(AppFont.bodyRegular)
+//                    .foregroundStyle(.textPrimaryWhite)
+//            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var emptyStateView: some View {
+        VStack {
+            Image.musicnotelist
+                .scaledToFit()
+                .frame(width: 80, height: 80)
+                .foregroundColor(.textSecondary)
+
+            VStack {
+                Text("Your library is empty")
+                    .font(AppFont.title3Bold)
+                    .foregroundColor(.textSecondary)
+                    .padding(.top, Spacing.xs)
+                Text("Press + to add a song, then swipe left to analyze")
+                    .font(AppFont.bodyRegular)
+                    .foregroundColor(.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding()
+        }
+        .padding(.horizontal, Spacing.xl)
+    }
+
+    private var firstTimeView: some View {
+        VStack(spacing: Spacing.md) {
+            Image.musicnotelist
+                .scaledToFit()
+                .frame(width: 80, height: 80)
+                .foregroundColor(.textSecondary)
+
+            Text("Finish your tutorial first")
+                .font(AppFont.bodyRegular)
+                .foregroundColor(.textSecondary)
+                .padding(.top, Spacing.xs)
+
+            CustomButton(title: "Do Tutorial") {
+                appState = .onboarding
+            }
+            .padding(.horizontal, Spacing.xxl)
+            .padding(.top, Spacing.sm)
+        }
+        .padding(.horizontal, Spacing.xl)
     }
 
     // MARK: - Actions

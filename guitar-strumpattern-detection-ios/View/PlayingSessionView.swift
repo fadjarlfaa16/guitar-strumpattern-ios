@@ -24,6 +24,8 @@ struct PlayingSessionView: View {
     var bpm: Int
     /// Time signature, e.g. "4/4", "3/4", "6/8".
     var timeSignature: String
+    /// The title of the song being played.
+    var songTitle: String
 
     /// Duration limit for repeating the sequence (e.g. "3:00"). If nil, plays once.
     var duration: String?
@@ -47,7 +49,7 @@ struct PlayingSessionView: View {
     @State private var screenWidth: CGFloat = 0
     @AppStorage("appState") private var navRoot: NavRoot = .onboarding
     @State private var tutorialPauseStep: Int = 0
-    @Environment(AppState.self) private var appState
+    @State private var lastWatchSyncTime: TimeInterval = 0
     @Environment(Routes.self) private var routes
 
     // MARK: - Init
@@ -56,6 +58,7 @@ struct PlayingSessionView: View {
         pattern:       [StrumBeat]    = ChordGroup.samplePattern,
         bpm:           Int            = 120,
         timeSignature: String         = ChordGroup.sampleTimeSignature,
+        songTitle:     String         = "Unknown Song",
         duration:      String?        = nil,
         isFirstTime:   Bool           = false,
         audioURL:      URL?           = nil,
@@ -67,6 +70,7 @@ struct PlayingSessionView: View {
         self.patternNotation = patternNotation ?? pattern.map(\.rawValue).joined()
         self.bpm           = safeBPM
         self.timeSignature = timeSignature
+        self.songTitle     = songTitle
         self.duration      = duration
 
         self.isFirstTime   = isFirstTime
@@ -149,6 +153,12 @@ struct PlayingSessionView: View {
                         if let dur = duration {
                             Text(" / \(dur)")
                                 .foregroundStyle(.white.opacity(0.5))
+                        } else {
+                            let maxT = vm.chordGroups.last?.endTime ?? 0
+                            if maxT > 0 {
+                                Text(" / \(formatTime(maxT))")
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
                         }
                     }
                     .font(.system(size: 14, weight: .bold, design: .monospaced))
@@ -213,6 +223,10 @@ struct PlayingSessionView: View {
             handleStrumDown()
         }
         .onAppear {
+            let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
+            let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
+            print("isFirstTime is \(isFirst)")
+            
             lockToLandscape()
 
             if let audioURL = audioURL {
@@ -229,6 +243,28 @@ struct PlayingSessionView: View {
             strumValidator.stop()
             vm.stopGame()
             audioPlayer.stop()
+        }
+        .onChange(of: vm.currentTime) { _, newTime in
+            if abs(newTime - lastWatchSyncTime) >= 1.0 || vm.isPaused != (lastWatchSyncTime == -1) {
+                lastWatchSyncTime = newTime
+                let maxT = vm.chordGroups.last?.endTime ?? 0
+                strumValidator.receiver.syncPlaying(title: songTitle, currentTime: newTime, maxTime: maxT, isPaused: vm.isPaused)
+            }
+        }
+        .onChange(of: strumValidator.receiver.watchDidTogglePause) { _, _ in
+            if vm.isPaused {
+                vm.resumeGame()
+            } else {
+                vm.pauseGame()
+            }
+            // Force immediate sync update
+            let maxT = vm.chordGroups.last?.endTime ?? 0
+            strumValidator.receiver.syncPlaying(title: songTitle, currentTime: vm.currentTime, maxTime: maxT, isPaused: vm.isPaused)
+        }
+        .onChange(of: vm.isPaused) { _, _ in
+            // Force immediate sync update
+            let maxT = vm.chordGroups.last?.endTime ?? 0
+            strumValidator.receiver.syncPlaying(title: songTitle, currentTime: vm.currentTime, maxTime: maxT, isPaused: vm.isPaused)
         }
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
@@ -670,7 +706,6 @@ struct StrumButtonStyle: ButtonStyle {
         bpm:           120,
         timeSignature: "4/4",
         duration: "0:10",
-        isFirstTime: true
     )
     .environment(Routes())
     

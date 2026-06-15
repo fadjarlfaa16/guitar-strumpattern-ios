@@ -15,6 +15,11 @@ struct guitar_strumpattern_detection_iosApp: App {
     @State private var appState = AppState()
     @State private var router = Routes()
 
+    init() {
+        // Activate WCSession as early as possible so the Watch connection is ready.
+        _ = WatchReceiver.shared
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

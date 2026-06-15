@@ -4,8 +4,12 @@ import Combine
 
 class WatchReceiver: NSObject, ObservableObject, WCSessionDelegate {
     
+    /// Single shared instance — ensures WCSession has exactly one delegate for the app's lifetime.
+    static let shared = WatchReceiver()
+    
     @Published var lastStrum: String = "Diam"
     @Published var strumPulseTrigger: UUID = UUID()
+    @Published var watchDidTogglePause: UUID = UUID()
     var session = WCSession.default
     
     @Published var calibrationStatusText: String = "Siap"
@@ -23,7 +27,7 @@ class WatchReceiver: NSObject, ObservableObject, WCSessionDelegate {
     let audioMonitor = AudioMonitor()
     var soundDetectedProvider: (() -> Bool)?
     
-    override init() {
+    private override init() {
         super.init()
         if WCSession.isSupported() {
             session.delegate = self
@@ -56,6 +60,24 @@ class WatchReceiver: NSObject, ObservableObject, WCSessionDelegate {
         soundDetectedProvider = nil
         audioMonitor.startMonitoring(allowsPlayback: allowsPlayback)
     }
+    func syncAppState(state: String) {
+        if session.isReachable {
+            session.sendMessage(["command": "syncAppState", "state": state], replyHandler: nil, errorHandler: nil)
+        }
+    }
+    
+    func syncPlaying(title: String, currentTime: Double, maxTime: Double, isPaused: Bool) {
+        if session.isReachable {
+            let msg: [String: Any] = [
+                "command": "syncPlaying",
+                "title": title,
+                "currentTime": currentTime,
+                "maxTime": maxTime,
+                "isPaused": isPaused
+            ]
+            session.sendMessage(msg, replyHandler: nil, errorHandler: nil)
+        }
+    }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         DispatchQueue.main.async {
@@ -81,6 +103,8 @@ class WatchReceiver: NSObject, ObservableObject, WCSessionDelegate {
                             self.session.sendMessage(reply, replyHandler: nil, errorHandler: nil)
                         }
                     }
+                } else if command == "togglePauseFromWatch" {
+                    self.watchDidTogglePause = UUID()
                 }
             }
             

@@ -387,6 +387,7 @@ struct SongListView: View {
                     rhythm: timeSignature,
                     patterns: recommendedPatterns,
                     chordSegments: chordSegments,
+                    songTitle: stored.title ?? "Unknown Song",
                     audioURL: audioURL
                 )
             } else {

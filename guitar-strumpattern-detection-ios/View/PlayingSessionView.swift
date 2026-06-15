@@ -65,10 +65,15 @@ struct PlayingSessionView: View {
         self.duration      = duration
         self.audioURL      = audioURL
         self.autoPlay      = autoPlay
-        self._tutorialPauseStep = State(initialValue: isFirstTime ? 1 : 0)
+        // Determine first launch status locally to avoid capturing `self` before initialization
+        let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
+        let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
+
+        self._tutorialPauseStep = State(initialValue: isFirst ? 1 : 0)
         
         var processedChords = chords
-        if isFirstTime {
+        if isFirst {
+            
             // Give it 2.0s of clean slide-in time before it hits the line and pauses
             let delay: TimeInterval = 2.0
             processedChords = chords.map {
@@ -216,6 +221,10 @@ struct PlayingSessionView: View {
             handleStrumDown()
         }
         .onAppear {
+            let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
+            let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
+            print("isFirstTime is \(isFirst)")
+            
             lockToLandscape()
 
             if let audioURL = audioURL {

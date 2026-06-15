@@ -21,7 +21,11 @@ struct WatchStatusView: View {
                         .foregroundStyle(isConnected ? .green : .red)
                 }
             }
-            CustomButton(title: "Recalibrate")
+            if isConnected {
+                CustomButton(title: "Recalibrate")
+            } else {
+                Spacer()
+            }
         }
         .padding(16)
         .background(.brandColorAccentGreen.opacity(0.1))

@@ -16,14 +16,6 @@ struct SongRow: View {
 
     var body: some View {
         rowContainer
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button {
-                onAnalyzeTapped?()
-            } label: {
-                Label("Analyze", systemImage: "waveform.circle.fill")
-            }
-            .tint(.brandColorAccentGreen)
-        }
         .contextMenu {
             Button {
                 onAnalyzeTapped?()
@@ -51,13 +43,17 @@ struct SongRow: View {
     private var rowContainer: some View {
         if isNavigationEnabled {
             HStack(spacing: Spacing.md) {
-                NavigationLink(value: item.id) {
-                    rowContent
-                }
-                .buttonStyle(.plain)
+                rowContent
+                    .background(
+                        NavigationLink(value: item.id) {
+                            EmptyView()
+                        }
+                        .opacity(0)
+                    )
 
                 menuButton
             }
+            .padding(.horizontal, Spacing.lg)
         } else {
             HStack(spacing: Spacing.md) {
                 Button {

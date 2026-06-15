@@ -161,7 +161,7 @@ struct SongListView: View {
                 )
             }
         }
-        .searchable(text: $searchText, prompt: "Search")
+        .searchable(text: $searchText, prompt: "Search")  
         .toolbar(.hidden, for: .navigationBar)
         .background(Color.bgPrimary)
         .navigationDestination(for: UUID.self) { songID in

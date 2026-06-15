@@ -506,8 +506,8 @@ struct PlayingSessionView: View {
                     .shadow(color: .brandColorPrimaryPurple.opacity(0.6), radius: 20)
 
                 HStack(spacing: 24) {
-                    Button { 
-                        vm.startGame() 
+                    Button {
+                        vm.startGame()
                     } label: {
                         VStack(spacing: 8) {
                             Image(systemName: "arrow.counterclockwise").font(.system(size: 28, weight: .black))

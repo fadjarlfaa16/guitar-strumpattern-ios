@@ -18,19 +18,11 @@ struct StrummingPatternList: View {
     let patterns: [StrummingPattern]
     @Binding var selectedPatternID: UUID?
     var onPatternTap: ((StrummingPattern) -> Void)? = nil
-
-     private func metadataLabel(_ text: String) -> some View {
-        Text(text)
-            .font(AppFont.bodyRegular)
-            .foregroundColor(.brandColorSecondaryPink)
-    }
     
     var body: some View {
         VStack(spacing: Spacing.lg) {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.lg) {
-                metadataLabel("BPM: \(bpm)")
-                metadataLabel("Rhythm: \(rhythm)")
-                
+                MusicPlayer()
                     .padding(.horizontal, Spacing.md)
                     .padding(.bottom, Spacing.sm)
     

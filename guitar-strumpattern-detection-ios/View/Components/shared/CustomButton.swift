@@ -19,7 +19,7 @@ struct CustomButton: View {
                 .font(AppFont.headlineSemibold)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, Spacing.md)
+                .padding(.vertical, Spacing.sm)
                 
         }
 

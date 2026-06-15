@@ -116,16 +116,12 @@ struct PlayingSessionView: View {
                     rhythmLane
 
                     if isFirstTime && !vm.hasPassedFirstNote {
-                        Text("Let’s get started by strumming according to the arrow on the screen.")
+                        Text("Let’s get started by strumming \naccording to the arrow on the screen.")
                             .font(AppFont.bodyRegular)
                             .foregroundStyle(.textPrimaryWhite)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(
-                                Capsule()
-                                    .fill(Color.backgroundPrimaryBlack.opacity(0.75))
-                            )
                             .offset(y: -10)
                             .transition(.opacity)
                             .animation(.easeInOut(duration: 0.4), value: vm.hasPassedFirstNote)

@@ -21,3 +21,4 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         return AppDelegate.orientationLock
     }
 }
+//

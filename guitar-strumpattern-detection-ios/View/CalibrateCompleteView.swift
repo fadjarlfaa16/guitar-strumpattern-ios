@@ -8,8 +8,16 @@ import SwiftUI
 
 
 struct CalibrateCompleteView: View {
+    @Environment(\.dismiss) private var dismiss
+    let isRecalibrating: Bool
+    
     @State private var navigateToTryWatchView = false
     var onReset: () -> Void = {}
+    
+    init(isRecalibrating: Bool = false, onReset: @escaping () -> Void = {}) {
+        self.isRecalibrating = isRecalibrating
+        self.onReset = onReset
+    }
 
     var body: some View {
         VStack {
@@ -38,8 +46,14 @@ struct CalibrateCompleteView: View {
             Spacer()
 
             VStack(spacing: 12) {
-                CustomButton(title: "Next") {
-                    navigateToTryWatchView = true
+                if isRecalibrating {
+                    CustomButton(title: "Done") {
+                        dismiss()
+                    }
+                } else {
+                    CustomButton(title: "Next") {
+                        navigateToTryWatchView = true
+                    }
                 }
 
                 Button(action: onReset) {

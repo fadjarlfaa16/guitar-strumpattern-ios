@@ -91,7 +91,8 @@ final class GuitarValidationViewModel: ObservableObject {
 
     private func handleCalibrationUpdate(status: String, isCalibrating: Bool) {
         guard !isCalibrating else { return }
-        let ready = status.contains("Ready") || status.contains("Selesai")
+        let hasCompletedStrums = receiver.recordedSamplesCount >= receiver.targetSamples
+        let ready = status.contains("Ready") || status.contains("Selesai") || hasCompletedStrums
         guard ready, phase == .calibration else { return }
         enterPlayingPhase()
     }

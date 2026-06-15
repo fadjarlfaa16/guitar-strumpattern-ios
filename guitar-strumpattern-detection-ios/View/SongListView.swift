@@ -171,7 +171,7 @@ struct SongListView: View {
             songDetailView(for: songID)
         }
         .navigationDestination(isPresented: $showRecalibrate) {
-            CalibrateWatchView()
+            CalibrateWatchView(isRecalibrating: true)
         }
     }
 

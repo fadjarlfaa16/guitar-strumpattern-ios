@@ -22,7 +22,7 @@ enum WatchAppState: Equatable {
     case playing
 }
 
-class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
+class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRuntimeSessionDelegate {
     
     let motionManager = CMMotionManager()
     var session = WCSession.default
@@ -31,7 +31,11 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
     @Published var lastStrum: String = "Diam"
     
     // UI State
-    @Published var currentWatchState: WatchAppState = .disconnected
+    @Published var currentWatchState: WatchAppState = .disconnected {
+        didSet {
+            updateExtendedRuntimeSession()
+        }
+    }
     @Published var songTitle: String = ""
     @Published var currentTime: Double = 0.0
     @Published var maxTime: Double = 0.0
@@ -41,6 +45,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
     @Published var calibrationStatusText: String = "Siap"
     @Published var recordedSamplesCount: Int = 0
     let targetSamples = 5
+    private var runtimeSession: WKExtendedRuntimeSession?
     private var temporaryCalibrationSamples: [Double] = []
     
     @Published var downThreshold: Double = 0.5
@@ -75,7 +80,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
                     }
                 }
                 else if command == "syncAppState" {
-                    if let stateStr = message["state"] as? String {
+                    if let stateStr = (message["state"] as? String) ?? (message["appState"] as? String) {
                         switch stateStr {
                         case "calibrating": self.currentWatchState = .calibrating
                         case "waitingForSong": self.currentWatchState = .waitingForSong
@@ -131,12 +136,8 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
         self.temporaryCalibrationSamples.removeAll()
         self.recordedSamplesCount = 0
         self.calibrationState = .calibratingDown
-//<<<<<<< HEAD
-//        self.calibrationStatusText = "Strum down 5 times"
-//=======
-//        self.calibrationStatusText = "Strum Down"
-//        self.currentWatchState = .calibrating
-//>>>>>>> chord-detection-feature
+        self.calibrationStatusText = "Strum Down"
+        self.currentWatchState = .calibrating
         
         syncCalibrationStateToiPhone()
         WKInterfaceDevice.current().play(.start)
@@ -234,12 +235,12 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
         let average = temporaryCalibrationSamples.reduce(0, +) / Double(targetSamples)
         self.upThreshold = average * sensitivityFactor
         self.calibrationState = .idle
+        self.calibrationStatusText = "Selesai"
         
         syncCalibrationStateToiPhone()
         WKInterfaceDevice.current().play(.success)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-//            self.calibrationStatusText = "Ready (Calibrated)"
             self.currentWatchState = .waitingForSong
             self.syncCalibrationStateToiPhone()
         }
@@ -268,4 +269,49 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate {
     }
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
+    
+    // MARK: - Extended Runtime Session Helpers
+    
+    private func updateExtendedRuntimeSession() {
+        if currentWatchState == .calibrating || currentWatchState == .playing {
+            startExtendedRuntimeSession()
+        } else {
+            stopExtendedRuntimeSession()
+        }
+    }
+    
+    private func startExtendedRuntimeSession() {
+        guard runtimeSession == nil else { return }
+        
+        let session = WKExtendedRuntimeSession()
+        session.delegate = self
+        self.runtimeSession = session
+        session.start()
+        print("WKExtendedRuntimeSession started for state: \(currentWatchState)")
+    }
+    
+    private func stopExtendedRuntimeSession() {
+        if let session = runtimeSession {
+            session.invalidate()
+            runtimeSession = nil
+            print("WKExtendedRuntimeSession invalidated manually")
+        }
+    }
+    
+    // MARK: - WKExtendedRuntimeSessionDelegate
+    
+    func extendedRuntimeSession(_ extendedRuntimeSession: WKExtendedRuntimeSession, didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason, error: Error?) {
+        DispatchQueue.main.async { [weak self] in
+            self?.runtimeSession = nil
+            print("WKExtendedRuntimeSession invalidated. Reason: \(reason), Error: \(error?.localizedDescription ?? "None")")
+        }
+    }
+    
+    func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
+        print("WKExtendedRuntimeSession did start")
+    }
+    
+    func extendedRuntimeSessionWillExpire(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
+        print("WKExtendedRuntimeSession will expire soon")
+    }
 }

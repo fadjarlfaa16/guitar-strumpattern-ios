@@ -5,21 +5,21 @@
 //  Created by Farhan Izzaz on 15/06/26.
 //
 import SwiftUI
-
+////s
 struct CalibrateWatchView: View {
+    let isRecalibrating: Bool
+    
     @State private var navigateToWatchCheck = false
-    @State private var strumDirection: StrumBeat = .up
+    @StateObject private var vm = GuitarValidationViewModel()
     
-    @StateObject private var vm: GuitarValidationViewModel
-    @ObservedObject private var receiver: WatchReceiver
-    @ObservedObject private var audioMonitor: AudioMonitor
-    
-    init() {
-        let viewModel = GuitarValidationViewModel()
-        _vm = StateObject(wrappedValue: viewModel)
-        _receiver = ObservedObject(wrappedValue: viewModel.receiver)
-        _audioMonitor = ObservedObject(wrappedValue: viewModel.receiver.audioMonitor)
+    private var strumDirection: StrumBeat {
+        vm.receiver.calibrationPhase == "up" ? .up : .down
     }
+    
+    init(isRecalibrating: Bool = false) {
+        self.isRecalibrating = isRecalibrating
+    }
+    
     var body: some View {
         ZStack {
             Color.backgroundPrimaryBlack
@@ -30,7 +30,7 @@ struct CalibrateWatchView: View {
 
             Group {
                 if vm.isCalibrated {
-                    CalibrateCompleteView(onReset: vm.recalibrate)
+                    CalibrateCompleteView(isRecalibrating: isRecalibrating, onReset: vm.recalibrate)
                         .transition(.opacity.combined(with: .scale(scale: 0.98)))
                 } else {
                     calibratingContent
@@ -71,44 +71,41 @@ struct CalibrateWatchView: View {
                     .frame(width: 168)
                     .fontWeight(.bold)
                     .symbolRenderingMode(.hierarchical)
-                    .scaleEffect(y: -1) // Membalik secara vertikal
                     .scaleEffect(
-                            x: strumDirection == .up ? -1 : 1,
-                            y: strumDirection == .up ? 1 : -1
-                        )
-                        .animation(.easeInOut(duration: 0.3), value: strumDirection)
+                        x: strumDirection == .up ? -1 : 1,
+                        y: strumDirection == .down ? -1 : 1
+                    )
+                    .animation(.easeInOut(duration: 0.3), value: strumDirection)
                     
-                    
-                    VStack(spacing: Spacing.sm) {
-                        Text(receiver.calibrationStatusText)
-                            .font(AppFont.title3Bold)
-                            .foregroundStyle(.textPrimaryWhite)
-                            .multilineTextAlignment(.center)
-                        
-                        if receiver.isCalibrating {
-                            ProgressView(
-                                value: Double(receiver.recordedSamplesCount),
-                                total: Double(receiver.targetSamples)
-                            )
-                            .tint(.brandColorAccentGreen)
-                            
-                            Text("\(receiver.recordedSamplesCount) / \(receiver.targetSamples)")
-                                .font(AppFont.bodyRegular.monospacedDigit())
-                                .foregroundStyle(.textPrimaryWhite)
-                        } else {
-                            Text("Make sure the guitar sound is detected while strumming.")
-                                .font(AppFont.caption1Regular)
-//                                .foregroundStyle(.textSecondaryWhite)
-                                .multilineTextAlignment(.center)
-                        }
-                    }
+//                    VStack(spacing: Spacing.sm) {
+//                        Text(vm.receiver.calibrationStatusText)
+//                            .font(AppFont.title3Bold)
+//                            .foregroundStyle(.textPrimaryWhite)
+//                            .multilineTextAlignment(.center)
+//                        
+//                        if vm.receiver.isCalibrating {
+//                            ProgressView(
+//                                value: Double(vm.receiver.recordedSamplesCount),
+//                                total: Double(vm.receiver.targetSamples)
+//                            )
+//                            .tint(.brandColorAccentGreen)
+//                            
+//                            Text("\(vm.receiver.recordedSamplesCount) / \(vm.receiver.targetSamples)")
+//                                .font(AppFont.bodyRegular.monospacedDigit())
+//                                .foregroundStyle(.textPrimaryWhite)
+//                        } else {
+//                            Text("Make sure the guitar sound is detected while strumming.")
+//                                .font(AppFont.caption1Regular)
+//                                .multilineTextAlignment(.center)
+//                        }
+//                    }
                     
                 HStack {
-                    ForEach(0..<receiver.targetSamples, id: \.self) { index in
+                    ForEach(0..<vm.receiver.targetSamples, id: \.self) { index in
                         if index > 0 { Spacer() }
                         ArrowIcon(
                             direction: strumDirection,
-                            isCompleted: index < receiver.recordedSamplesCount
+                            isCompleted: index < vm.receiver.recordedSamplesCount
                         )
                     }
                     Spacer()

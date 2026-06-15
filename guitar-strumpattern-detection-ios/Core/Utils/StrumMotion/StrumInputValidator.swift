@@ -35,12 +35,14 @@ final class StrumInputValidator: ObservableObject {
         receiver.micBaseThreshold = thresholds.base
         receiver.micSpikeThreshold = thresholds.spike
         receiver.switchToCalibrationAudioMode(allowsPlayback: allowsPlayback)
+        receiver.syncAppState(state: "playing")
     }
 
     func stop() {
         guard isActive else { return }
         isActive = false
         receiver.audioMonitor.stopMonitoring()
+        receiver.syncAppState(state: "waitingForSong")
     }
 
     private func handleConfirmedStrum() {

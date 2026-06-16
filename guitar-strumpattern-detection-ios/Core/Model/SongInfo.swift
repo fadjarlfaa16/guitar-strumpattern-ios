@@ -18,7 +18,7 @@ extension SongInfo {
     static let sample = SongInfo(
         bpm: 120,
         timeSignature: "4/4",
-        displayTitle: "Backburner",
-        displayArtist: "Niki"
+        displayTitle: "Twinkle Twinkle Little Star",
+        displayArtist: ""
     )
 }

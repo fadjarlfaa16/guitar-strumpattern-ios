@@ -17,7 +17,7 @@ struct MusicPlayer: View {
                     HStack {
                         Image(systemName: "stopwatch.fill")
                             .foregroundColor(.brandColorAccentGreen)
-                        Text("= 120 bpm")
+                        Text("= 60 bpm")
                             .foregroundColor(.brandColorAccentGreen)
                     }
                     HStack {
@@ -27,7 +27,7 @@ struct MusicPlayer: View {
                             .foregroundColor(.brandColorAccentGreen)
                     }
                 }
-                Text("Niki - Backburner")
+                Text("Twinkle Twinkle Little ")
                     .foregroundColor(.brandColorAccentGreen)
                 
             }

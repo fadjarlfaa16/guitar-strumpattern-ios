@@ -4,6 +4,48 @@ import SwiftUI
 struct TryDemoSongView: View {
     @State private var navigateToChoosePattern = false
 
+    // MARK: - Demo Song Constants
+    private static let demoBPM: Int = 60
+    private static let demoTimeSignature: String = "4/4"
+
+    // MARK: - Demo Chord Segments (parsed from bundled txt)
+    /// Parses twinkle-twinkle-chords.txt (format: "startTime  endTime  label" per line)
+    private var demoChordSegments: [StoredChordSegment] {
+        guard let url = Bundle.main.url(forResource: "twinkle-twinkle-chords", withExtension: "txt"),
+              let content = try? String(contentsOf: url, encoding: .utf8) else {
+            return []
+        }
+        return content
+            .components(separatedBy: .newlines)
+            .compactMap { line -> StoredChordSegment? in
+                let parts = line.split(whereSeparator: \.isWhitespace)
+                guard parts.count >= 3,
+                      let start = Double(parts[0]),
+                      let end = Double(parts[1]) else { return nil }
+                let label = String(parts[2])
+                return StoredChordSegment(startTime: start, endTime: end, label: label)
+            }
+    }
+
+    // MARK: - Demo Audio URL (from bundle)
+    private var demoAudioURL: URL? {
+        Bundle.main.url(forResource: "twinkle-twinkle", withExtension: "mp3")
+    }
+
+    // MARK: - Recommended Patterns (based on real demo parameters)
+    private var demoPatterns: [StrummingPattern] {
+        let segments = demoChordSegments
+        guard !segments.isEmpty else {
+            // Fallback: show all patterns if txt failed to load
+            return Array(StrumPatternLibrary.allPatterns().prefix(4))
+        }
+        return StrumPatternLibrary.recommendations(
+            bpm: Self.demoBPM,
+            timeSignature: Self.demoTimeSignature,
+            chordSegments: segments
+        )
+    }
+
     var body: some View {
         ZStack {
             // Background
@@ -42,7 +84,11 @@ struct TryDemoSongView: View {
                     }
                     .navigationDestination(isPresented: $navigateToChoosePattern) {
                         ChooseStrummingPatternView(
-                            bpm: 120, rhythm: "4/4", patterns: Array(StrumPatternLibrary.allPatterns().prefix(4))
+                            bpm: Self.demoBPM,
+                            rhythm: Self.demoTimeSignature,
+                            patterns: demoPatterns,
+                            chordSegments: demoChordSegments,
+                            audioURL: demoAudioURL
                         )
                     }
                 }

@@ -7,6 +7,10 @@
 import SwiftUI
 
 struct MusicPlayer: View {
+    var bpm: Int
+    var rhythm: String
+    var title: String
+
     var body: some View {
         HStack(spacing: Spacing.md) {
             Image(systemName: "play.circle.fill")
@@ -17,18 +21,19 @@ struct MusicPlayer: View {
                     HStack {
                         Image(systemName: "stopwatch.fill")
                             .foregroundColor(.brandColorAccentGreen)
-                        Text("= 60 bpm")
+                        Text("= \(bpm) bpm")
                             .foregroundColor(.brandColorAccentGreen)
                     }
                     HStack {
                         Image(systemName: "metronome.fill")
                             .foregroundColor(.brandColorAccentGreen)
-                        Text("= 4/4")
+                        Text("= \(rhythm)")
                             .foregroundColor(.brandColorAccentGreen)
                     }
                 }
-                Text("Twinkle Twinkle Little ")
+                Text(title)
                     .foregroundColor(.brandColorAccentGreen)
+                    .lineLimit(1)
                 
             }
         }
@@ -36,5 +41,6 @@ struct MusicPlayer: View {
 }
 
 #Preview {
-    MusicPlayer()
+    MusicPlayer(bpm: 60, rhythm: "4/4", title: "Twinkle Twinkle Little")
 }
+

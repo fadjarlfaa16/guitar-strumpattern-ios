@@ -11,6 +11,7 @@ struct ChooseStrummingPatternView: View {
     let rhythm: String
     let patterns: [StrummingPattern]
     var chordSegments: [StoredChordSegment]? = nil
+    var songTitle: String = "Twinkle Twinkle Little"
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     var audioURL: URL?
     var onPatternSelected: ((StrummingPattern) -> Void)? = nil
@@ -82,6 +83,7 @@ struct ChooseStrummingPatternView: View {
         StrummingPatternList(
             bpm: bpm, rhythm: rhythm,
             patterns: patterns,
+            songTitle: songTitle,
             selectedPatternID: $selectedPatternID,
             onPatternTap: selectPattern
         )
@@ -143,7 +145,8 @@ func metadataLabel(_ text: String) -> some View {
             bpm: 120,
             rhythm: "4/4",
             patterns: Array(StrumPatternLibrary.allPatterns().prefix(4)),
-            chordSegments: nil
+            chordSegments: nil,
+            songTitle: "Sample Song"
         )
     }
 }

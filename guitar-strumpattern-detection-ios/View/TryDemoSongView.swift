@@ -72,7 +72,7 @@ struct TryDemoSongView: View {
                             .scaledToFit()
                             .frame(width: 160, height: 160)
                             .foregroundColor(.brandColorAccentGreen)
-                        MusicPlayer()
+                        MusicPlayer(bpm: Self.demoBPM, rhythm: Self.demoTimeSignature, title: "Twinkle Twinkle Little Star")
                         
                     }
                     .padding(.horizontal, Spacing .md)
@@ -88,6 +88,7 @@ struct TryDemoSongView: View {
                             rhythm: Self.demoTimeSignature,
                             patterns: demoPatterns,
                             chordSegments: demoChordSegments,
+                            songTitle: "Twinkle Twinkle Little Star",
                             audioURL: demoAudioURL
                         )
                     }

@@ -16,13 +16,14 @@ struct StrummingPatternList: View {
     let bpm: Int
     let rhythm: String
     let patterns: [StrummingPattern]
+    let songTitle: String
     @Binding var selectedPatternID: UUID?
     var onPatternTap: ((StrummingPattern) -> Void)? = nil
     
     var body: some View {
         VStack(spacing: Spacing.lg) {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.lg) {
-                MusicPlayer()
+                MusicPlayer(bpm: bpm, rhythm: rhythm, title: songTitle)
                     .padding(.horizontal, Spacing.md)
                     .padding(.bottom, Spacing.sm)
     
@@ -48,7 +49,9 @@ struct StrummingPatternList: View {
         bpm: 120,
         rhythm: "4/4",
         patterns: Array(StrumPatternLibrary.allPatterns().prefix(4)),
+        songTitle: "Sample Song",
         selectedPatternID: $selectedID
     )
     .background(Color.backgroundPrimaryBlack)
 }
+

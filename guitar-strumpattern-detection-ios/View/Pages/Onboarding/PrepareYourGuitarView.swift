@@ -25,7 +25,10 @@ struct PrepareYourGuitarView: View {
             // Main Content
             VStack {
                 // Header Section
-                PrepareHeader()
+                HeroHeader(
+                    title: "Prepare Your Guitar and Apple Watch",
+                    subtitle: "You'll need a guitar and an Apple Watch to practice your strumming"
+                )
                 
                 Spacer()
                 
@@ -44,12 +47,8 @@ struct PrepareYourGuitarView: View {
                             isWatchConnected: true
                         )
                     }
-                    Button(action: {
+                    SecondaryTextButton(title: "Skip for Now") {
                         navRoot = .songList
-                    }) {
-                        Text("Skip for Now")
-                            .font(AppFont.bodyRegular)
-                            .foregroundColor(.brandColorPrimaryPurple)
                     }
                 }
                 }

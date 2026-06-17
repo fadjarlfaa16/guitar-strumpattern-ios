@@ -22,15 +22,17 @@ struct StrummingPatternList: View {
     var body: some View {
         VStack(spacing: Spacing.lg) {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.lg) {
-                MusicPlayer()
+                MusicPlayer(bpm: bpm, timeSignature: rhythm)
                     .padding(.horizontal, Spacing.md)
                     .padding(.bottom, Spacing.sm)
     
             }
             ForEach(patterns) { pattern in
-                StrummingPatternButton(
-                    label: pattern.notation,
-                    isSelected: selectedPatternID == pattern.id
+                CustomButton(
+                    title: pattern.notation,
+                    tint: selectedPatternID == pattern.id
+                        ? .brandColorSecondaryPink
+                        : .accentPurple
                 ) {
                     selectedPatternID = pattern.id
                     onPatternTap?(pattern)

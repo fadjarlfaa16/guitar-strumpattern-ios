@@ -184,7 +184,6 @@ struct SongListView: View {
                 SongRow(
                     item: item,
                     isNavigationEnabled: item.isAnalyzed,
-                    onMenuTapped: { onMenuTapped?(item) },
                     onEditTapped: { openEditSong(for: item) },
                     onDeleteTapped: { openDeleteSong(for: item) },
                     onAnalyzeTapped: { openAnalysis(for: item.id) }

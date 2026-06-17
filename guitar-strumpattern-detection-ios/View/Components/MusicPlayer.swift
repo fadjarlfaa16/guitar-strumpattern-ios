@@ -4,32 +4,37 @@
 //
 //  Created by Farhan Izzaz on 05/06/26.
 //
+
 import SwiftUI
 
 struct MusicPlayer: View {
+    var songTitle: String = "Niki - Backburner"
+    var bpm: Int = 120
+    var timeSignature: String = "4/4"
+
     var body: some View {
         HStack(spacing: Spacing.md) {
             Image(systemName: "play.circle.fill")
                 .foregroundColor(.brandColorPrimaryPurple)
                 .font(.system(size: 33))
+
             VStack(alignment: .leading) {
                 HStack {
                     HStack {
                         Image(systemName: "stopwatch.fill")
                             .foregroundColor(.brandColorAccentGreen)
-                        Text("= 120 bpm")
+                        Text("= \(bpm) bpm")
                             .foregroundColor(.brandColorAccentGreen)
                     }
                     HStack {
                         Image(systemName: "metronome.fill")
                             .foregroundColor(.brandColorAccentGreen)
-                        Text("= 4/4")
+                        Text("= \(timeSignature)")
                             .foregroundColor(.brandColorAccentGreen)
                     }
                 }
-                Text("Niki - Backburner")
+                Text(songTitle)
                     .foregroundColor(.brandColorAccentGreen)
-                
             }
         }
     }
@@ -37,4 +42,5 @@ struct MusicPlayer: View {
 
 #Preview {
     MusicPlayer()
+        .background(Color.backgroundPrimaryBlack)
 }

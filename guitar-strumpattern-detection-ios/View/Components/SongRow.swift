@@ -9,32 +9,36 @@ import SwiftUI
 struct SongRow: View {
     let item: SongListItem
     var isNavigationEnabled = true
-    var onMenuTapped: (() -> Void)? = nil
     var onEditTapped: (() -> Void)? = nil
     var onDeleteTapped: (() -> Void)? = nil
     var onAnalyzeTapped: (() -> Void)? = nil
 
     var body: some View {
         rowContainer
-        .contextMenu {
+            .contextMenu { menuItems }
+    }
+
+    /// Shared menu options for both the long-press context menu and the
+    /// ellipsis menu button, so the two stay in sync.
+    @ViewBuilder
+    private var menuItems: some View {
+        Button {
+            onAnalyzeTapped?()
+        } label: {
+            Label("Analyze Audio", systemImage: "waveform.circle.fill")
+        }
+        if onEditTapped != nil {
             Button {
-                onAnalyzeTapped?()
+                onEditTapped?()
             } label: {
-                Label("Analyze Audio", systemImage: "waveform.circle.fill")
+                Label("Edit Name", systemImage: "pencil")
             }
-            if onEditTapped != nil {
-                Button {
-                    onEditTapped?()
-                } label: {
-                    Label("Edit Name", systemImage: "pencil")
-                }
-            }
-            if onDeleteTapped != nil {
-                Button(role: .destructive) {
-                    onDeleteTapped?()
-                } label: {
-                    Label("Delete Song", systemImage: "trash")
-                }
+        }
+        if onDeleteTapped != nil {
+            Button(role: .destructive) {
+                onDeleteTapped?()
+            } label: {
+                Label("Delete Song", systemImage: "trash")
             }
         }
     }
@@ -94,17 +98,7 @@ struct SongRow: View {
 
     private var menuButton: some View {
         Menu {
-            Button {
-                onEditTapped?()
-            } label: {
-                Label("Edit Name", systemImage: "pencil")
-            }
-
-            Button(role: .destructive) {
-                onDeleteTapped?()
-            } label: {
-                Label("Delete Song", systemImage: "trash")
-            }
+            menuItems
         } label: {
             Image(systemName: "ellipsis")
                 .font(.system(size: 16, weight: .semibold))

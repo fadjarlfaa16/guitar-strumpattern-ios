@@ -114,12 +114,8 @@ struct CalibrateWatchView: View {
 
             Spacer()
 
-            Button {
+            SecondaryTextButton(title: "Reset") {
                 vm.recalibrate()
-            } label: {
-                Text("Reset")
-                    .font(AppFont.bodyRegular)
-                    .foregroundColor(.brandColorPrimaryPurple)
             }
         }
     }

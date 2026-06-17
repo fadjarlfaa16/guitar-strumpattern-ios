@@ -6,9 +6,7 @@
 //
 
 import SwiftUI
-/// Draws a pill background that spans from the first note to the last note
-/// in the group (time-based width). BPM directly controls how wide the pill is.
-/// A small floating chord label appears above the pill's leading edge.
+
 struct ChordGroupPillView: View {
     
     let group: ChordGroup
@@ -43,21 +41,6 @@ struct ChordGroupPillView: View {
     
     var body: some View {
         ZStack {
-            
-            // ── Pill background ──
-//            RoundedRectangle(cornerRadius: 12)
-//                .fill(.brandColorPrimaryPurple.opacity(0.4))
-//                .overlay(
-//                    RoundedRectangle(cornerRadius: 12)
-//                        .strokeBorder(
-//                            .brandColorPrimaryPurple.opacity(0.45),
-//                            lineWidth: 1
-//                        )
-//                )
-//                .frame(width: pillW, height: blockSize)
-//                .position(x: pillCX, y: pillCY)
-//            
-            // ── Floating chord label ──
             HStack(spacing: 0) {
                 Text(group.chord)
                     .font(AppFont.title3Bold)

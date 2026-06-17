@@ -310,12 +310,8 @@ struct PlayingSessionView: View {
                 }
                 Spacer()
                 if isFirstTime {
-                    Button {
+                    SecondaryTextButton(title: "Skip", color: .textPrimaryWhite, font: AppFont.bodyBold) {
                         navRoot = .uploadSong
-                    } label: {
-                        Text("Skip")
-                            .font(AppFont.bodyBold)
-                            .foregroundStyle(.textPrimaryWhite)
                     }
                 }
             }
@@ -568,52 +564,19 @@ extension PlayingSessionView {
             Color.black.opacity(0.6).ignoresSafeArea()
             
             HStack {
-                Button {
+                pauseActionButton(icon: .arrowBackward, label: "Exit") {
                     routes.songLibraryRoute = NavigationPath()
-                } label: {
-                    VStack {
-                        Image.arrowBackward
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 24)
-                            .foregroundStyle(.textPrimaryWhite)
-                        Text("Exit")
-                            .font(.caption)
-                            .foregroundStyle(.textPrimaryWhite)
-                    }
                 }
                 Spacer()
-                Button {
+                pauseActionButton(icon: .replay, label: "Replay") {
                     vm.startGame()
                     if tutorialPauseStep == 2 {
                         withAnimation { tutorialPauseStep = 0 }
                     }
-                } label: {
-                    VStack {
-                        Image.replay
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 24)
-                            .foregroundStyle(.textPrimaryWhite)
-                        Text("Replay")
-                            .font(.caption)
-                            .foregroundStyle(.textPrimaryWhite)
-                    }
                 }
                 Spacer()
-                Button {
+                pauseActionButton(icon: .musicnotelist, label: "Change Pattern") {
                     dismiss()
-                } label: {
-                    VStack {
-                        Image.musicnotelist
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 24)
-                            .foregroundStyle(.textPrimaryWhite)
-                        Text("Change Pattern")
-                            .font(.caption)
-                            .foregroundStyle(.textPrimaryWhite)
-                    }
                 }
             }
             
@@ -647,6 +610,24 @@ extension PlayingSessionView {
             vm.resumeGame()
             if tutorialPauseStep == 2 {
                 withAnimation { tutorialPauseStep = 0 }
+            }
+        }
+    }
+
+    /// One icon-over-caption button used for Exit / Replay / Change Pattern
+    /// in the pause overlay. These three used to be three near-identical
+    /// hand-written `Button { VStack { ... } }` blocks.
+    private func pauseActionButton(icon: Image, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack {
+                icon
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 24)
+                    .foregroundStyle(.textPrimaryWhite)
+                Text(label)
+                    .font(.caption)
+                    .foregroundStyle(.textPrimaryWhite)
             }
         }
     }

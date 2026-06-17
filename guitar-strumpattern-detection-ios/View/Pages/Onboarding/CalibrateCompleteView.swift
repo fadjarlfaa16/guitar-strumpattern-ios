@@ -56,11 +56,7 @@ struct CalibrateCompleteView: View {
                     }
                 }
 
-                Button(action: onReset) {
-                    Text("Reset")
-                        .font(AppFont.bodyRegular)
-                        .foregroundColor(.brandColorPrimaryPurple)
-                }
+                SecondaryTextButton(title: "Reset", action: onReset)
             }
             .navigationDestination(isPresented: $navigateToTryWatchView) {
                 TryDemoSongView()

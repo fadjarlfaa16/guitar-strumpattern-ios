@@ -49,15 +49,8 @@ struct AppleWatchCheckView: View {
                 // Next Button
                 if isWatchConnected {
                 VStack(spacing: 12) {
-                        CustomButton(title: "Next") {
+                    CustomButton(title: "Next") {
                             navigateToCalibrateWatch = true
-                        }
-                        Button(action: {
-                            appState = .songList
-                        }) {
-                            Text("Skip for Now")
-                                .font(AppFont.bodyRegular)
-                                .foregroundColor(.brandColorPrimaryPurple)
                         }
                     }
                     .navigationDestination(isPresented: $navigateToCalibrateWatch) {

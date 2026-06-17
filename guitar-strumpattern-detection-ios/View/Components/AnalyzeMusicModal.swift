@@ -17,7 +17,7 @@ struct AnalyzeMusicModal: View {
     @State private var analysisError: String? = nil
     @State private var progress: Double = 0
     @State private var animatingIndex: Int = 0
-    @State private var analysisStage: String = "Analyzing BPM & Time Signature..."
+    @State private var analysisStage: AnalysisStage = .validating
 
     var body: some View {
         ZStack {
@@ -108,7 +108,7 @@ struct AnalyzeMusicModal: View {
                             .scaleEffect(y: 2, anchor: .center)
 
                         VStack(spacing: 8) {
-                            Text(analysisStage)
+                            Text(analysisStage.message)
                                 .font(AppFont.bodyRegular)
                                 .foregroundStyle(.textPrimaryWhite)
 
@@ -191,7 +191,7 @@ struct AnalyzeMusicModal: View {
         isAnalyzing = true
         analysisError = nil
         withAnimation(.easeOut(duration: 0.3)) { progress = 0 }
-        analysisStage = "Validating audio file..."
+        analysisStage = .validating
 
         do {
             let audioURL = SongLibraryStore.audioDirectory.appendingPathComponent(song.sandboxFileName)
@@ -211,18 +211,14 @@ struct AnalyzeMusicModal: View {
             }
 
             withAnimation(.easeOut(duration: 0.3)) { progress = 0.04 }
-            analysisStage = "Starting analysis pipeline..."
+            analysisStage = .starting
 
-            // Buat AsyncStream sebagai jembatan antara background task (sync)
-            // dan main actor (SwiftUI). Setiap onProgress callback dari ChordAnalyzer
-            // di-yield ke stream, lalu dikonsumsi di main actor dengan animasi smooth.
-            var progressContinuation: AsyncStream<(Double, String)>.Continuation?
-            let progressStream = AsyncStream<(Double, String)> { cont in
+            var progressContinuation: AsyncStream<(Double, AnalysisStage)>.Continuation?
+            let progressStream = AsyncStream<(Double, AnalysisStage)> { cont in
                 progressContinuation = cont
             }
             let continuation = progressContinuation!
 
-            // Jalankan analisis di background thread
             let analysisTask = Task.detached(priority: .userInitiated) {
                 let r = Result {
                     try ChordAnalyzer.shared.analyze(audioURL: audioURL) { prog, stage in
@@ -233,14 +229,12 @@ struct AnalyzeMusicModal: View {
                 return r
             }
 
-            // Timeout: cancel task jika terlalu lama
             let timeoutTask = Task {
                 try? await Task.sleep(nanoseconds: 600 * 1_000_000_000)
                 analysisTask.cancel()
                 continuation.finish()
             }
 
-            // Konsumsi progress update di main actor dengan animasi smooth
             for await (prog, stage) in progressStream {
                 withAnimation(.easeInOut(duration: 0.5)) { progress = prog }
                 analysisStage = stage
@@ -248,22 +242,20 @@ struct AnalyzeMusicModal: View {
 
             timeoutTask.cancel()
 
-            // Ambil hasil dari background task
             let result = try await analysisTask.value.get()
 
             withAnimation(.easeInOut(duration: 0.4)) { progress = 0.97 }
-            analysisStage = "Processing results..."
+            analysisStage = .processing
             try await Task.sleep(nanoseconds: 200_000_000)
 
             withAnimation(.easeOut(duration: 0.5)) { progress = 1.0 }
-            analysisStage = "Complete!"
+            analysisStage = .complete
             try await Task.sleep(nanoseconds: 500_000_000)
 
             analysisResult = result
             isAnalyzing = false
 
         } catch is CancellationError {
-            // .task modifier cancel saat view disappear — tidak perlu error message
             isAnalyzing = false
         } catch {
             analysisError = getErrorMessage(error)

@@ -180,7 +180,6 @@ struct PlayingSessionView: View {
                 }
             }
             
-            // Feedback overlay removed
 
             if vm.isFinished {
                 FinishedOverlay(

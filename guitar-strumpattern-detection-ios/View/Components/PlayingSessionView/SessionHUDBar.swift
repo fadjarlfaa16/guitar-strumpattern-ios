@@ -1,4 +1,12 @@
 //
+//  SessionHUDBar 2.swift
+//  guitar-strumpattern-detection-ios
+//
+//  Created by muhammad aqil zaki on 18/06/26.
+//
+
+
+//
 //  SessionHUDBar.swift
 //  guitar-strumpattern-detection-ios
 //
@@ -33,6 +41,16 @@ struct SessionHUDBar: View {
             .foregroundStyle(.textPrimaryWhite.opacity(0.85))
             .lineLimit(1)
 
+        if isFirstTime {
+            Spacer()
+            SecondaryTextButton(
+                title: "Skip",
+                color: .textPrimaryWhite,
+                font: .system(size: 13, weight: .semibold)
+            ) {
+                onSkip?()
+            }
+        }
         }
     }
 }

@@ -25,7 +25,7 @@ struct CalibrateWatchView: View {
             Color.backgroundPrimaryBlack
                 .ignoresSafeArea()
 
-            PrepareGuitarBackgroundLines()
+        BackgroundLines(style:.prepareGuitar)
                 .ignoresSafeArea()
 
             Group {

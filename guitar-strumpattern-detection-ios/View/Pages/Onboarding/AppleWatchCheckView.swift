@@ -20,7 +20,7 @@ struct AppleWatchCheckView: View {
                 .ignoresSafeArea()
             
             // Background Wavy Lines
-            PrepareGuitarBackgroundLines()
+            BackgroundLines(style:.prepareGuitar)
                 .ignoresSafeArea()
             
             // Main Content

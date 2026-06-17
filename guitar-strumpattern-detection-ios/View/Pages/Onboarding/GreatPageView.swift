@@ -22,10 +22,17 @@ struct GreatPageView: View {
 
             VStack(spacing: 0) {
                 // 1. Header: blob hijau outline + teks Great!
-                HeroHeader(
-                    title: "Great!",
-                    subtitle: "Before you go, you need to add song from your local library. Make sure its in MP3, WAV, and M4A"
-                )
+                HeroHeader {
+                    Text("Great!")
+                        .font(AppFont.largeTitleBold)
+                        .foregroundColor(.textPrimaryWhite)
+
+                    Text("""
+                    Before you go, you need to add a song from your local library. Make sure it's in MP3, WAV, or M4A.
+                    """)
+                    .font(AppFont.bodyRegular)
+                    .foregroundColor(.textPrimaryWhite.opacity(0.7))
+                }
 
                 Spacer()
 

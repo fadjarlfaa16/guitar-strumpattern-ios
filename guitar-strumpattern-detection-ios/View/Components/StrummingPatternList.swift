@@ -32,7 +32,9 @@ struct StrummingPatternList: View {
                     title: pattern.notation,
                     tint: selectedPatternID == pattern.id
                         ? .brandColorSecondaryPink
-                        : .accentPurple
+                        : .accentPurple,
+                    textColor: .textPrimary,
+                    style: .glass
                 ) {
                     selectedPatternID = pattern.id
                     onPatternTap?(pattern)

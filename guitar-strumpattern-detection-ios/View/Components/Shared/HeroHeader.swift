@@ -11,20 +11,33 @@
 import SwiftUI
 
 // MARK: - Hero Header View
-struct HeroHeader: View {
-    let title: String
-    let subtitle: String
+struct HeroHeader<Content: View>: View {
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
+    private let content: Content
+
+    init(
+        title: String,
+        subtitle: String
+    ) where Content == VStack<TupleView<(Text, Text)>> {
+
+        self.content = VStack(alignment: .leading, spacing: Spacing.sm) {
             Text(title)
                 .font(AppFont.largeTitleBold)
                 .foregroundColor(.textPrimaryWhite)
-                .lineSpacing(2)
 
             Text(subtitle)
                 .font(AppFont.bodyRegular)
                 .foregroundColor(.textPrimaryWhite.opacity(0.7))
+        }
+    }
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            content
         }
     }
 }

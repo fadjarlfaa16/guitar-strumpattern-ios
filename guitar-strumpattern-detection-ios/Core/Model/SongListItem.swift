@@ -5,7 +5,6 @@
 
 import Foundation
 
-/// Ringan untuk list + NavigationLink. Chord segments di-load dari storage saat navigasi.
 struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
     let id: UUID
     let bpm: Int

@@ -7,26 +7,56 @@
 
 import SwiftUI
 
+enum CustomButtonStyle {
+    case glass
+    case capsule
+}
 // MARK: - Primary Button
 struct CustomButton: View {
     let title: String
+
     var tint: Color = .brandColorPrimaryPurple2
+    var textColor: Color = .white
     var isDisabled: Bool = false
+    var style: CustomButtonStyle = .glass
+
     var action: (() -> Void) = {}
 
     var body: some View {
-        Button {
-            action()
-        } label: {
-            Text(title)
-                .font(AppFont.headlineSemibold)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Spacing.sm)
+
+        switch style {
+
+        case .glass:
+            Button {
+                action()
+            } label: {
+                Text(title)
+                    .font(AppFont.headlineSemibold)
+                    .foregroundColor(textColor)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Spacing.sm)
+            }
+            .disabled(isDisabled)
+            .tint(tint)
+            .buttonStyle(.glassProminent)
+
+        case .capsule:
+            Button {
+                action()
+            } label: {
+                Text(title)
+                    .font(AppFont.headlineSemibold)
+                    .foregroundColor(textColor)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Spacing.lg)
+                    .background(
+                        Capsule()
+                            .fill(tint)
+                    )
+            }
+            .disabled(isDisabled)
+            .buttonStyle(.plain)
         }
-        .disabled(isDisabled)
-        .tint(tint)
-        .buttonStyle(.glassProminent)
     }
 }
 

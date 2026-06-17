@@ -21,15 +21,15 @@ struct PauseOverlay: View {
             Color.black.opacity(0.6).ignoresSafeArea()
             
             HStack {
-                pauseActionButton(icon: .arrowBackward, label: "Exit") {
+                pauseActionButton(icon: .arrowBackward, label: "Exit", color:.textPrimaryWhite ) {
                     onExit()
                 }
                 Spacer()
-                pauseActionButton(icon: .replay, label: "Replay") {
+                pauseActionButton(icon: .replay, label: "Replay",color:.textPrimaryWhite) {
                     onReplay()
                 }
                 Spacer()
-                pauseActionButton(icon: .musicnotelist, label: "Change Pattern") {
+                pauseActionButton(icon: .musicnotelist, label: "Change Pattern",color:.textPrimaryWhite) {
                     onChangePattern()
                 }
             }
@@ -58,11 +58,15 @@ struct PauseOverlay: View {
                 .allowsHitTesting(false)
             }
         }
+        .onTapGesture {
+            onResume()
+        }
     }
     
     private func pauseActionButton(
         icon: Image,
         label: String,
+        color: Color = .textPrimaryWhite,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -71,9 +75,11 @@ struct PauseOverlay: View {
                     .resizable()
                     .scaledToFit()
                     .frame(height: 24)
+                    .foregroundStyle(color)
 
                 Text(label)
                     .font(.caption)
+                    .foregroundStyle(color)
             }
         }
     }

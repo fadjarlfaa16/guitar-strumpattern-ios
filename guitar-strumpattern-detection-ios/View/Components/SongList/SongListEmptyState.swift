@@ -21,3 +21,6 @@ struct SongListEmptyState: View {
         }
     }
 }
+#Preview {
+    SongListEmptyState()
+}

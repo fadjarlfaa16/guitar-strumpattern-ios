@@ -64,9 +64,12 @@ struct SongListView: View {
                 }
                 Spacer()
             } else if savedSong.songs.isEmpty {
-                Spacer()
-                SongListEmptyState()
-                Spacer()
+                VStack {
+                        Spacer()
+                        SongListEmptyState()
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
             } else {
                 SongListContent(
                     items: filteredItems,
@@ -187,8 +190,11 @@ struct SongListView: View {
 // MARK: - Preview
 
 #Preview {
+    let savedSong = SavedSong()
+
     NavigationStack {
         SongListView()
+            .environment(savedSong)
     }
 }
 

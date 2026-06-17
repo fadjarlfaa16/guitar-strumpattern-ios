@@ -23,3 +23,6 @@ struct ChoosePatternHeader: View {
         }
     }
 }
+#Preview {
+    ChoosePatternHeader()
+}

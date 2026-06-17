@@ -37,3 +37,12 @@ struct SessionHUDBar: View {
     }
 }
 
+#Preview {
+    SessionHUDBar(
+        bpm: 120,
+        timeSignature: "4/4",
+        patternNotation: "DUDU",
+        isFirstTime: true,
+        onSkip: {}
+    )
+}

@@ -106,13 +106,23 @@ struct PlayingSessionView: View {
             backgroundGradient
             
             VStack(spacing: 0) {
-                hudBar
+                SessionHUDBar(
+                    bpm: bpm,
+                    timeSignature: timeSignature,
+                    patternNotation: patternNotation,
+                    isFirstTime: isFirstTime
+                ) {
+                    navRoot = .uploadSong
+                }
                     .padding(.horizontal, 28)
                     .padding(.vertical, 10)
 
                 ZStack(alignment: .top) {
-                    rhythmLane
-                    
+                    RhythmLaneView(
+                        vm: vm,
+                        screenWidth: $screenWidth,
+                        hitZoneX: hitZoneX
+                    )
 
                     if isFirstTime && !vm.hasPassedFirstNote {
                         Text("Let’s get started by strumming \naccording to the arrow on the screen.")
@@ -161,7 +171,10 @@ struct PlayingSessionView: View {
                 .padding(.horizontal, 28)
                 
                 if !autoPlay && !usesStrumValidator {
-                    strumButtons
+                    StrumButtonsView(
+                        onUp: handleStrumUp,
+                        onDown: handleStrumDown
+                    )
                         .padding(.horizontal, 28)
                         .padding(.vertical, 12)
                 }
@@ -169,18 +182,38 @@ struct PlayingSessionView: View {
             
             // Feedback overlay removed
 
-            // Finished overlay
             if vm.isFinished {
-                finishedOverlay
-                    .transition(.opacity)
-                    .animation(.easeInOut(duration: 0.4), value: vm.isFinished)
+                FinishedOverlay(
+                    isFirstTime: isFirstTime,
+                    onReplay: {
+                        vm.startGame()
+                    },
+                    onContinue: {
+                        if isFirstTime {
+                            navRoot = .uploadSong
+                        } else {
+                            routes.songLibraryRoute = NavigationPath()
+                        }
+                    }
+                )
             }
 
-            // Pause overlay
             if vm.isPaused {
-                pauseOverlay
-                    .transition(.opacity)
-                    .animation(.easeInOut(duration: 0.25), value: vm.isPaused)
+                PauseOverlay(
+                    tutorialPauseStep: tutorialPauseStep,
+                    onExit: {
+                        routes.songLibraryRoute = NavigationPath()
+                    },
+                    onReplay: {
+                        vm.startGame()
+                    },
+                    onChangePattern: {
+                        dismiss()
+                    },
+                    onResume: {
+                        vm.resumeGame()
+                    }
+                )
             }
 
             // Pause Tutorial Step 1
@@ -282,366 +315,12 @@ struct PlayingSessionView: View {
         .ignoresSafeArea()
     }
 
-    // ──────────────────────────────────────────────────────────────────
-    // MARK: - HUD
-    // ──────────────────────────────────────────────────────────────────
-
-    private var hudBar: some View {
-        ZStack {
-            // BPM + time signature badge
-            HStack(spacing: Spacing.sm) {
-                HStack {
-                    Image(systemName: "metronome.fill")
-                        .foregroundStyle(.textPrimaryWhite)
-                        .font(AppFont.bodyBold)
-                Text("\(bpm) BPM")
-                        .font(AppFont.bodyBold)
-                    .foregroundStyle(.textPrimaryWhite)
-                Text("·").foregroundStyle(.textPrimaryWhite.opacity(0.5))
-                Text(timeSignature)
-                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(.brandColorAccentGreen.opacity(0.8))
-                Text("·").foregroundStyle(.brandColorAccentGreen.opacity(0.5))
-                Text(patternNotation)
-                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(.textPrimaryWhite.opacity(0.85))
-                    .lineLimit(1)
-
-                }
-                Spacer()
-                if isFirstTime {
-                    SecondaryTextButton(title: "Skip", color: .textPrimaryWhite, font: AppFont.bodyBold) {
-                        navRoot = .uploadSong
-                    }
-                }
-            }
-            .padding(.horizontal, 14).padding(.vertical, 5)
-        }
-    }
 
     private func formatTime(_ time: TimeInterval) -> String {
         let maxTime = max(0, time)
         let m = Int(maxTime) / 60
         let s = Int(maxTime) % 60
         return String(format: "%d:%02d", m, s)
-    }
-
-    // ──────────────────────────────────────────────────────────────────
-    // MARK: - Rhythm Lane
-    // ──────────────────────────────────────────────────────────────────
-
-    private var rhythmLane: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
-            let blockSize = RhythmGameViewModel.noteBlockSize
-
-            ZStack(alignment: .leading) {
-                laneBackground(width: w, height: 150)
-                hitZoneLine(height: 150)
-                    .zIndex(100)
-
-                // ── Chord-group pill backgrounds + floating labels ──
-                ForEach(vm.chordGroups) { group in
-                    let leadX = vm.groupLeadingX(for: group)
-                    let pillW = vm.groupPillWidth(for: group)
-                    let trailX = leadX + pillW
-
-                    if trailX > 0 && leadX < w {
-                        ChordGroupPillView(
-                            group: group,
-                            leadX: leadX,
-                            pillW: pillW,
-                            laneH: h,
-                            hitZoneX: hitZoneX
-                        )
-                    }
-                }
-
-                // ── Individual note blocks (on top of pills) ──
-                ForEach(vm.activeNotes) { note in
-                    let x = vm.noteXPosition(for: note)
-                    noteBlock(note: note)
-                        .position(x: x, y: h / 2)
-                }
-
-                // ── Sticky chord label pinned at the timing line ──
-                // Shows the current chord name fixed at the hit zone
-                // while the group scrolls past.
-                if let chord = vm.currentChord {
-                    let labelY = h / 2 - blockSize / 2 - 14
-                    Text(chord)
-                        .font(AppFont.title3Bold)
-                        .foregroundStyle(.brandColorAccentGreen)
-                        .position(
-                            x: w * RhythmGameViewModel.hitZoneFraction - 20,
-                            y: labelY
-                        )
-                        .transition(.opacity)
-                        .animation(.easeInOut(duration: 0.15), value: vm.currentChord)
-                }
-            }
-            .clipped()
-            .onAppear {
-                screenWidth    = w
-                vm.screenWidth = w
-            }
-            .onChange(of: geo.size.width) { _, newW in
-                screenWidth    = newW
-                vm.screenWidth = newW
-            }
-        }
-    }
-    // MARK: Lane Background
-
-    private func laneBackground(width: CGFloat, height: CGFloat) -> some View {
-        Rectangle()
-               .fill(Color(hex: "9E9E9E").opacity(0.06))
-               .frame(width: width, height: height)
-       }
-
-    // MARK: Hit Zone Line
-
-    private func hitZoneLine(height: CGFloat) -> some View {
-        ZStack {
-            // Sharp line
-            Rectangle()
-                .fill(.textPrimaryWhite)
-                .frame(width: 4, height: height)
-        }
-        .offset(x: hitZoneX - 1)
-    }
-
-    private var diamondAccent: some View {
-        Rectangle()
-            .fill(.brandColorPrimaryPurple)
-            .frame(width: 9, height: 9)
-            .rotationEffect(.degrees(45))
-            .shadow(color: .brandColorPrimaryPurple, radius: 4)
-    }
-
-    // MARK: Note Block
-
-    private func noteBlock(note: ActiveNote) -> some View {
-        let state: NoteState = {
-            if note.isHit || note.isExpired {
-                return note.hitResult == .miss ? .missState : .successState
-            }
-            return .defaultState
-        }()
-        return StrumBlock(direction: note.input.direction, noteState: state)
-            .opacity(note.isExpired ? 0 : 1)
-            .animation(.easeOut(duration: 0.22), value: note.isExpired)
-    }
-
-    // ──────────────────────────────────────────────────────────────────
-    // MARK: - Strum Buttons
-    // ──────────────────────────────────────────────────────────────────
-
-    private var strumButtons: some View {
-        HStack(spacing: 16) {
-            strumButton(
-                label: "STRUM UP", icon: "arrow.up", hint: "↑ Arrow",
-                colors: [Color(hue: 0.75, saturation: 0.7, brightness: 0.7),
-                         .brandColorPrimaryPurple],
-                glowColor: .brandColorPrimaryPurple,
-                action: handleStrumUp
-            )
-            strumButton(
-                label: "STRUM DOWN", icon: "arrow.down", hint: "↓ Arrow",
-                colors: [Color(hue: 0.55, saturation: 0.7, brightness: 0.55),
-                         .brandColorAccentGreen],
-                glowColor: .brandColorAccentGreen,
-                action: handleStrumDown
-            )
-        }
-    }
-
-    private func strumButton(
-        label: String, icon: String, hint: String,
-        colors: [Color], glowColor: Color,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            HStack(spacing: 10) {
-                Image(systemName: icon).font(.system(size: 18, weight: .black))
-                Text(label).font(.system(size: 17, weight: .black, design: .monospaced))
-                Text("· \(hint)")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .opacity(0.5)
-            }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(LinearGradient(colors: colors,
-                                             startPoint: .topLeading, endPoint: .bottomTrailing))
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(.white.opacity(0.18), lineWidth: 1)
-                }
-            )
-            .shadow(color: glowColor.opacity(0.55), radius: 14, y: 4)
-        }
-        .buttonStyle(StrumButtonStyle())
-    }
-
-    // ──────────────────────────────────────────────────────────────────
-    // MARK: - Finished Overlay
-    // ──────────────────────────────────────────────────────────────────
-
-    private var finishedOverlay: some View {
-        ZStack {
-            Color.black.opacity(0.78).ignoresSafeArea()
-
-            VStack(spacing: 32) {
-                Text("PATTERN COMPLETE!")
-                    .font(.system(size: 28, weight: .black, design: .monospaced))
-                    .foregroundStyle(.white)
-                    .shadow(color: .brandColorPrimaryPurple.opacity(0.6), radius: 20)
-
-                HStack(spacing: 24) {
-                    Button {
-                        vm.startGame()
-                    } label: {
-                        VStack(spacing: 8) {
-                            Image(systemName: "arrow.counterclockwise").font(.system(size: 28, weight: .black))
-                            Text("REPLAY").font(.system(size: 14, weight: .black, design: .monospaced))
-                        }
-                        .foregroundStyle(.white)
-                        .frame(width: 160)
-                        .padding(.vertical, 20)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14)
-                                .fill(LinearGradient(
-                                    colors: [.brandColorPrimaryPurple,
-                                             Color(hue: 0.75, saturation: 0.8, brightness: 0.6)],
-                                    startPoint: .topLeading, endPoint: .bottomTrailing
-                                ))
-                        )
-                        .shadow(color: .brandColorPrimaryPurple.opacity(0.55), radius: 14)
-                    }
-                    .buttonStyle(StrumButtonStyle())
-
-                    Button {
-                        if(isFirstTime) {
-                            navRoot = .uploadSong
-                            print("isFirstTime")
-                        } else {
-                            routes.songLibraryRoute = NavigationPath()
-                            print(navRoot.rawValue)
-                        }
-                    } label: {
-                        VStack(spacing: 8) {
-                            Image(systemName: "arrow.right").font(.system(size: 24, weight: .bold))
-                            Text("CONTINUE").font(.system(size: 12, weight: .bold, design: .monospaced))
-                        }
-                        .foregroundStyle(.brandColorAccentGreen)
-                        .frame(width: 140)
-                        .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14)
-                                .fill(.brandColorAccentGreen.opacity(0.1))
-                                .strokeBorder(.brandColorAccentGreen.opacity(0.3), lineWidth: 1)
-                        )
-                    }
-                    .buttonStyle(StrumButtonStyle())
-                }
-            }
-            .padding(40)
-        }
-    }
-}
-
-// ──────────────────────────────────────────────────────────────────
-// MARK: - Pause Overlay
-// ──────────────────────────────────────────────────────────────────
-
-extension PlayingSessionView {
-    private var pauseOverlay: some View {
-        ZStack(alignment: .top) {
-            Color.black.opacity(0.6).ignoresSafeArea()
-            
-            HStack {
-                pauseActionButton(icon: .arrowBackward, label: "Exit") {
-                    routes.songLibraryRoute = NavigationPath()
-                }
-                Spacer()
-                pauseActionButton(icon: .replay, label: "Replay") {
-                    vm.startGame()
-                    if tutorialPauseStep == 2 {
-                        withAnimation { tutorialPauseStep = 0 }
-                    }
-                }
-                Spacer()
-                pauseActionButton(icon: .musicnotelist, label: "Change Pattern") {
-                    dismiss()
-                }
-            }
-            
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 40)
-            .padding(.vertical, 12)
-            .background(
-                Rectangle()
-                    .fill(Color(hue: 0.75, saturation: 0.4, brightness: 0.2))
-            )
-            .shadow(color: .black.opacity(0.5), radius: 20)
-            
-            // Pause Tutorial Step 2
-            if tutorialPauseStep == 2 {
-                VStack {
-                    Spacer()
-                    Text("Tap again to unpause")
-                        .font(AppFont.title3Regular)
-                        .foregroundStyle(.textPrimaryWhite)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 12)
-                        .background(Capsule().fill(Color.backgroundPrimaryBlack.opacity(0.8)))
-                    Spacer()
-                }
-                .allowsHitTesting(false)
-            }
-        }
-        .ignoresSafeArea()
-        // Tapping anywhere on the pause overlay resumes the game
-        .onTapGesture {
-            vm.resumeGame()
-            if tutorialPauseStep == 2 {
-                withAnimation { tutorialPauseStep = 0 }
-            }
-        }
-    }
-
-    /// One icon-over-caption button used for Exit / Replay / Change Pattern
-    /// in the pause overlay. These three used to be three near-identical
-    /// hand-written `Button { VStack { ... } }` blocks.
-    private func pauseActionButton(icon: Image, label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack {
-                icon
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 24)
-                    .foregroundStyle(.textPrimaryWhite)
-                Text(label)
-                    .font(.caption)
-                    .foregroundStyle(.textPrimaryWhite)
-            }
-        }
-    }
-}
-
-// MARK: - Strum Button Style
-
-struct StrumButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.93 : 1.0)
-            .brightness(configuration.isPressed ? -0.06 : 0)
-            .animation(.spring(response: 0.18, dampingFraction: 0.55),
-                       value: configuration.isPressed)
     }
 }
 

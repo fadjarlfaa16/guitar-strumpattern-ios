@@ -257,15 +257,11 @@ struct PlayingSessionView: View {
         .onReceive(NotificationCenter.default.publisher(for: StrumNotifier.strumDownNotification)) { _ in
             handleStrumDown()
         }
-        .onReceive(chordVM.$currentChord) { detected in
-            vm.liveDetectedChord = detected
-        }
         .onAppear {
             let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
             let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
             print("isFirstTime is \(isFirst)")
             
-            WatchReceiver.shared.requiresSoundValidation = false
             lockToLandscape()
 
             if let audioURL = audioURL {

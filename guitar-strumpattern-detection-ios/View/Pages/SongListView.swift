@@ -13,7 +13,7 @@ struct SongListView: View {
     @StateObject private var viewModel = SongListViewModel()
     @State private var showRecalibrate = false
     @AppStorage("navRoot") private var navRoot: NavRoot = .songList
-    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = false
+    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @Environment(SavedSong.self) private var savedSong
 
     private var filteredItems: [SongListItem] {

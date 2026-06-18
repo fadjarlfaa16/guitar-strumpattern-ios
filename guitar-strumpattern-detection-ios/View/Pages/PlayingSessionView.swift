@@ -53,6 +53,8 @@ struct PlayingSessionView: View {
     @State private var sessionState: SessionState = .playing
     @State private var countdownValue: Int = 3
     @State private var countdownTask: Task<Void, Never>? = nil
+    @State private var showRecalibrate = false
+
 
     // MARK: - Init
     init(
@@ -156,6 +158,16 @@ struct PlayingSessionView: View {
                             .frame(width: 24, height: 24)
                             .foregroundStyle(Color.textPrimaryWhite)
                     }
+                    WatchStatusView()
+                        .padding(.horizontal, 16)
+                    Button("Recalibrate Watch") {
+                        showRecalibrate = true
+                    }
+                    .navigationDestination(isPresented: $showRecalibrate) {
+                        CalibrateWatchView(isRecalibrating: true)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.brandColorAccentGreen.opacity(0.3))
                     Spacer()
                     HStack {
                         Spacer()

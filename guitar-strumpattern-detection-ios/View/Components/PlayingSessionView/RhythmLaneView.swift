@@ -55,7 +55,7 @@ struct RhythmLaneView: View {
                 if let chord = vm.currentChord {
                     let labelY = h / 2 - blockSize / 2 - 14
                     Text(chord)
-                        .font(AppFont.title3Bold)
+                        .font(AppFont.largeTitleBold)
                         .foregroundStyle(.brandColorAccentGreen)
                         .position(
                             x: w * RhythmGameViewModel.hitZoneFraction - 20,

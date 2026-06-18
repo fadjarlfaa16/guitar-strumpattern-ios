@@ -17,6 +17,9 @@ struct WatchStatusView: View {
         HStack(spacing: Spacing.lg) {
             HStack {
                 Image(watchSession.isConnected ? .applewatchBadgeCheckmark : .applewatchBadgeExclamationmark)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24)
                     .foregroundStyle(.white)
                 Text(watchSession.statusMessage)
                     .foregroundStyle(watchSession.isConnected ? .green : .red)

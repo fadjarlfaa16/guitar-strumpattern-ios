@@ -41,3 +41,8 @@ struct SongListItem: Identifiable, Equatable, Hashable, Sendable {
         self.sandboxFileName = sandboxFileName
     }
 }
+struct StoredChordSegment: Codable, Equatable, Hashable {
+    let startTime: TimeInterval
+    let endTime: TimeInterval
+    let label: String
+}

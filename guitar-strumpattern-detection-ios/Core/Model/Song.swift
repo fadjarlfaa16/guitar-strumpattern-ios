@@ -45,8 +45,4 @@ struct Song: Identifiable, Codable {
     }
 }
 
-struct StoredChordSegment: Codable, Equatable, Hashable {
-    let startTime: TimeInterval
-    let endTime: TimeInterval
-    let label: String
-}
+

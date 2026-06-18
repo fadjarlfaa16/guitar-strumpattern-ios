@@ -25,6 +25,10 @@ struct ArrowIcon: View {
             .animation(.easeInOut(duration: 0.3), value: isCompleted)
     }
 }
+enum AppIcon {
+    static let upArrow = "arrow.up"
+    static let downArrow = "arrow.down"
+}
 //
 #Preview {
     ArrowIcon(direction: .up)

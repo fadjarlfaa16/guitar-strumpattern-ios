@@ -122,3 +122,17 @@ struct CalibratePlaySection: View {
         }
     }
 }
+
+#Preview("CalibratePlaySection") {
+    // Provide mock/sample instances and values for preview
+    let receiver = WatchReceiver.shared
+    let chordVM = RealTimeChordViewModel()
+    return CalibratePlaySection(
+        receiver: receiver,
+        chordVM: chordVM,
+        strumCount: 12,
+        lastConfirmedStrum: "Down",
+        strumScale: 1.0,
+        flashOpacity: 0.0
+    )
+}

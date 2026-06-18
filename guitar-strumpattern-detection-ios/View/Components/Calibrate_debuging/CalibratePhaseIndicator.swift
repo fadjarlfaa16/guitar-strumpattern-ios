@@ -48,3 +48,6 @@ struct CalibratePhaseIndicator: View {
             .padding(.bottom, 18)
     }
 }
+#Preview {
+    CalibratePhaseIndicator(isCalibrated: false)
+}

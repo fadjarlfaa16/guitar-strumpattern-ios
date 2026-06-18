@@ -35,8 +35,6 @@ final class WatchSessionManager: NSObject, ObservableObject {
 
     // Dictionary tetap private, diisolasi secara otomatis oleh @MainActor
     private var messageHandlers: [UUID: ([String: Any]) -> Void] = [:]
-    
-    // NSLock DIHAPUS karena @MainActor sudah menjamin thread-safety
 
     var session: WCSession { WCSession.default }
 

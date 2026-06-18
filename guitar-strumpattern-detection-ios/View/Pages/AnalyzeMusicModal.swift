@@ -8,16 +8,23 @@
 import SwiftUI
 
 struct AnalyzeMusicModal: View {
+
+    // MARK: - Parameters
+
     let song: Song
     var onAnalysisComplete: (ChordAnalysisResult) -> Void
     var onDismiss: () -> Void
-    
+
+    // MARK: - State
+
     @State private var isAnalyzing = false
     @State private var analysisResult: ChordAnalysisResult? = nil
     @State private var analysisError: String? = nil
     @State private var progress: Double = 0
     @State private var animatingIndex: Int = 0
     @State private var analysisStage: String = "Analyzing BPM & Time Signature..."
+
+    // MARK: - Body
 
     var body: some View {
         ZStack {
@@ -30,40 +37,96 @@ struct AnalyzeMusicModal: View {
                     .font(AppFont.title3Bold)
                     .foregroundStyle(.textPrimaryWhite)
 
-                // Content
                 if let result = analysisResult {
-                    // ✅ Results
-                    VStack(spacing: 20) {
-                        resultCard(label: "BPM", value: "\(result.bpm)")
-                        resultCard(label: "Time Signature", value: result.timeSignature)
-                        resultCard(label: "Chords Detected", value: "\(result.chordSegments.count)")
-                    }
+                    VStack(spacing: 28) {
 
-                    // Action Buttons
-                    VStack(spacing: 12) {
-                        Button(action: {
+                        // Header
+                        VStack(spacing: 12) {
+                            Text("Analysis Complete")
+                                .font(.system(size: 32, weight: .bold))
+
+                            Text("Analysis finished successfully")
+                                .font(.title3)
+                                .foregroundStyle(.secondary)
+
+                            Text("100%")
+                                .font(.title2.bold())
+                                .foregroundStyle(.brandColorAccentGreen)
+
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 42))
+                                .foregroundStyle(.brandColorAccentGreen)
+                        }
+
+                        // Progress Bar
+                        GeometryReader { geo in
+                            ZStack(alignment: .leading) {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.15))
+                                    .frame(height: 12)
+
+                                Capsule()
+                                    .fill(.brandColorAccentGreen)
+                                    .frame(width: geo.size.width, height: 12)
+                            }
+                        }
+                        .frame(height: 12)
+
+                        // Confirm Button
+                        Button {
                             onAnalysisComplete(result)
                             onDismiss()
-                        }) {
+                        } label: {
                             Text("Confirm & Continue")
-                                .font(AppFont.bodyBold)
+                                .font(.title3.bold())
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
+                                .padding(.vertical, 22)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color.brandColorAccentGreen)
+                                    RoundedRectangle(cornerRadius: 24)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [
+                                                    Color(red: 0.35, green: 0.08, blue: 0.15),
+                                                    Color(red: 0.20, green: 0.05, blue: 0.10)
+                                                ],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
                                 )
                         }
 
-                        Button(action: { onDismiss() }) {
-                            Text("Cancel")
-                                .font(AppFont.bodyRegular)
-                                .foregroundStyle(.brandColorPrimaryPurple)
+                        // Result Summary
+                        VStack(alignment: .leading, spacing: 14) {
+
+                            resultRow(
+                                title: "BPM",
+                                value: "\(result.bpm)"
+                            )
+
+                            resultRow(
+                                title: "Time Signature",
+                                value: result.timeSignature
+                            )
+
+                            resultRow(
+                                title: "Chords Detected",
+                                value: "\(result.chordSegments.count)"
+                            )
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
                     }
+                    .padding(32)
+                    .background(
+                        RoundedRectangle(cornerRadius: 32)
+                            .fill(Color(hex: "09081A"))
+                    )
+                    .padding(.horizontal)
+                
                 } else if let error = analysisError {
-                    // ❌ Error
+                    // MARK: Error State
                     VStack(spacing: 16) {
                         Image(systemName: "exclamationmark.circle.fill")
                             .font(.system(size: 48))
@@ -92,15 +155,9 @@ struct AnalyzeMusicModal: View {
                                         .fill(Color.brandColorPrimaryPurple)
                                 )
                         }
-
-                        Button(action: { onDismiss() }) {
-                            Text("Cancel")
-                                .font(AppFont.bodyRegular)
-                                .foregroundStyle(.brandColorAccentGreen)
-                        }
                     }
                 } else {
-                    // 🔄 Loading
+                    // MARK: Loading State
                     VStack(spacing: 24) {
                         // Progress Indicator
                         ProgressView(value: progress)
@@ -117,7 +174,6 @@ struct AnalyzeMusicModal: View {
                                 .foregroundStyle(.brandColorAccentGreen)
                         }
 
-                        // Analyzing animation — .task otomatis cancel saat HStack hilang
                         HStack(spacing: 4) {
                             ForEach(0..<3, id: \.self) { index in
                                 RoundedRectangle(cornerRadius: 2)
@@ -137,7 +193,7 @@ struct AnalyzeMusicModal: View {
                     }
                 }
 
-                // Song Info
+                // MARK: Song Info
                 VStack(spacing: 8) {
                     Text(song.title)
                         .font(AppFont.bodyBold)
@@ -212,10 +268,6 @@ struct AnalyzeMusicModal: View {
 
             withAnimation(.easeOut(duration: 0.3)) { progress = 0.04 }
             analysisStage = "Starting analysis pipeline..."
-
-            // Buat AsyncStream sebagai jembatan antara background task (sync)
-            // dan main actor (SwiftUI). Setiap onProgress callback dari ChordAnalyzer
-            // di-yield ke stream, lalu dikonsumsi di main actor dengan animasi smooth.
             var progressContinuation: AsyncStream<(Double, String)>.Continuation?
             let progressStream = AsyncStream<(Double, String)> { cont in
                 progressContinuation = cont
@@ -271,6 +323,22 @@ struct AnalyzeMusicModal: View {
         }
     }
 
+    private func resultRow(
+        title: String,
+        value: String
+    ) -> some View {
+        HStack {
+            Text(title)
+                .foregroundStyle(.white.opacity(0.7))
+
+            Spacer()
+
+            Text(value)
+                .fontWeight(.bold)
+                .foregroundStyle(.white)
+        }
+    }
+    
     private func getErrorMessage(_ error: Error) -> String {
         let errorDesc = error.localizedDescription
         if errorDesc.contains("timed out") || errorDesc.contains("timeout") {

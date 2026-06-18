@@ -62,3 +62,7 @@ struct ChoosePatternBackground: View {
         .allowsHitTesting(false)
     }
 }
+
+#Preview {
+    ChoosePatternBackground()
+}

@@ -26,7 +26,6 @@ struct RhythmLaneView: View {
                 hitZoneLine(height: 150)
                     .zIndex(100)
 
-                // ── Chord-group pill backgrounds + floating labels ──
                 ForEach(vm.chordGroups) { group in
                     let leadX = vm.groupLeadingX(for: group)
                     let pillW = vm.groupPillWidth(for: group)

@@ -47,7 +47,7 @@ struct PlayingSessionView: View {
     @StateObject private var audioPlayer = AudioPlayerManager()
     @StateObject private var strumValidator = StrumInputValidator()
     @State private var screenWidth: CGFloat = 0
-    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = false
+    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @AppStorage("navRoot") private var navRoot: NavRoot = .onboarding
     @Environment(Routes.self) private var routes
     @State private var sessionState: SessionState = .playing

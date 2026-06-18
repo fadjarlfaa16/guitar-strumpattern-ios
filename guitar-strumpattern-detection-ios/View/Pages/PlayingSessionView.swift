@@ -40,6 +40,8 @@ struct PlayingSessionView: View {
     @StateObject private var vm: RhythmGameViewModel
     @StateObject private var audioPlayer = AudioPlayerManager()
     @StateObject private var strumValidator = StrumInputValidator()
+    @StateObject private var chordVM = RealTimeChordViewModel()
+    @ObservedObject private var receiver = WatchReceiver.shared
     @State private var screenWidth: CGFloat = 0
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @AppStorage("navRoot") private var navRoot: NavRoot = .onboarding
@@ -150,6 +152,12 @@ struct PlayingSessionView: View {
                             .frame(width: 24, height: 24)
                             .foregroundStyle(Color.textPrimaryWhite)
                     }
+                    
+                    Text("AI: \(vm.liveDetectedChord) | Strum: \(receiver.lastStrum)")
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.yellow)
+                        .padding(.leading, 16)
+                        
                     Spacer()
                     HStack {
                         Spacer()
@@ -249,11 +257,15 @@ struct PlayingSessionView: View {
         .onReceive(NotificationCenter.default.publisher(for: StrumNotifier.strumDownNotification)) { _ in
             handleStrumDown()
         }
+        .onReceive(chordVM.$currentChord) { detected in
+            vm.liveDetectedChord = detected
+        }
         .onAppear {
             let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
             let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
             print("isFirstTime is \(isFirst)")
             
+            WatchReceiver.shared.requiresSoundValidation = false
             lockToLandscape()
 
             if let audioURL = audioURL {
@@ -263,11 +275,21 @@ struct PlayingSessionView: View {
             }
 
             setupStrumValidator()
+            
+            if usesStrumValidator {
+                if StrumCalibrationStore.isCalibrated {
+                    let thresholds = StrumCalibrationStore.loadThresholds()
+                    chordVM.updateSoundThresholds(baseDecibels: thresholds.base, spikeDecibels: thresholds.spike)
+                }
+                chordVM.startListening()
+            }
+            
             vm.startGame()
         }
         .onDisappear {
             unlockOrientation()
             strumValidator.stop()
+            chordVM.stopListening()
             vm.stopGame()
             audioPlayer.stop()
         }

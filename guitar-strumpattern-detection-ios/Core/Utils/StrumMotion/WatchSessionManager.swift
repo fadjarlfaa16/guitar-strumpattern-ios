@@ -52,7 +52,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
     private func requestHealthKitPermissionOnPhone() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         let types: Set = [HKObjectType.workoutType()]
-        healthStore.requestAuthorization(toShare: types, read: types) { success, error in
+        healthStore.requestAuthorization(toShare: types, read: nil) { success, error in
             if !success {
                 print("Failed to authorize HealthKit on phone: \(error?.localizedDescription ?? "unknown")")
             }

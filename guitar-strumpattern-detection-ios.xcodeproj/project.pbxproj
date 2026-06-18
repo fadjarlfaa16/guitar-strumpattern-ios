@@ -373,7 +373,6 @@
 				DEVELOPMENT_TEAM = YC8SS4YRCV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -412,7 +411,6 @@
 				DEVELOPMENT_TEAM = YC8SS4YRCV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -453,7 +451,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses HealthKit to maintain a background session for tracking your guitar strumming motion.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses HealthKit to maintain a background session for tracking your guitar strumming motion.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "arip.guitar-strumpattern-detection-ios";
@@ -492,7 +489,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses HealthKit to maintain a background session for tracking your guitar strumming motion.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses HealthKit to maintain a background session for tracking your guitar strumming motion.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "arip.guitar-strumpattern-detection-ios";

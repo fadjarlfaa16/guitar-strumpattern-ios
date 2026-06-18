@@ -55,7 +55,6 @@ final class GuitarValidationViewModel: ObservableObject {
 
         receiver.$strumPulseTrigger
             .dropFirst()
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.handleConfirmedStrum()
             }

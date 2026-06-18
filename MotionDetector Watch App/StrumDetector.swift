@@ -26,6 +26,7 @@ enum WatchAppState: Equatable {
 class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
     
     let motionManager = CMMotionManager()
+    private let motionQueue = OperationQueue()
     var session = WCSession.default
     
     @Published var currentYAxis: Double = 0.0
@@ -72,7 +73,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     private func requestHealthKitPermissionOnWatch() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         let types: Set = [HKObjectType.workoutType()]
-        healthStore.requestAuthorization(toShare: types, read: types) { _, _ in }
+        healthStore.requestAuthorization(toShare: types, read: nil) { _, _ in }
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
@@ -136,8 +137,9 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     
     func startDetecting() {
         guard motionManager.isDeviceMotionAvailable else { return }
+        motionQueue.qualityOfService = .userInteractive
         motionManager.deviceMotionUpdateInterval = 1.0 / 50.0
-        motionManager.startDeviceMotionUpdates(to: .main) { [weak self] (data, error) in
+        motionManager.startDeviceMotionUpdates(to: motionQueue) { [weak self] (data, error) in
             guard let self = self, let motionData = data else { return }
             self.analyzeMotion(motion: motionData)
         }
@@ -158,7 +160,9 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     
     private func analyzeMotion(motion: CMDeviceMotion) {
         let yAxis = motion.userAcceleration.y
-        self.currentYAxis = yAxis
+        DispatchQueue.main.async {
+            self.currentYAxis = yAxis
+        }
         
         let rot = motion.rotationRate
         let gyroMagnitude = sqrt(rot.x * rot.x + rot.y * rot.y + rot.z * rot.z)
@@ -219,16 +223,18 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     }
     
     private func updateStrumState(to direction: String) {
-        lastStrum = direction
         sendStrumData(direction: direction)
         
-        idleResetWorkItem?.cancel()
-        let workItem = DispatchWorkItem { [weak self] in
-            self?.lastStrum = "Diam"
-            self?.sendStrumData(direction: "Diam")
+        DispatchQueue.main.async {
+            self.lastStrum = direction
+            self.idleResetWorkItem?.cancel()
+            let workItem = DispatchWorkItem { [weak self] in
+                self?.lastStrum = "Diam"
+                self?.sendStrumData(direction: "Diam")
+            }
+            self.idleResetWorkItem = workItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + self.idleTimeout, execute: workItem)
         }
-        idleResetWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + idleTimeout, execute: workItem)
     }
     
     private func finalizeDownstrokeCalibration() {
@@ -268,8 +274,10 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     
     private func triggerCooldown(_ duration: Double = 0.2) {
         isCooldown = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-            self.isCooldown = false
+        DispatchQueue.global().asyncAfter(deadline: .now() + duration) { [weak self] in
+            self?.motionQueue.addOperation {
+                self?.isCooldown = false
+            }
         }
     }
     

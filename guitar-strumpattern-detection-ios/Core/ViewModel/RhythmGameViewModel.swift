@@ -30,11 +30,13 @@ class RhythmGameViewModel: ObservableObject {
     @Published var isPausedForInput: Bool      = false
     @Published var hasPassedFirstNote: Bool    = false
     @Published var currentChord:  String?      = nil
+    @Published var liveDetectedChord: String   = "--"
 
     // MARK: Configuration
     var bpm: Int
     private(set) var chordGroups: [ChordGroup]
     private let autoPlay: Bool
+    var requireChordValidation: Bool = true
 
     // MARK: Layout Constants
     /// How many seconds before its hit time a note appears at the right edge.
@@ -191,8 +193,9 @@ class RhythmGameViewModel: ObservableObject {
             // Find the earliest unhit note
             let unhitNotes = activeNotes.filter { !$0.isHit && !$0.isExpired }
             if let earliest = unhitNotes.min(by: { $0.input.time < $1.input.time }) {
-                // If it reached the hit line without being strummed
-                if currentTime >= earliest.input.time {
+                let lateWindow: TimeInterval = 0.20 // 200ms toleransi terlambat
+                // If it reached the hit line + lateWindow without being strummed
+                if currentTime >= earliest.input.time + lateWindow {
                     currentTime = earliest.input.time // snap to exact hit line
                     isPausedForInput = true
                     pausedTime = currentTime
@@ -273,10 +276,52 @@ class RhythmGameViewModel: ObservableObject {
         }
 
         let delta = target.input.time - currentTime
+        
+        // Helper untuk validasi chord
+        func checkChordValid() -> Bool {
+            guard requireChordValidation else { return true }
+            let expectedChord = target.input.chord
+            guard expectedChord != "N" && expectedChord != "--" else { return true }
+            
+            let detected = liveDetectedChord
+            
+            // Ekstrak huruf utama (misal: "A:maj" -> "A", "Am" -> "A", "C#m" -> "C#")
+            func extractRoot(from c: String) -> String {
+                var base = c.components(separatedBy: ":").first ?? c
+                if base.count > 1 {
+                    let secondChar = base[base.index(after: base.startIndex)]
+                    if secondChar == "#" || secondChar == "b" {
+                        base = String(base.prefix(2))
+                    } else {
+                        base = String(base.prefix(1))
+                    }
+                }
+                return base
+            }
+            
+            let expectedRoot = extractRoot(from: expectedChord)
+            let detectedRoot = extractRoot(from: detected)
+            
+            if detectedRoot == expectedRoot { return true }
+            
+            // Toleransi AI: Cek apakah AI masih mendeteksi chord sebelumnya karena delay
+            var previousChord: String? = nil
+            for group in chordGroups {
+                if group.id == target.input.groupId { break }
+                previousChord = group.chord
+            }
+            
+            if let prev = previousChord {
+                let prevRoot = extractRoot(from: prev)
+                if detectedRoot == prevRoot { return true }
+            }
+            
+            return false
+        }
 
         // If the game is already paused waiting for this note
         if isPausedForInput {
-            if target.input.direction == direction {
+            if target.input.direction == direction && checkChordValid() {
                 // Correct strum! Resume the timeline.
                 activeNotes[idx].isHit = true
                 activeNotes[idx].isExpired = true
@@ -295,26 +340,30 @@ class RhythmGameViewModel: ObservableObject {
         }
 
         // If the game is flowing normally:
-        // Define a strict hit window (e.g., 0.2 seconds before the line)
-        let hitWindow: TimeInterval = 0.20
+        let earlyWindow: TimeInterval = 0.25 // Toleransi awal 250ms
+        let lateWindow: TimeInterval = 0.20 // Toleransi terlambat 200ms
 
-        if delta > hitWindow {
+        if delta > earlyWindow {
             // Strummed too early. Ignore it to prevent early hits or sudden timeline shifts.
+            return
+        }
+        
+        if delta < -lateWindow {
+            // Strummed too late. Should ideally be caught by tick() auto-pause, but just in case.
             return
         }
 
         // Inside the hit window:
-        if target.input.direction == direction {
-            // Correct strum!
+        if target.input.direction == direction && checkChordValid() {
+            // Correct strum and chord!
             activeNotes[idx].isHit = true
             activeNotes[idx].isExpired = true
             if !hasPassedFirstNote { hasPassedFirstNote = true }
         } else {
-            // Wrong strum inside the window!
+            // Wrong strum or wrong chord inside the window!
             // We do NOTHING here. By ignoring it, the timeline continues flowing naturally
             // for the remaining fraction of a second until it hits the line, where the 
             // `tick()` auto-pause will cleanly freeze the note exactly on the hit line.
-            // This completely fixes the "sudden shift" bug.
         }
     }
 

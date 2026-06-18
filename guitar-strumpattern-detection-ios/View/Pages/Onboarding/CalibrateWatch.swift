@@ -41,6 +41,7 @@ struct CalibrateWatchView: View {
             .animation(.easeInOut(duration: 0.35), value: vm.isCalibrated)
         }
         .onAppear {
+            WatchReceiver.shared.requiresSoundValidation = true
             vm.startCalibration()
         }
         .onDisappear {

@@ -40,6 +40,9 @@ struct PlayingSessionView: View {
     /// Runs the lane without requiring strum input.
     var autoPlay: Bool
     
+    /// The title of the song being played.
+    var songTitle: String?
+    
 
     // MARK: - ViewModel & State
 
@@ -65,7 +68,8 @@ struct PlayingSessionView: View {
         duration:      String?        = nil,
         audioURL:      URL?           = nil,
         autoPlay:      Bool           = false,
-        patternNotation: String?      = nil
+        patternNotation: String?      = nil,
+        songTitle:     String?        = nil
     ) {
         let safeBPM = bpm > 0 ? bpm : 120
         self.pattern       = pattern
@@ -75,6 +79,7 @@ struct PlayingSessionView: View {
         self.duration      = duration
         self.audioURL      = audioURL
         self.autoPlay      = autoPlay
+        self.songTitle     = songTitle
         // Determine first launch status locally to avoid capturing `self` before initialization
         let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
         let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
@@ -270,6 +275,17 @@ struct PlayingSessionView: View {
         .onReceive(NotificationCenter.default.publisher(for: StrumNotifier.strumDownNotification)) { _ in
             handleStrumDown()
         }
+        .onChange(of: Int(vm.currentTime)) { _, _ in
+            syncToWatch()
+        }
+        .onChange(of: vm.isPaused) { _, _ in
+            syncToWatch()
+        }
+        .onChange(of: sessionState) { _, _ in
+            if sessionState == .playing {
+                syncToWatch()
+            }
+        }
         .onAppear {
             let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
             let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
@@ -367,6 +383,23 @@ struct PlayingSessionView: View {
         let m = Int(maxTime) / 60
         let s = Int(maxTime) % 60
         return String(format: "%d:%02d", m, s)
+    }
+
+    private func syncToWatch() {
+        var maxT: Double = vm.chordGroups.last?.endTime ?? 0
+        if let dur = duration {
+            let parts = dur.split(separator: ":")
+            let m = Double(parts.first.map(String.init) ?? "0") ?? 0
+            let s = parts.count > 1 ? (Double(String(parts.last!)) ?? 0) : 0
+            maxT = m * 60 + s
+        }
+        
+        WatchReceiver.shared.syncPlaying(
+            title: songTitle ?? "Unknown Song",
+            currentTime: vm.currentTime,
+            maxTime: maxT,
+            isPaused: vm.isPaused
+        )
     }
 }
 

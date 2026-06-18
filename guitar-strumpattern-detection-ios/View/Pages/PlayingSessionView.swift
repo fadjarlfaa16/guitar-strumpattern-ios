@@ -153,10 +153,10 @@ struct PlayingSessionView: View {
                             .foregroundStyle(Color.textPrimaryWhite)
                     }
                     
-                    Text("AI: \(vm.liveDetectedChord) | Strum: \(receiver.lastStrum)")
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                        .foregroundStyle(.yellow)
-                        .padding(.leading, 16)
+//                    Text("AI: \(vm.liveDetectedChord) | Strum: \(receiver.lastStrum)")
+//                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+//                        .foregroundStyle(.yellow)
+//                        .padding(.leading, 16)
                         
                     Spacer()
                     HStack {

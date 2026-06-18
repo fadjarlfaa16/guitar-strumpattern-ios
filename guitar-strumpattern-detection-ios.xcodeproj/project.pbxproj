@@ -47,13 +47,6 @@
 			);
 			target = 31FEC7742FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios */;
 		};
-		A73FE00B2FE4716400F0A3B4 /* Exceptions for "MotionDetector Watch App" folder in "MotionDetector Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"MotionDetector-Watch-App-Info.plist",
-			);
-			target = 5E9D3F5F2FDC0883005DAE06 /* MotionDetector Watch App */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
@@ -78,9 +71,6 @@
 		};
 		5E9D3F612FDC0883005DAE06 /* MotionDetector Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				A73FE00B2FE4716400F0A3B4 /* Exceptions for "MotionDetector Watch App" folder in "MotionDetector Watch App" target */,
-			);
 			path = "MotionDetector Watch App";
 			sourceTree = "<group>";
 		};
@@ -382,7 +372,7 @@
 				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = bang;
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -412,13 +402,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "guitar-strumpattern-detection-ios/guitar-strumpattern-detection-ios.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "guitar-strumpattern-detection-ios/guitar-strumpattern-detection-iosRelease.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = bang;
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -456,6 +446,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -491,6 +482,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";
 				LD_RUNPATH_SEARCH_PATHS = (

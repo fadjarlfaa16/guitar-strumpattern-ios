@@ -56,3 +56,4 @@ struct SongDetailDestination: View {
         }
     }
 }
+

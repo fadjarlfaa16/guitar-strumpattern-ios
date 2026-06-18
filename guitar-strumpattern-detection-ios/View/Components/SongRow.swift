@@ -18,8 +18,6 @@ struct SongRow: View {
             .contextMenu { menuItems }
     }
 
-    /// Shared menu options for both the long-press context menu and the
-    /// ellipsis menu button, so the two stay in sync.
     @ViewBuilder
     private var menuItems: some View {
         Button {

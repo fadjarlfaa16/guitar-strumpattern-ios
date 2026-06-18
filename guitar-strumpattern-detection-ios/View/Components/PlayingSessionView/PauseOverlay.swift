@@ -47,7 +47,7 @@ struct PauseOverlay: View {
             if tutorialPauseStep == 2 {
                 VStack {
                     Spacer()
-                    Text("Tap again to unpause")
+                    Text("Tap again to Play")
                         .font(AppFont.title3Regular)
                         .foregroundStyle(.textPrimaryWhite)
                         .padding(.horizontal, 24)

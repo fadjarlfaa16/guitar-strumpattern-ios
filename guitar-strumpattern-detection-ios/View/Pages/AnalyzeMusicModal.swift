@@ -32,99 +32,16 @@ struct AnalyzeMusicModal: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 24) {
-                // Header
-                Text("Analyzing Audio")
-                    .font(AppFont.title3Bold)
-                    .foregroundStyle(.textPrimaryWhite)
 
                 if let result = analysisResult {
-                    VStack(spacing: 28) {
-
-                        // Header
-                        VStack(spacing: 12) {
-                            Text("Analysis Complete")
-                                .font(.system(size: 32, weight: .bold))
-
-                            Text("Analysis finished successfully")
-                                .font(.title3)
-                                .foregroundStyle(.secondary)
-
-                            Text("100%")
-                                .font(.title2.bold())
-                                .foregroundStyle(.brandColorAccentGreen)
-
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 42))
-                                .foregroundStyle(.brandColorAccentGreen)
-                        }
-
-                        // Progress Bar
-                        GeometryReader { geo in
-                            ZStack(alignment: .leading) {
-                                Capsule()
-                                    .fill(Color.white.opacity(0.15))
-                                    .frame(height: 12)
-
-                                Capsule()
-                                    .fill(.brandColorAccentGreen)
-                                    .frame(width: geo.size.width, height: 12)
-                            }
-                        }
-                        .frame(height: 12)
-
-                        // Confirm Button
-                        Button {
+                    AnalysisResultView(
+                        result: result,
+                        onConfirm: {
                             onAnalysisComplete(result)
                             onDismiss()
-                        } label: {
-                            Text("Confirm & Continue")
-                                .font(.title3.bold())
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 22)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 24)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color(red: 0.35, green: 0.08, blue: 0.15),
-                                                    Color(red: 0.20, green: 0.05, blue: 0.10)
-                                                ],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                )
-                        }
-
-                        // Result Summary
-                        VStack(alignment: .leading, spacing: 14) {
-
-                            resultRow(
-                                title: "BPM",
-                                value: "\(result.bpm)"
-                            )
-
-                            resultRow(
-                                title: "Time Signature",
-                                value: result.timeSignature
-                            )
-
-                            resultRow(
-                                title: "Chords Detected",
-                                value: "\(result.chordSegments.count)"
-                            )
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    }
-                    .padding(32)
-                    .background(
-                        RoundedRectangle(cornerRadius: 32)
-                            .fill(Color(hex: "09081A"))
+                        },
+                        songTitle: song.title
                     )
-                    .padding(.horizontal)
-                
                 } else if let error = analysisError {
                     // MARK: Error State
                     VStack(spacing: 16) {
@@ -192,55 +109,14 @@ struct AnalyzeMusicModal: View {
                         }
                     }
                 }
-
-                // MARK: Song Info
-                VStack(spacing: 8) {
-                    Text(song.title)
-                        .font(AppFont.bodyBold)
-                        .foregroundStyle(.textPrimaryWhite)
-
-                    if let artist = song.artist {
-                        Text(artist)
-                            .font(AppFont.bodyRegular)
-                            .foregroundStyle(.textPrimaryWhite.opacity(0.7))
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 8)
             }
             .padding(24)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(hue: 0.75, saturation: 0.3, brightness: 0.15))
-            )
             .padding(.horizontal, 20)
         }
         .task(id: song.id) {
             await runAnalysis()
         }
     }
-
-    // MARK: - Subviews
-
-    private func resultCard(label: String, value: String) -> some View {
-        VStack(spacing: 8) {
-            Text(label)
-                .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                .foregroundStyle(.brandColorAccentGreen.opacity(0.8))
-
-            Text(value)
-                .font(.system(size: 28, weight: .bold, design: .monospaced))
-                .foregroundStyle(.brandColorAccentGreen)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.brandColorAccentGreen.opacity(0.1))
-                .strokeBorder(Color.brandColorAccentGreen.opacity(0.3), lineWidth: 1)
-        )
-    }
-
     // MARK: - Analysis
 
     private func runAnalysis() async {
@@ -362,16 +238,15 @@ struct AnalyzeMusicModal: View {
 
 // MARK: - Preview
 
-#Preview {
+#Preview("Analysis Complete") {
     AnalyzeMusicModal(
         song: Song(
-            title: "Sample Song",
-            artist: "Sample Artist",
-            sandboxFileName: "test.mp3"
+            title: "Untuk Perempuan Yang Sedang Dalam Pelukan",
+            artist: "Payung Teduh",
+            sandboxFileName: "payung_teduh.mp3",
+            duration: 245
         ),
-        onAnalysisComplete: { result in
-            print("BPM: \(result.bpm), Time Signature: \(result.timeSignature), Chords: \(result.chordSegments.count)")
-        },
+        onAnalysisComplete: { _ in },
         onDismiss: {}
     )
 }

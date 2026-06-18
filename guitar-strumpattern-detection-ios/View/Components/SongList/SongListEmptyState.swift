@@ -19,6 +19,7 @@ struct SongListEmptyState: View {
                 Text("Press + to add a song...")
             }
         }
+        .foregroundStyle(.textPrimaryWhite.opacity(0.35))
     }
 }
 #Preview {

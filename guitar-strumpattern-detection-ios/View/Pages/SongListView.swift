@@ -13,7 +13,7 @@ struct SongListView: View {
     @StateObject private var viewModel = SongListViewModel()
     @State private var showRecalibrate = false
     @AppStorage("navRoot") private var navRoot: NavRoot = .songList
-    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
+    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = false
     @Environment(SavedSong.self) private var savedSong
 
     private var filteredItems: [SongListItem] {
@@ -52,9 +52,6 @@ struct SongListView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             SongListHeader()
-                .padding(.horizontal, Spacing.xl)
-                .padding(.bottom, Spacing.md)
-            WatchStatusView(onRecalibrate: { showRecalibrate = true })
                 .padding(.horizontal, Spacing.xl)
                 .padding(.bottom, Spacing.md)
             if isFirstTime {

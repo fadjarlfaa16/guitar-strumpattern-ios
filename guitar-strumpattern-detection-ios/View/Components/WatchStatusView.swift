@@ -16,36 +16,28 @@ struct WatchStatusView: View {
     var body: some View {
         HStack(spacing: Spacing.lg) {
             HStack {
-                Image(systemName: "applewatch")
+                Image(watchSession.isConnected ? .applewatchBadgeCheckmark : .applewatchBadgeExclamationmark)
                     .foregroundStyle(.white)
-                VStack(alignment: .leading) {
-                    Text("Apple Watch")
-                        .foregroundStyle(.textPrimaryWhite)
-                    Text(watchSession.statusMessage)
-                        .foregroundStyle(watchSession.isConnected ? .green : .red)
-                }
+                Text(watchSession.statusMessage)
+                    .foregroundStyle(watchSession.isConnected ? .green : .red)
+                    .font(AppFont.caption1Bold)
+                
             }
 
-            Spacer()
-
-            if watchSession.isConnected {
-                CustomButton(title: "Recalibrate", action: onRecalibrate)
-                    .frame(maxWidth: 140)
-            } else {
-                CustomButton(title: "Open Watch App") {
-                    watchSession.requestWatchAppLaunch()
-                    showWatchInstructions = true
-                }
-                .frame(maxWidth: 160)
-            }
+//            if watchSession.isConnected {
+//                CustomButton(title: "Recalibrate", action: onRecalibrate)
+//                    .frame(maxWidth: 140)
+//            } else {
+//                CustomButton(title: "Open Watch App") {
+//                    watchSession.requestWatchAppLaunch()
+//                    showWatchInstructions = true
+//                }
+//                .frame(maxWidth: 160)
+//            }
         }
-        .padding(16)
-        .background(.brandColorAccentGreen.opacity(0.1))
+        .padding(Spacing.sm)
+        .background(watchSession.isConnected ? Color.greenSurface : Color.redSurface)
         .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.white.opacity(0.2), lineWidth: 1)
-        }
         .onAppear {
             watchSession.activate()
         }

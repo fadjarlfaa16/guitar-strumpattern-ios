@@ -17,10 +17,10 @@ final class WatchSessionManager: NSObject, ObservableObject {
 
     var statusMessage: String {
         guard WCSession.isSupported() else { return "Not Supported" }
-        if !isPaired { return "Not Paired" }
+        if !isPaired { return "Watch Disconnected" }
         if !isWatchAppInstalled { return "App Not Installed" }
-        if !isReachable { return "Not Connected" }
-        return "Connected"
+        if !isReachable { return "Watch Disconnected" }
+        return "Watch Connected"
     }
 
     var openWatchInstructionsMessage: String {

@@ -20,6 +20,10 @@ extension Color {
     static let textPrimary   = Color.textPrimaryWhite
     static let textSecondary = Color(hex: "#AAAAAA")
     static let textLabel     = Color(hex: "#D4B84A")   // label bpm/time
+    
+    // Background Cards
+    static let greenSurface = Color(hex: "#152721")
+    static let redSurface = Color(hex: "#31151F")
 }
 // MARK: - Radius Tokens
 enum Radius {
@@ -55,7 +59,9 @@ enum AppFont {
     static let bodyRegular : Font = .body
     static let bodyBold : Font = .body.bold()
     static let caption1Regular : Font = .caption
+    static let caption1Bold : Font = .caption.bold()
     static let caption2Regular : Font = .caption2
+    static let caption2Bold : Font = .caption2.bold()
     }
 
 // MARK: - Hex Color Helper

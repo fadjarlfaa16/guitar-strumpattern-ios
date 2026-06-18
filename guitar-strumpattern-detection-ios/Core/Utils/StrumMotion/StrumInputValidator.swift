@@ -43,6 +43,7 @@ final class StrumInputValidator: ObservableObject {
         isActive = false
         receiver.audioMonitor.stopMonitoring()
         receiver.syncAppState(state: "waitingForSong")
+        WatchSessionManager.shared.stopWatchFromPhone()
     }
 
     private func handleConfirmedStrum() {

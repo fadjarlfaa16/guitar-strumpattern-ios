@@ -16,7 +16,7 @@ class WatchReceiver: ObservableObject {
     
     @Published var lastStrum: String = "Diam"
     @Published var strumPulseTrigger: UUID = UUID()
-    @Published var watchDidTogglePause: UUID = UUID() // ✅ Sudah aman terpasang
+    @Published var watchDidTogglePause: UUID = UUID() 
     @Published var calibrationStatusText: String = "Siap"
     @Published var isCalibrating: Bool = false
     @Published var calibrationPhase: String = "down"
@@ -30,12 +30,14 @@ class WatchReceiver: ObservableObject {
         didSet { audioMonitor.suddenSpikeThreshold = micSpikeThreshold }
     }
     
+    @Published var requiresSoundValidation: Bool = false
+    
     let audioMonitor = AudioMonitor()
     var soundDetectedProvider: (() -> Bool)?
 
     private let sessionManager = WatchSessionManager.shared
     private var messageHandlerID: UUID?
-    
+     
     init() {
             // Karena WatchReceiver adalah class biasa (belum @MainActor),
             // lebih aman jika kita pastikan pemanggilan sessionManager ada di Main Thread
@@ -73,7 +75,6 @@ class WatchReceiver: ObservableObject {
         }
     }
     
-    // ✅ TAMBAHKAN FUNGSI INI (Untuk sinkronisasi state dari ContentView)
     func syncAppState(state: String) {
         if sessionManager.session.isReachable {
             let message = ["command": "syncAppState", "appState": state]
@@ -95,36 +96,36 @@ class WatchReceiver: ObservableObject {
     }
 
     private func handleMessage(_ message: [String: Any]) {
-        DispatchQueue.main.async {
-            if let direction = message["strumDirection"] as? String {
-                if direction == "Down" || direction == "Up" {
-                    if self.isSoundDetected() {
-                        self.lastStrum = direction
-                        self.strumPulseTrigger = UUID()
-                    }
-                } else if direction == "Diam" {
+        if let direction = message["strumDirection"] as? String {
+            if direction == "Down" || direction == "Up" {
+                let isValid = requiresSoundValidation ? self.isSoundDetected() : true
+                if isValid {
                     self.lastStrum = direction
+                    self.strumPulseTrigger = UUID()
                 }
+            } else if direction == "Diam" {
+                self.lastStrum = direction
             }
-
-            if let command = message["command"] as? String {
-                if command == "verifyCalibration" {
-                    if let yAxisValue = message["yAxis"] as? Double {
-                        if self.isSoundDetected() {
-                            let reply: [String: Any] = ["command": "approveCalibration", "yAxis": yAxisValue]
-                            self.sessionManager.session.sendMessage(reply, replyHandler: nil, errorHandler: nil)
-                        }
-                    }
-                } else if command == "togglePauseFromWatch" {
-                    self.watchDidTogglePause = UUID()
-                }
-            }
-
-            if let status = message["calibrationStatus"] as? String { self.calibrationStatusText = status }
-            if let isCal = message["isCalibrating"] as? Bool { self.isCalibrating = isCal }
-            if let phase = message["calibrationPhase"] as? String { self.calibrationPhase = phase }
-            if let count = message["recordedSamplesCount"] as? Int { self.recordedSamplesCount = count }
-            if let target = message["targetSamples"] as? Int { self.targetSamples = target }
         }
+
+        if let command = message["command"] as? String {
+            if command == "verifyCalibration" {
+                if let yAxisValue = message["yAxis"] as? Double {
+                    let isValid = requiresSoundValidation ? self.isSoundDetected() : true
+                    if isValid {
+                        let reply: [String: Any] = ["command": "approveCalibration", "yAxis": yAxisValue]
+                        self.sessionManager.session.sendMessage(reply, replyHandler: nil, errorHandler: nil)
+                    }
+                }
+            } else if command == "togglePauseFromWatch" {
+                self.watchDidTogglePause = UUID()
+            }
+        }
+
+        if let status = message["calibrationStatus"] as? String { self.calibrationStatusText = status }
+        if let isCal = message["isCalibrating"] as? Bool { self.isCalibrating = isCal }
+        if let phase = message["calibrationPhase"] as? String { self.calibrationPhase = phase }
+        if let count = message["recordedSamplesCount"] as? Int { self.recordedSamplesCount = count }
+        if let target = message["targetSamples"] as? Int { self.targetSamples = target }
     }
 }

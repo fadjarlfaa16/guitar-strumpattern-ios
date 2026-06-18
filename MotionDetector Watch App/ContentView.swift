@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var detector = StrumDetector()
+    @ObservedObject var detector: StrumDetector
     
     var body: some View {
         Group {
@@ -137,5 +137,5 @@ struct PlayingSessionWatchView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(detector: StrumDetector())
 }

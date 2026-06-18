@@ -120,7 +120,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
             }
         }
     }
-
+//
     func stopWatchFromPhone() {
         if session.isReachable {
             session.sendMessage(["command": "stop_sync"], replyHandler: nil) { error in

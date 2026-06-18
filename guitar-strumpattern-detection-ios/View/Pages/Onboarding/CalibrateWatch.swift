@@ -41,6 +41,7 @@ struct CalibrateWatchView: View {
             .animation(.easeInOut(duration: 0.35), value: vm.isCalibrated)
         }
         .onAppear {
+            WatchReceiver.shared.requiresSoundValidation = true
             vm.startCalibration()
         }
         .onDisappear {
@@ -92,8 +93,19 @@ struct CalibrateWatchView: View {
 
             Spacer()
 
-            SecondaryTextButton(title: "Reset") {
-                vm.recalibrate()
+            HStack(spacing: 24) {
+                SecondaryTextButton(title: "Wake Watch") {
+                    WatchSessionManager.shared.requestWatchAppLaunch()
+                }
+                
+                SecondaryTextButton(title: "Sync Watch") {
+                    vm.receiver.syncAppState(state: "calibrating")
+                    vm.receiver.startCalibration()
+                }
+                
+                SecondaryTextButton(title: "Reset") {
+                    vm.recalibrate()
+                }
             }
         }
     }

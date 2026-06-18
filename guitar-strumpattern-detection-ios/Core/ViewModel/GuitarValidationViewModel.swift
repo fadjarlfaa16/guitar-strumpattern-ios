@@ -55,7 +55,6 @@ final class GuitarValidationViewModel: ObservableObject {
 
         receiver.$strumPulseTrigger
             .dropFirst()
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.handleConfirmedStrum()
             }
@@ -87,6 +86,7 @@ final class GuitarValidationViewModel: ObservableObject {
     func stop() {
         chordVM.stopListening()
         receiver.switchToChordAudioMode()
+        WatchSessionManager.shared.stopWatchFromPhone()
     }
 
     private func handleCalibrationUpdate(status: String, isCalibrating: Bool) {

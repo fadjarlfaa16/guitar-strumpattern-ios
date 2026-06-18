@@ -10,6 +10,7 @@ import CoreMotion
 import WatchConnectivity
 import Combine
 import WatchKit
+import HealthKit
 
 enum CalibrationState {
     case idle, calibratingDown, calibratingUp
@@ -22,9 +23,10 @@ enum WatchAppState: Equatable {
     case playing
 }
 
-class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRuntimeSessionDelegate {
+class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
     
     let motionManager = CMMotionManager()
+    private let motionQueue = OperationQueue()
     var session = WCSession.default
     
     @Published var currentYAxis: Double = 0.0
@@ -33,7 +35,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRu
     // UI State
     @Published var currentWatchState: WatchAppState = .disconnected {
         didSet {
-            updateExtendedRuntimeSession()
+            updateWorkoutSession()
         }
     }
     @Published var songTitle: String = ""
@@ -45,7 +47,9 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRu
     @Published var calibrationStatusText: String = "Siap"
     @Published var recordedSamplesCount: Int = 0
     let targetSamples = 5
-    private var runtimeSession: WKExtendedRuntimeSession?
+    let healthStore = HKHealthStore()
+    var workoutSession: HKWorkoutSession?
+    var workoutBuilder: HKLiveWorkoutBuilder?
     private var temporaryCalibrationSamples: [Double] = []
     
     @Published var downThreshold: Double = 0.5
@@ -63,6 +67,13 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRu
             session.delegate = self
             session.activate()
         }
+        requestHealthKitPermissionOnWatch()
+    }
+    
+    private func requestHealthKitPermissionOnWatch() {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        let types: Set = [HKObjectType.workoutType()]
+        healthStore.requestAuthorization(toShare: types, read: nil) { _, _ in }
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
@@ -70,6 +81,9 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRu
             if let command = message["command"] as? String {
                 if command == "startCalibration" {
                     self.startCalibrationProcess()
+                }
+                else if command == "stop_sync" {
+                    self.stopWorkoutSession()
                 }
                 else if command == "wake" {
                     WKInterfaceDevice.current().play(.notification)
@@ -123,8 +137,9 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRu
     
     func startDetecting() {
         guard motionManager.isDeviceMotionAvailable else { return }
+        motionQueue.qualityOfService = .userInteractive
         motionManager.deviceMotionUpdateInterval = 1.0 / 50.0
-        motionManager.startDeviceMotionUpdates(to: .main) { [weak self] (data, error) in
+        motionManager.startDeviceMotionUpdates(to: motionQueue) { [weak self] (data, error) in
             guard let self = self, let motionData = data else { return }
             self.analyzeMotion(motion: motionData)
         }
@@ -145,7 +160,9 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRu
     
     private func analyzeMotion(motion: CMDeviceMotion) {
         let yAxis = motion.userAcceleration.y
-        self.currentYAxis = yAxis
+        DispatchQueue.main.async {
+            self.currentYAxis = yAxis
+        }
         
         let rot = motion.rotationRate
         let gyroMagnitude = sqrt(rot.x * rot.x + rot.y * rot.y + rot.z * rot.z)
@@ -206,16 +223,18 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRu
     }
     
     private func updateStrumState(to direction: String) {
-        lastStrum = direction
         sendStrumData(direction: direction)
         
-        idleResetWorkItem?.cancel()
-        let workItem = DispatchWorkItem { [weak self] in
-            self?.lastStrum = "Diam"
-            self?.sendStrumData(direction: "Diam")
+        DispatchQueue.main.async {
+            self.lastStrum = direction
+            self.idleResetWorkItem?.cancel()
+            let workItem = DispatchWorkItem { [weak self] in
+                self?.lastStrum = "Diam"
+                self?.sendStrumData(direction: "Diam")
+            }
+            self.idleResetWorkItem = workItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + self.idleTimeout, execute: workItem)
         }
-        idleResetWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + idleTimeout, execute: workItem)
     }
     
     private func finalizeDownstrokeCalibration() {
@@ -255,8 +274,10 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRu
     
     private func triggerCooldown(_ duration: Double = 0.2) {
         isCooldown = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-            self.isCooldown = false
+        DispatchQueue.global().asyncAfter(deadline: .now() + duration) { [weak self] in
+            self?.motionQueue.addOperation {
+                self?.isCooldown = false
+            }
         }
     }
     
@@ -270,48 +291,77 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, WKExtendedRu
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
     
-    // MARK: - Extended Runtime Session Helpers
+    // MARK: - Workout Session Helpers
     
-    private func updateExtendedRuntimeSession() {
+    private func updateWorkoutSession() {
         if currentWatchState == .calibrating || currentWatchState == .playing {
-            startExtendedRuntimeSession()
+            startWorkoutSession()
         } else {
-            stopExtendedRuntimeSession()
+            stopWorkoutSession()
         }
     }
     
-    private func startExtendedRuntimeSession() {
-        guard runtimeSession == nil else { return }
+    func startWorkoutSession(with configuration: HKWorkoutConfiguration? = nil) {
+        guard workoutSession == nil else { return }
         
-        let session = WKExtendedRuntimeSession()
-        session.delegate = self
-        self.runtimeSession = session
-        session.start()
-        print("WKExtendedRuntimeSession started for state: \(currentWatchState)")
-    }
-    
-    private func stopExtendedRuntimeSession() {
-        if let session = runtimeSession {
-            session.invalidate()
-            runtimeSession = nil
-            print("WKExtendedRuntimeSession invalidated manually")
+        let config = configuration ?? {
+            let c = HKWorkoutConfiguration()
+            c.activityType = .other
+            c.locationType = .indoor
+            return c
+        }()
+        
+        do {
+            workoutSession = try HKWorkoutSession(healthStore: healthStore, configuration: config)
+            workoutBuilder = workoutSession?.associatedWorkoutBuilder()
+            
+            workoutSession?.delegate = self
+            workoutBuilder?.delegate = self
+            workoutBuilder?.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore, workoutConfiguration: config)
+            
+            workoutSession?.startActivity(with: Date())
+            workoutBuilder?.beginCollection(withStart: Date()) { success, error in
+                DispatchQueue.main.async {
+                    if success {
+                        print("HKWorkoutSession started successfully")
+                    } else {
+                        print("Failed to start HKLiveWorkoutBuilder collection: \(error?.localizedDescription ?? "unknown")")
+                    }
+                }
+            }
+        } catch {
+            print("Failed to create HKWorkoutSession: \(error.localizedDescription)")
         }
     }
     
-    // MARK: - WKExtendedRuntimeSessionDelegate
-    
-    func extendedRuntimeSession(_ extendedRuntimeSession: WKExtendedRuntimeSession, didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason, error: Error?) {
-        DispatchQueue.main.async { [weak self] in
-            self?.runtimeSession = nil
-            print("WKExtendedRuntimeSession invalidated. Reason: \(reason), Error: \(error?.localizedDescription ?? "None")")
+    func stopWorkoutSession() {
+        workoutSession?.end()
+        workoutBuilder?.endCollection(withEnd: Date()) { [weak self] _, _ in
+            self?.workoutBuilder?.finishWorkout { _, _ in
+                DispatchQueue.main.async {
+                    self?.workoutSession = nil
+                    self?.workoutBuilder = nil
+                    print("HKWorkoutSession stopped successfully")
+                }
+            }
         }
     }
     
-    func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
-        print("WKExtendedRuntimeSession did start")
+    // MARK: - HKWorkoutSessionDelegate
+    
+    func workoutSession(_ workoutSession: HKWorkoutSession, didChangeTo toState: HKWorkoutSessionState, from fromState: HKWorkoutSessionState, date: Date) {
+        print("Workout session changed state from \(fromState) to \(toState)")
     }
     
-    func extendedRuntimeSessionWillExpire(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
-        print("WKExtendedRuntimeSession will expire soon")
+    func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: Error) {
+        print("Workout session failed with error: \(error.localizedDescription)")
+        DispatchQueue.main.async {
+            self.stopWorkoutSession()
+        }
     }
+    
+    // MARK: - HKLiveWorkoutBuilderDelegate
+    
+    func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf types: Set<HKSampleType>) {}
+    func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {}
 }

@@ -18,7 +18,8 @@ final class RealTimeAudioDetector {
         stopListening()
 
         let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.record, mode: .measurement, options: .duckOthers)
+        try session.setCategory(.playAndRecord, mode: .measurement, options: [.defaultToSpeaker, .allowBluetooth])
+        try session.setPreferredIOBufferDuration(0.02)
         try session.setActive(true)
 
         let inputNode = engine.inputNode
@@ -40,7 +41,7 @@ final class RealTimeAudioDetector {
         targetFormat = targetFmt
         converter = audioConverter
 
-        inputNode.installTap(onBus: 0, bufferSize: 4096, format: inputFormat) { [weak self] buffer, _ in
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] buffer, _ in
             self?.processingQueue.async {
                 self?.process(buffer: buffer)
             }

@@ -9,9 +9,9 @@ import SwiftUI
 
 struct WatchStatusView: View {
     @ObservedObject private var watchSession = WatchSessionManager.shared
-    var onRecalibrate: () -> Void = {}
 
     @State private var showWatchInstructions = false
+    var onRefresh: () -> Void = {}
 
     var body: some View {
         HStack(spacing: Spacing.lg) {
@@ -24,19 +24,16 @@ struct WatchStatusView: View {
                 Text(watchSession.statusMessage)
                     .foregroundStyle(watchSession.isConnected ? .green : .red)
                     .font(AppFont.caption1Bold)
+                Button {
+                    onRefresh()
+                } label: {
+                    Image(systemName: "arrow.2.circlepath")
+                        .font(.system(size: 16))
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
                 
             }
-
-//            if watchSession.isConnected {
-//                CustomButton(title: "Recalibrate", action: onRecalibrate)
-//                    .frame(maxWidth: 140)
-//            } else {
-//                CustomButton(title: "Open Watch App") {
-//                    watchSession.requestWatchAppLaunch()
-//                    showWatchInstructions = true
-//                }
-//                .frame(maxWidth: 160)
-//            }
         }
         .padding(Spacing.sm)
         .background(watchSession.isConnected ? Color.greenSurface : Color.redSurface)

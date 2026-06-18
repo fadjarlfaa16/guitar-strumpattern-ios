@@ -43,7 +43,7 @@ struct ChordGroupPillView: View {
         ZStack {
             HStack(spacing: 0) {
                 Text(group.chord)
-                    .font(AppFont.title3Bold)
+                    .font(AppFont.largeTitleBold)
                     .foregroundStyle(.brandColorAccentGreen)
                 
                 Spacer(minLength: 0)

@@ -8,9 +8,6 @@
 import SwiftUI
 
 struct FinishedOverlay: View {
-
-    let isFirstTime: Bool
-
     let onReplay: () -> Void
     let onContinue: () -> Void
 
@@ -30,28 +27,22 @@ struct FinishedOverlay: View {
                     } label: {
                         VStack(spacing: 8) {
                             Image(systemName: "arrow.counterclockwise")
-                                .font(.system(size: 28, weight: .black))
+                                .font(.system(size: 20, weight: .bold))
 
                             Text("REPLAY")
-                                .font(.system(size: 14, weight: .black, design: .monospaced))
+                                .font(.system(size: 12, weight: .bold, design: .monospaced))
                         }
-                        .foregroundStyle(.white)
-                        .frame(width: 160)
-                        .padding(.vertical, 20)
+                        .foregroundStyle(.brandColorPrimaryPurple)
+                        .frame(width: 140)
+                        .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 14)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            .brandColorPrimaryPurple,
-                                            Color(hue: 0.75, saturation: 0.8, brightness: 0.6)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
+                                .fill(.brandColorPrimaryPurple.opacity(0.1))
+                                .strokeBorder(
+                                    .brandColorPrimaryPurple.opacity(0.3),
+                                    lineWidth: 1
                                 )
                         )
-                        .shadow(color: .brandColorPrimaryPurple.opacity(0.55), radius: 14)
                     }
                     .buttonStyle(StrumButtonStyle())
 
@@ -83,4 +74,8 @@ struct FinishedOverlay: View {
             .padding(40)
         }
     }
+}
+
+#Preview {
+    FinishedOverlay(onReplay: {}, onContinue: {})
 }

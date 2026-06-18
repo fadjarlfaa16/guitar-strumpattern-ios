@@ -206,7 +206,6 @@ struct PlayingSessionView: View {
 
             if vm.isFinished {
                 FinishedOverlay(
-                    isFirstTime: isFirstTime,
                     onReplay: {
                         vm.startGame()
                     },

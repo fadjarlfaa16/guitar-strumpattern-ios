@@ -23,9 +23,10 @@ struct StrummingPatternList: View {
     var body: some View {
         VStack(spacing: Spacing.lg) {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.lg) {
-                MusicPlayer(songTitle: songTitle, bpm: bpm, timeSignature: rhythm)
-                    .padding(.horizontal, Spacing.md)
-                    .padding(.bottom, Spacing.sm)
+//                MusicPlayer(songTitle: songTitle, bpm: bpm, timeSignature: rhythm)
+//                    .padding(.horizontal, Spacing.md)
+//                    .padding(.bottom, Spacing.sm)
+                
     
             }
             ForEach(patterns) { pattern in

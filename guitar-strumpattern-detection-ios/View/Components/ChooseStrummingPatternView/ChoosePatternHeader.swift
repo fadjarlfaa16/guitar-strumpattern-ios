@@ -20,6 +20,7 @@ struct ChoosePatternHeader: View {
                 .font(AppFont.bodyRegular)
                 .foregroundColor(.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
+            WatchStatusView()
         }
     }
 }

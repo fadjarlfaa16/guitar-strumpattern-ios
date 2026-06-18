@@ -158,6 +158,7 @@ struct PlayingSessionView: View {
                             .frame(width: 24, height: 24)
                             .foregroundStyle(Color.textPrimaryWhite)
                     }
+                    Spacer()
                     WatchStatusView()
                         .padding(.horizontal, 16)
                     Button("Recalibrate Watch") {

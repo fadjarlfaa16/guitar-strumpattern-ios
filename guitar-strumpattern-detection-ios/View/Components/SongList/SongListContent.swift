@@ -16,15 +16,22 @@ struct SongListContent: View {
 
     var body: some View {
         List {
-            ForEach(items) { item in
-                SongRow(
-                    item: item,
-                    isNavigationEnabled: item.isAnalyzed,
-                    onEditTapped: { onEdit(item) },
-                    onDeleteTapped: { onDelete(item) },
-                    onAnalyzeTapped: { onAnalyze(item.id) }
-                )
+            if items.isEmpty {
+                Text("No songs available.")
+            } else {
+                ForEach(items) { item in
+                    SongRow(
+                        item: item,
+                        isNavigationEnabled: item.isAnalyzed,
+                        onEditTapped: { onEdit(item) },
+                        onDeleteTapped: { onDelete(item) },
+                        onAnalyzeTapped: { onAnalyze(item.id) }
+                    )
+                }
             }
         }
     }
 }
+
+
+

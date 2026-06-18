@@ -58,6 +58,7 @@ struct CalibrateWatchView: View {
                 Text("Strum \(strumDirection == .up ? "up" : "down") 5 times on your guitar")
                     .font(AppFont.title3Regular)
                     .foregroundColor(.textPrimaryWhite)
+                WatchStatusView()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 

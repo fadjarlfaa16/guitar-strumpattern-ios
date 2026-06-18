@@ -76,7 +76,7 @@ class RhythmGameViewModel: ObservableObject {
 
     // MARK: - Game Control
 
-    func startGame() {
+    func startGame(startPaused: Bool = false) {
         reset()
         pendingGroups = chordGroups.sorted { $0.startTime < $1.startTime }
         
@@ -84,15 +84,23 @@ class RhythmGameViewModel: ObservableObject {
         if let audioPlayer = audioPlayer {
             useAudioTiming = true
             setupAudioTimeObserver()
-            audioPlayer.play()
+            if !startPaused {
+                audioPlayer.play()
+            }
         } else {
             // Fallback ke local timer
             useAudioTiming = false
-            startDate = Date()
-            startLocalTimer()
+            if !startPaused {
+                startDate = Date()
+                startLocalTimer()
+            }
         }
         
         isPlaying = true
+        if startPaused {
+            isPaused = true
+            tick()
+        }
     }
 
     func stopGame() {
@@ -136,7 +144,7 @@ class RhythmGameViewModel: ObservableObject {
         if isPausedForInput { return }
         
         if useAudioTiming {
-            audioPlayer?.resume()
+            audioPlayer?.play()
         } else {
             // Recalculate startDate so currentTime picks up where it left off
             startDate = Date().addingTimeInterval(-pausedTime)

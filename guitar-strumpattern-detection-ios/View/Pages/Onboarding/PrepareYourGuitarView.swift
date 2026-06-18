@@ -43,9 +43,7 @@ struct PrepareYourGuitarView: View {
                         navigateToWatchCheck = true
                     }
                     .navigationDestination(isPresented: $navigateToWatchCheck) {
-                        AppleWatchCheckView(
-                            isWatchConnected: true
-                        )
+                        AppleWatchCheckView()
                     }
                     SecondaryTextButton(title: "Skip for Now") {
                         navRoot = .songList

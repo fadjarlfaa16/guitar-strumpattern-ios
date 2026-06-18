@@ -11,7 +11,7 @@ import SwiftUI
 struct AppleWatchCheckView: View {
     @State private var navigateToCalibrateWatch = false
     @AppStorage("appState") private var appState: NavRoot = .onboarding
-    let isWatchConnected: Bool
+    @ObservedObject private var watchSession = WatchSessionManager.shared
 
     var body: some View {
         ZStack {
@@ -26,28 +26,28 @@ struct AppleWatchCheckView: View {
             // Main Content
             VStack {
                 // Header Section
-                HeroHeader(title: isWatchConnected ? "Ready with your Apple Watch?" : "Apple Watch Required", subtitle: isWatchConnected ? "Wear it on your strumming hand so we can detect your strumming movements." : "We use your Apple Watch to detect your strumming movements.")
+                HeroHeader(title: watchSession.isConnected ? "Ready with your Apple Watch?" : "Apple Watch Required", subtitle: watchSession.isConnected ? "Wear it on your strumming hand so we can detect your strumming movements." : "We use your Apple Watch to detect your strumming movements.")
                 
                 Spacer()
                 
                 ZStack {
-                    Image(systemName: "applewatch")
+                    Image(watchSession.isConnected ? .applewatchBadgeCheckmark : .applewatchBadgeExclamationmark)
                         .resizable()
                         .scaledToFit()
                         .foregroundStyle(.brandColorAccentGreen)
                         .frame(width: 168)
-                    Image(systemName: isWatchConnected ? "checkmark.circle.fill" : "x.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(isWatchConnected ? .green : .red)
-                        .frame(width: 42)
-                        .offset(x: 60, y: 105)
+//                    Image(systemName: watchSession.isConnected ? "checkmark.circle.fill" : "x.circle.fill")
+//                        .resizable()
+//                        .scaledToFit()
+//                        .foregroundStyle(isWatchConnected ? .green : .red)
+//                        .frame(width: 42)
+//                        .offset(x: 60, y: 105)
                 }
                 
                 Spacer()
                 
                 // Next Button
-                if isWatchConnected {
+                if watchSession.isConnected {
                 VStack(spacing: 12) {
                     CustomButton(title: "Next") {
                             navigateToCalibrateWatch = true
@@ -64,5 +64,5 @@ struct AppleWatchCheckView: View {
 }
 
 #Preview {
-    AppleWatchCheckView(isWatchConnected: true)
+    AppleWatchCheckView()
 }

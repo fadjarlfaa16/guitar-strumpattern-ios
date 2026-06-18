@@ -52,6 +52,7 @@ enum AppFont {
     static let largeTitleBold: Font = .largeTitle.bold()
     static let largeTitleRegular: Font = .largeTitle
     static let title2Regular : Font = .title2
+    static let title2Bold : Font = .title2.bold()
     static let title3Regular : Font = .title3
     static let title3Bold : Font = .title3.bold()
     static let headlineSemibold : Font = .headline.weight(.semibold)

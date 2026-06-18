@@ -9,6 +9,12 @@ import SwiftUI
 
 // MARK: - Playing Session View
 
+enum SessionState {
+    case waitingForTap
+    case countingDown
+    case playing
+}
+
 struct PlayingSessionView: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -41,10 +47,12 @@ struct PlayingSessionView: View {
     @StateObject private var audioPlayer = AudioPlayerManager()
     @StateObject private var strumValidator = StrumInputValidator()
     @State private var screenWidth: CGFloat = 0
-    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
+    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = false
     @AppStorage("navRoot") private var navRoot: NavRoot = .onboarding
-    @State private var tutorialPauseStep: Int = 0
     @Environment(Routes.self) private var routes
+    @State private var sessionState: SessionState = .playing
+    @State private var countdownValue: Int = 3
+    @State private var countdownTask: Task<Void, Never>? = nil
 
     // MARK: - Init
     init(
@@ -68,8 +76,6 @@ struct PlayingSessionView: View {
         // Determine first launch status locally to avoid capturing `self` before initialization
         let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
         let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
-
-        self._tutorialPauseStep = State(initialValue: isFirst ? 1 : 0)
         
         var processedChords = chords
         if isFirst {
@@ -180,6 +186,23 @@ struct PlayingSessionView: View {
                 }
             }
             
+            if sessionState == .waitingForTap {
+                ZStack {
+                    Color.clear.contentShape(Rectangle()).ignoresSafeArea()
+                    Text("Tap to start")
+                        .font(AppFont.title2Bold)
+                        .foregroundStyle(.white)
+                }
+                .zIndex(30)
+            } else if sessionState == .countingDown {
+                ZStack {
+                    Color.black.opacity(0.6).ignoresSafeArea()
+                    Text("\(countdownValue)")
+                        .font(.system(size: 100, weight: .bold, design: .rounded))
+                        .foregroundStyle(.textPrimaryWhite)
+                }
+                .zIndex(30)
+            }
 
             if vm.isFinished {
                 FinishedOverlay(
@@ -197,14 +220,15 @@ struct PlayingSessionView: View {
                 )
             }
 
-            if vm.isPaused {
+            if vm.isPaused && sessionState != .countingDown {
                 PauseOverlay(
-                    tutorialPauseStep: tutorialPauseStep,
+                    isFirstTime: isFirstTime,
                     onExit: {
                         routes.songLibraryRoute = NavigationPath()
                     },
                     onReplay: {
-                        vm.startGame()
+                        vm.startGame(startPaused: true)
+                        startCountdown()
                     },
                     onChangePattern: {
                         dismiss()
@@ -215,29 +239,14 @@ struct PlayingSessionView: View {
                 )
             }
 
-            // Pause Tutorial Step 1
-            if tutorialPauseStep == 1 {
-                ZStack {
-                    backgroundGradient
-                    .opacity(0.6)
-                    .ignoresSafeArea()
-                
-                    Text("Tap the screen to pause")
-                        .font(AppFont.title3Bold)
-                        .foregroundStyle(.textPrimaryWhite)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 12)
-                }
-                .transition(.opacity)
-                .zIndex(20)
-                .allowsHitTesting(false)
-            }
+
         }
         .onTapGesture {
-            if vm.isPlaying && !vm.isPaused && !vm.isFinished {
-                vm.pauseGame()
-                if tutorialPauseStep == 1 {
-                    withAnimation { tutorialPauseStep = 2 }
+            if sessionState == .waitingForTap {
+                startCountdown()
+            } else if sessionState == .playing {
+                if vm.isPlaying && !vm.isPaused && !vm.isFinished {
+                    vm.pauseGame()
                 }
             }
         }
@@ -263,9 +272,16 @@ struct PlayingSessionView: View {
             }
 
             setupStrumValidator()
-            vm.startGame()
+            vm.startGame(startPaused: true)
+            
+            if isFirst {
+                sessionState = .waitingForTap
+            } else {
+                startCountdown()
+            }
         }
         .onDisappear {
+            countdownTask?.cancel()
             unlockOrientation()
             strumValidator.stop()
             vm.stopGame()
@@ -314,6 +330,25 @@ struct PlayingSessionView: View {
         .ignoresSafeArea()
     }
 
+
+    private func startCountdown() {
+        sessionState = .countingDown
+        countdownValue = 3
+        
+        countdownTask?.cancel()
+        countdownTask = Task {
+            for i in (1...3).reversed() {
+                if Task.isCancelled { return }
+                await MainActor.run { countdownValue = i }
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+            }
+            if Task.isCancelled { return }
+            await MainActor.run {
+                sessionState = .playing
+                vm.resumeGame()
+            }
+        }
+    }
 
     private func formatTime(_ time: TimeInterval) -> String {
         let maxTime = max(0, time)

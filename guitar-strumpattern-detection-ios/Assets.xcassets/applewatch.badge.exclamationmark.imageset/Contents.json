@@ -6,10 +6,12 @@
       "scale" : "1x"
     },
     {
+      "filename" : "applewatch.badge.exclamationmark 1.svg",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "applewatch.badge.exclamationmark 2.svg",
       "idiom" : "universal",
       "scale" : "3x"
     }

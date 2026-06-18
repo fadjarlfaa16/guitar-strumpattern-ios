@@ -87,6 +87,7 @@ final class GuitarValidationViewModel: ObservableObject {
     func stop() {
         chordVM.stopListening()
         receiver.switchToChordAudioMode()
+        WatchSessionManager.shared.stopWatchFromPhone()
     }
 
     private func handleCalibrationUpdate(status: String, isCalibrating: Bool) {

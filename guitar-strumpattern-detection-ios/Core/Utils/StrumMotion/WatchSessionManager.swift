@@ -1,11 +1,14 @@
 import Combine
 import Foundation
 import WatchConnectivity
+import HealthKit
 
 @MainActor
 final class WatchSessionManager: NSObject, ObservableObject {
 
     static let shared = WatchSessionManager()
+    
+    private let healthStore = HKHealthStore()
 
     @Published private(set) var isPaired = false
     @Published private(set) var isWatchAppInstalled = false
@@ -43,6 +46,17 @@ final class WatchSessionManager: NSObject, ObservableObject {
     private override init() {
         super.init()
         activate()
+        requestHealthKitPermissionOnPhone()
+    }
+
+    private func requestHealthKitPermissionOnPhone() {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        let types: Set = [HKObjectType.workoutType()]
+        healthStore.requestAuthorization(toShare: types, read: types) { success, error in
+            if !success {
+                print("Failed to authorize HealthKit on phone: \(error?.localizedDescription ?? "unknown")")
+            }
+        }
     }
 
     func activate() {
@@ -90,8 +104,28 @@ final class WatchSessionManager: NSObject, ObservableObject {
 
         guard isPaired else { return }
 
-        if isWatchAppInstalled, session.isReachable == false {
-            session.sendMessage(["command": "wake"], replyHandler: nil, errorHandler: nil)
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .other
+        configuration.locationType = .indoor
+
+        healthStore.startWatchApp(with: configuration) { success, error in
+            if success {
+                print("Successfully launched Watch app via HealthKit")
+            } else {
+                print("Failed to launch Watch app via HealthKit: \(error?.localizedDescription ?? "unknown")")
+                // Fallback: send message if reachable
+                if WCSession.default.isReachable {
+                    WCSession.default.sendMessage(["command": "wake"], replyHandler: nil, errorHandler: nil)
+                }
+            }
+        }
+    }
+//
+    func stopWatchFromPhone() {
+        if session.isReachable {
+            session.sendMessage(["command": "stop_sync"], replyHandler: nil) { error in
+                print("Error sending stop command: \(error.localizedDescription)")
+            }
         }
     }
 }

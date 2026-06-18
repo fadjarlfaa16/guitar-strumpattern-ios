@@ -36,12 +36,6 @@ struct AppleWatchCheckView: View {
                         .scaledToFit()
                         .foregroundStyle(.brandColorAccentGreen)
                         .frame(width: 168)
-//                    Image(systemName: watchSession.isConnected ? "checkmark.circle.fill" : "x.circle.fill")
-//                        .resizable()
-//                        .scaledToFit()
-//                        .foregroundStyle(isWatchConnected ? .green : .red)
-//                        .frame(width: 42)
-//                        .offset(x: 60, y: 105)
                 }
                 
                 Spacer()

@@ -15,6 +15,7 @@ import SwiftUI
 struct StrummingPatternList: View {
     let bpm: Int
     let rhythm: String
+    var songTitle: String = "Unknown Song"
     let patterns: [StrummingPattern]
     @Binding var selectedPatternID: UUID?
     var onPatternTap: ((StrummingPattern) -> Void)? = nil
@@ -22,7 +23,7 @@ struct StrummingPatternList: View {
     var body: some View {
         VStack(spacing: Spacing.lg) {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.lg) {
-                MusicPlayer(bpm: bpm, timeSignature: rhythm)
+                MusicPlayer(songTitle: songTitle, bpm: bpm, timeSignature: rhythm)
                     .padding(.horizontal, Spacing.md)
                     .padding(.bottom, Spacing.sm)
     

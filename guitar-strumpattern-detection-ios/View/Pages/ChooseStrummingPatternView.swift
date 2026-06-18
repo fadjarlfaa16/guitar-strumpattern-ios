@@ -6,6 +6,7 @@ struct ChooseStrummingPatternView: View {
     let patterns: [StrummingPattern]
     var chordSegments: [StoredChordSegment]? = nil
     var audioURL: URL?
+    var songTitle: String = "Unknown Song"
 
     var onPatternSelected: ((StrummingPattern) -> Void)? = nil
 
@@ -47,6 +48,7 @@ struct ChooseStrummingPatternView: View {
         StrummingPatternList(
             bpm: bpm,
             rhythm: rhythm,
+            songTitle: songTitle,
             patterns: patterns,
             selectedPatternID: $selectedPatternID,
             onPatternTap: selectPattern

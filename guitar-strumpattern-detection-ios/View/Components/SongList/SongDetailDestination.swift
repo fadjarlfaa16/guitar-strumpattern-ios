@@ -38,7 +38,8 @@ struct SongDetailDestination: View {
                     rhythm: timeSignature,
                     patterns: recommendedPatterns,
                     chordSegments: chordSegments,
-                    audioURL: audioURL
+                    audioURL: audioURL,
+                    songTitle: stored.title
                 )
 
             } else {

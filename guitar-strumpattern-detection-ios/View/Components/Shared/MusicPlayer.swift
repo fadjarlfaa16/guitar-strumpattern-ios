@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MusicPlayer: View {
-    var songTitle: String = "Niki - Backburner"
+    var songTitle: String = "Unknown Song"
     var bpm: Int = 120
     var timeSignature: String = "4/4"
 

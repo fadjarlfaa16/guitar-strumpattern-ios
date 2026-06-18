@@ -78,29 +78,6 @@ struct CalibrateWatchView: View {
                     )
                     .animation(.easeInOut(duration: 0.3), value: strumDirection)
                     
-//                    VStack(spacing: Spacing.sm) {
-//                        Text(vm.receiver.calibrationStatusText)
-//                            .font(AppFont.title3Bold)
-//                            .foregroundStyle(.textPrimaryWhite)
-//                            .multilineTextAlignment(.center)
-//                        
-//                        if vm.receiver.isCalibrating {
-//                            ProgressView(
-//                                value: Double(vm.receiver.recordedSamplesCount),
-//                                total: Double(vm.receiver.targetSamples)
-//                            )
-//                            .tint(.brandColorAccentGreen)
-//                            
-//                            Text("\(vm.receiver.recordedSamplesCount) / \(vm.receiver.targetSamples)")
-//                                .font(AppFont.bodyRegular.monospacedDigit())
-//                                .foregroundStyle(.textPrimaryWhite)
-//                        } else {
-//                            Text("Make sure the guitar sound is detected while strumming.")
-//                                .font(AppFont.caption1Regular)
-//                                .multilineTextAlignment(.center)
-//                        }
-//                    }
-                    
                 HStack {
                     ForEach(0..<vm.receiver.targetSamples, id: \.self) { index in
                         if index > 0 { Spacer() }

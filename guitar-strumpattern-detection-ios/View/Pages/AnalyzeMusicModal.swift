@@ -109,14 +109,18 @@ struct AnalyzeMusicModal: View {
                         }
                     }
                 }
+
+            
             }
             .padding(24)
             .padding(.horizontal, 20)
+            
         }
         .task(id: song.id) {
             await runAnalysis()
         }
     }
+
     // MARK: - Analysis
 
     private func runAnalysis() async {
@@ -199,21 +203,7 @@ struct AnalyzeMusicModal: View {
         }
     }
 
-    private func resultRow(
-        title: String,
-        value: String
-    ) -> some View {
-        HStack {
-            Text(title)
-                .foregroundStyle(.white.opacity(0.7))
-
-            Spacer()
-
-            Text(value)
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
-        }
-    }
+   
     
     private func getErrorMessage(_ error: Error) -> String {
         let errorDesc = error.localizedDescription

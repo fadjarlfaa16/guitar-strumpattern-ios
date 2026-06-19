@@ -242,20 +242,20 @@ struct PlayingSessionView: View {
             // Debug Overlay
             VStack {
                 Spacer()
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Debug Mode").font(.caption2).bold()
-                        Text("Chord: \(vm.liveDetectedChord)").font(.caption2)
-                        Text("Strum: \(strumValidator.receiver.lastStrum)").font(.caption2)
-                    }
-                    .padding(8)
-                    .background(Color.black.opacity(0.7))
-                    .foregroundStyle(.white)
-                    .cornerRadius(8)
-                    .padding(.bottom, 20)
-                    .padding(.leading, 20)
-                    Spacer()
-                }
+//                HStack {
+//                    VStack(alignment: .leading, spacing: 4) {
+//                        Text("Debug Mode").font(.caption2).bold()
+//                        Text("Chord: \(vm.liveDetectedChord)").font(.caption2)
+//                        Text("Strum: \(strumValidator.receiver.lastStrum)").font(.caption2)
+//                    }
+//                    .padding(8)
+//                    .background(Color.black.opacity(0.7))
+//                    .foregroundStyle(.white)
+//                    .cornerRadius(8)
+//                    .padding(.bottom, 20)
+//                    .padding(.leading, 20)
+//                    Spacer()
+//                }
             }
             .zIndex(100)
 

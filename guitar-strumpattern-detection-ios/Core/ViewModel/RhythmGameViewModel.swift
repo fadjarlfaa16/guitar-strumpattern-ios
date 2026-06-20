@@ -203,7 +203,7 @@ class RhythmGameViewModel: ObservableObject {
             if let earliest = unhitNotes.min(by: { $0.input.time < $1.input.time }) {
                 let lateWindow: TimeInterval = 0 // 200ms toleransi terlambat
 //                let lateWindow: TimeInterval = 0.20 // 200ms toleransi terlambat
-                let lateWindow: TimeInterval = 0 // 200ms toleransi terlambat
+                //let lateWindow: TimeInterval = 0 // 200ms toleransi terlambat
                 // If it reached the hit line + lateWindow without being strummed
                 if currentTime >= earliest.input.time + lateWindow {
                     currentTime = earliest.input.time // snap to exact hit line

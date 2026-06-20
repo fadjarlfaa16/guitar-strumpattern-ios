@@ -39,7 +39,6 @@ class WatchReceiver: ObservableObject {
     private var messageHandlerID: UUID?
      
     init() {
-            // Karena WatchReceiver adalah class biasa (belum @MainActor),
             // lebih aman jika kita pastikan pemanggilan sessionManager ada di Main Thread
             Task { @MainActor in
                 sessionManager.activate()

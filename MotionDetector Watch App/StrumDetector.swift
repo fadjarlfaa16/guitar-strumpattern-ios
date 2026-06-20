@@ -58,7 +58,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     var isCooldown = false
     
     private var idleResetWorkItem: DispatchWorkItem?
-    private let idleTimeout: TimeInterval = 0.8
+    private let idleTimeout: TimeInterval = 0.5
     private let minFlickRotation: Double = 1.5 // Filter Giroskop
     
     override init() {
@@ -272,7 +272,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
         }
     }
     
-    private func triggerCooldown(_ duration: Double = 0.2) {
+    private func triggerCooldown(_ duration: Double = 0.1) {
         isCooldown = true
         DispatchQueue.global().asyncAfter(deadline: .now() + duration) { [weak self] in
             self?.motionQueue.addOperation {

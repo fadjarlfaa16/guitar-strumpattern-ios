@@ -4,7 +4,8 @@
 //
 //  Created by Muhammad Fadjar Al Farisyi on 05/06/26.
 //
-
+//fasdf
+//
 import SwiftUI
 
 // MARK: - Playing Session View
@@ -46,6 +47,7 @@ struct PlayingSessionView: View {
     @StateObject private var vm: RhythmGameViewModel
     @StateObject private var audioPlayer = AudioPlayerManager()
     @StateObject private var strumValidator = StrumInputValidator()
+    @StateObject private var chordVM = RealTimeChordViewModel()
     @State private var screenWidth: CGFloat = 0
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @AppStorage("navRoot") private var navRoot: NavRoot = .onboarding
@@ -251,6 +253,25 @@ struct PlayingSessionView: View {
                 )
             }
 
+            // Debug Overlay
+            VStack {
+                Spacer()
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Debug Mode").font(.caption2).bold()
+                        Text("Chord: \(vm.liveDetectedChord)").font(.caption2)
+                        Text("Strum: \(strumValidator.receiver.lastStrum)").font(.caption2)
+                    }
+                    .padding(8)
+                    .background(Color.black.opacity(0.7))
+                    .foregroundStyle(.white)
+                    .cornerRadius(8)
+                    .padding(.bottom, 20)
+                    .padding(.leading, 20)
+                    Spacer()
+                }
+            }
+            .zIndex(100)
 
         }
         .onTapGesture {
@@ -269,6 +290,9 @@ struct PlayingSessionView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: StrumNotifier.strumDownNotification)) { _ in
             handleStrumDown()
+        }
+        .onReceive(chordVM.$currentChord) { chord in
+            vm.liveDetectedChord = chord
         }
         .onAppear {
             let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
@@ -296,6 +320,7 @@ struct PlayingSessionView: View {
             countdownTask?.cancel()
             unlockOrientation()
             strumValidator.stop()
+            chordVM.stopListening()
             vm.stopGame()
             audioPlayer.stop()
         }
@@ -315,6 +340,17 @@ struct PlayingSessionView: View {
             vm.onAction(direction: direction)
         }
         strumValidator.start()
+        
+        // AI Chord Validation Setup
+        chordVM.updateSoundThresholds(
+            baseDecibels: strumValidator.receiver.micBaseThreshold,
+            spikeDecibels: strumValidator.receiver.micSpikeThreshold
+        )
+        strumValidator.receiver.switchToChordAudioMode()
+        strumValidator.receiver.soundDetectedProvider = { [weak chordVM] in
+            chordVM?.isSoundDetected() ?? false
+        }
+        chordVM.startListening()
     }
 
     private func lockToLandscape() {

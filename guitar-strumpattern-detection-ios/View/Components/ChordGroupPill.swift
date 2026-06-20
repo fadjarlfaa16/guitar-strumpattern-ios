@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ChordGroupPillView: View {
-    
+
     let group: ChordGroup
     let leadX: CGFloat
     let pillW: CGFloat

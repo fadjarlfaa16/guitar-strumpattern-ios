@@ -24,14 +24,16 @@ struct WatchStatusView: View {
                 Text(watchSession.statusMessage)
                     .foregroundStyle(watchSession.isConnected ? .green : .red)
                     .font(AppFont.caption1Bold)
-                Button {
-                    onRefresh()
-                } label: {
-                    Image(systemName: "arrow.2.circlepath")
-                        .font(.system(size: 16))
+                if !watchSession.isConnected {
+                    Button {
+                        onRefresh()
+                    } label: {
+                        Image(systemName: "arrow.2.circlepath")
+                            .font(.system(size: 16))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)                    
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.red)
                 
             }
         }

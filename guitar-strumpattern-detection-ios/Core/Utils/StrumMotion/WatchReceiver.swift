@@ -81,6 +81,19 @@ class WatchReceiver: ObservableObject {
         }
     }
     
+    func syncPlaying(title: String, currentTime: Double, maxTime: Double, isPaused: Bool) {
+        if sessionManager.session.isReachable {
+            let message: [String: Any] = [
+                "command": "syncPlaying",
+                "title": title,
+                "currentTime": currentTime,
+                "maxTime": maxTime,
+                "isPaused": isPaused
+            ]
+            sessionManager.session.sendMessage(message, replyHandler: nil, errorHandler: nil)
+        }
+    }
+    
     func isSoundDetected() -> Bool {
         soundDetectedProvider?() ?? audioMonitor.isSoundDetected()
     }

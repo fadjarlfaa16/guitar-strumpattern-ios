@@ -39,7 +39,8 @@ struct ChooseStrummingPatternView: View {
                 chordSegments: chordSegments,
                 bpm: bpm,
                 rhythm: rhythm,
-                audioURL: audioURL
+                audioURL: audioURL,
+                songTitle: songTitle
             )
         }
     }

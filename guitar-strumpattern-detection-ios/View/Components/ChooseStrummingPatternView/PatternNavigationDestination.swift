@@ -14,6 +14,7 @@ struct PatternNavigationDestination: View {
     let bpm: Int
     let rhythm: String
     let audioURL: URL?
+    var songTitle: String?
 
     var body: some View {
         let beats = selectedPattern?.beats ?? []
@@ -34,7 +35,8 @@ struct PatternNavigationDestination: View {
             bpm: bpm,
             timeSignature: rhythm,
             audioURL: audioURL,
-            patternNotation: selectedPattern?.notation
+            patternNotation: selectedPattern?.notation,
+            songTitle: songTitle
         )
     }
 }

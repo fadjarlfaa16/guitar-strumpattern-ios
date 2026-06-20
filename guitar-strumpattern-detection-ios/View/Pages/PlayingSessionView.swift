@@ -4,8 +4,7 @@
 //
 //  Created by Muhammad Fadjar Al Farisyi on 05/06/26.
 //
-//fasdf
-//
+
 import SwiftUI
 
 // MARK: - Playing Session View
@@ -41,13 +40,15 @@ struct PlayingSessionView: View {
     /// Runs the lane without requiring strum input.
     var autoPlay: Bool
     
+    /// The title of the song being played.
+    var songTitle: String?
+    
 
     // MARK: - ViewModel & State
 
     @StateObject private var vm: RhythmGameViewModel
     @StateObject private var audioPlayer = AudioPlayerManager()
     @StateObject private var strumValidator = StrumInputValidator()
-    @StateObject private var chordVM = RealTimeChordViewModel()
     @State private var screenWidth: CGFloat = 0
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
     @AppStorage("navRoot") private var navRoot: NavRoot = .onboarding
@@ -67,7 +68,8 @@ struct PlayingSessionView: View {
         duration:      String?        = nil,
         audioURL:      URL?           = nil,
         autoPlay:      Bool           = false,
-        patternNotation: String?      = nil
+        patternNotation: String?      = nil,
+        songTitle:     String?        = nil
     ) {
         let safeBPM = bpm > 0 ? bpm : 120
         self.pattern       = pattern
@@ -77,6 +79,7 @@ struct PlayingSessionView: View {
         self.duration      = duration
         self.audioURL      = audioURL
         self.autoPlay      = autoPlay
+        self.songTitle     = songTitle
         // Determine first launch status locally to avoid capturing `self` before initialization
         let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
         let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
@@ -253,25 +256,6 @@ struct PlayingSessionView: View {
                 )
             }
 
-            // Debug Overlay
-            VStack {
-                Spacer()
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Debug Mode").font(.caption2).bold()
-                        Text("Chord: \(vm.liveDetectedChord)").font(.caption2)
-                        Text("Strum: \(strumValidator.receiver.lastStrum)").font(.caption2)
-                    }
-                    .padding(8)
-                    .background(Color.black.opacity(0.7))
-                    .foregroundStyle(.white)
-                    .cornerRadius(8)
-                    .padding(.bottom, 20)
-                    .padding(.leading, 20)
-                    Spacer()
-                }
-            }
-            .zIndex(100)
 
         }
         .onTapGesture {
@@ -291,8 +275,16 @@ struct PlayingSessionView: View {
         .onReceive(NotificationCenter.default.publisher(for: StrumNotifier.strumDownNotification)) { _ in
             handleStrumDown()
         }
-        .onReceive(chordVM.$currentChord) { chord in
-            vm.liveDetectedChord = chord
+        .onChange(of: Int(vm.currentTime)) { _, _ in
+            syncToWatch()
+        }
+        .onChange(of: vm.isPaused) { _, _ in
+            syncToWatch()
+        }
+        .onChange(of: sessionState) { _, _ in
+            if sessionState == .playing {
+                syncToWatch()
+            }
         }
         .onAppear {
             let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
@@ -320,7 +312,6 @@ struct PlayingSessionView: View {
             countdownTask?.cancel()
             unlockOrientation()
             strumValidator.stop()
-            chordVM.stopListening()
             vm.stopGame()
             audioPlayer.stop()
         }
@@ -340,17 +331,6 @@ struct PlayingSessionView: View {
             vm.onAction(direction: direction)
         }
         strumValidator.start()
-        
-        // AI Chord Validation Setup
-        chordVM.updateSoundThresholds(
-            baseDecibels: strumValidator.receiver.micBaseThreshold,
-            spikeDecibels: strumValidator.receiver.micSpikeThreshold
-        )
-        strumValidator.receiver.switchToChordAudioMode()
-        strumValidator.receiver.soundDetectedProvider = { [weak chordVM] in
-            chordVM?.isSoundDetected() ?? false
-        }
-        chordVM.startListening()
     }
 
     private func lockToLandscape() {
@@ -403,6 +383,23 @@ struct PlayingSessionView: View {
         let m = Int(maxTime) / 60
         let s = Int(maxTime) % 60
         return String(format: "%d:%02d", m, s)
+    }
+
+    private func syncToWatch() {
+        var maxT: Double = vm.chordGroups.last?.endTime ?? 0
+        if let dur = duration {
+            let parts = dur.split(separator: ":")
+            let m = Double(parts.first.map(String.init) ?? "0") ?? 0
+            let s = parts.count > 1 ? (Double(String(parts.last!)) ?? 0) : 0
+            maxT = m * 60 + s
+        }
+        
+        WatchReceiver.shared.syncPlaying(
+            title: songTitle ?? "Unknown Song",
+            currentTime: vm.currentTime,
+            maxTime: maxT,
+            isPaused: vm.isPaused
+        )
     }
 }
 

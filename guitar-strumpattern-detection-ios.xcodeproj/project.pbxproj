@@ -383,6 +383,8 @@
 				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -419,6 +421,8 @@
 				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -456,10 +460,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
+				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.aqil.guitar-strumpattern-detection-ios";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -492,10 +496,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
+				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.aqil.guitar-strumpattern-detection-ios";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

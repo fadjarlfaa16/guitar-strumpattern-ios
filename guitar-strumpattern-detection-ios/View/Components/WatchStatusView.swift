@@ -51,11 +51,11 @@ struct WatchStatusView: View {
     }
 }
 
-#Preview {
-    ZStack {
-        Color.black
-            .ignoresSafeArea()
-        WatchStatusView()
-            .padding()
-    }
-}
+//#Preview {
+//    ZStack {
+//        Color.black
+//            .ignoresSafeArea()
+//        WatchStatusView()
+//            .padding()
+//    }
+//}

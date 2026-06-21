@@ -384,6 +384,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses HealthKit data to support motion detection on Apple Watch.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -422,6 +423,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses HealthKit data to support motion detection on Apple Watch.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "give me access";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

@@ -50,7 +50,6 @@
 		A76917C92FE48BE80089F7A7 /* Exceptions for "MotionDetector Watch App" folder in "MotionDetector Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Assets.xcassets,
 				Info.plist,
 			);
 			target = 5E9D3F5F2FDC0883005DAE06 /* MotionDetector Watch App */;
@@ -451,8 +450,10 @@
 		5E9D3F6C2FDC0884005DAE06 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = WatchIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=watchos*]" = WatchIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "MotionDetector Watch App/MotionDetector Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
@@ -461,6 +462,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses HealthKit data to support motion detection on Apple Watch.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";
@@ -487,8 +489,10 @@
 		5E9D3F6D2FDC0884005DAE06 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = WatchIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=watchos*]" = WatchIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "MotionDetector Watch App/MotionDetector Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
@@ -497,6 +501,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app uses HealthKit data to support motion detection on Apple Watch.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";

@@ -14,6 +14,7 @@ struct SongListView: View {
     @State private var showRecalibrate = false
     @AppStorage("navRoot") private var navRoot: NavRoot = .songList
     @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
+    @AppStorage("shouldShowFilePickerOnLoad") private var shouldShowFilePickerOnLoad = false
     @Environment(SavedSong.self) private var savedSong
 
     private var filteredItems: [SongListItem] {
@@ -178,6 +179,12 @@ struct SongListView: View {
         }
         .navigationDestination(isPresented: $showRecalibrate) {
             CalibrateWatchView(isRecalibrating: true)
+        }
+        .onAppear {
+            if shouldShowFilePickerOnLoad {
+                viewModel.showFilePicker = true
+                shouldShowFilePickerOnLoad = false
+            }
         }
     }
 }

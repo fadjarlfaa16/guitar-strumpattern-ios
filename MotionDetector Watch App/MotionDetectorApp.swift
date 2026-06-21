@@ -9,25 +9,21 @@ import SwiftUI
 import WatchKit
 import HealthKit
 
+// 🛠️ The Interceptor: Catches the wake-up command from the iPhone
 class WatchAppDelegate: NSObject, WKApplicationDelegate {
-    var detector: StrumDetector?
-    
     func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
-        detector?.startWorkoutSession(with: workoutConfiguration)
+        // When iPhone triggers 'startWatchApp', this method catches it instantly
+        StrumDetector.shared.startWorkoutSession(with: workoutConfiguration)
     }
 }
 
 @main
 struct MotionDetector_Watch_AppApp: App {
     @WKApplicationDelegateAdaptor(WatchAppDelegate.self) var appDelegate
-    @StateObject private var detector = StrumDetector()
     
     var body: some Scene {
         WindowGroup {
-            ContentView(detector: detector)
-                .onAppear {
-                    appDelegate.detector = detector
-                }
+            ContentView(detector: StrumDetector.shared)
         }
     }
 }

@@ -13,14 +13,27 @@ final class WatchSessionManager: NSObject, ObservableObject {
     @Published private(set) var isPaired = false
     @Published private(set) var isWatchAppInstalled = false
     @Published private(set) var isReachable = false
+    @Published private(set) var lastMessageTime: Date? = nil
+    private var timeoutWorkItem: DispatchWorkItem? = nil
 
     var isConnected: Bool {
         isPaired
     }
 
+    var isWatchAppActive: Bool {
+        guard isPaired && isWatchAppInstalled else { return false }
+        if isReachable { return true }
+        if let lastTime = lastMessageTime, Date().timeIntervalSince(lastTime) < 12.0 {
+            return true
+        }
+        return false
+    }
+
     var statusMessage: String {
         guard WCSession.isSupported() else { return "Not Supported" }
         if !isPaired { return "Watch Disconnected" }
+        if !isWatchAppInstalled { return "App Not Installed" }
+        if !isReachable { return "App Not Running" }
         return "Watch Connected"
     }
 
@@ -159,6 +172,18 @@ extension WatchSessionManager: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         // Akses messageHandlers secara aman dengan melompat ke MainActor menggunakan Task
         Task { @MainActor in
+            self.lastMessageTime = Date()
+            self.timeoutWorkItem?.cancel()
+            let workItem = DispatchWorkItem { [weak self] in
+                self?.lastMessageTime = nil
+            }
+            self.timeoutWorkItem = workItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + 12.0, execute: workItem)
+            
+            if (message["command"] as? String) == "heartbeat" {
+                return
+            }
+            
             self.messageHandlers.values.forEach { $0(message) }
         }
     }

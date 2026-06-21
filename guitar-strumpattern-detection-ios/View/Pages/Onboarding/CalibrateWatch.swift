@@ -59,7 +59,10 @@ struct CalibrateWatchView: View {
                 Text("Strum \(strumDirection == .up ? "up" : "down") 5 times on your guitar")
                     .font(AppFont.title3Regular)
                     .foregroundColor(.textPrimaryWhite)
-                WatchStatusView()
+                WatchStatusView(onWakeAndSync: {
+                    vm.receiver.syncAppState(state: "calibrating")
+                    vm.receiver.startCalibration()
+                })
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -93,20 +96,24 @@ struct CalibrateWatchView: View {
 
             Spacer()
 
-            HStack(spacing: 24) {
-                SecondaryTextButton(title: "Wake Watch") {
-                    WatchSessionManager.shared.requestWatchAppLaunch()
-                }
-                
-                SecondaryTextButton(title: "Sync Watch") {
-                    vm.receiver.syncAppState(state: "calibrating")
-                    vm.receiver.startCalibration()
-                }
-                
-                SecondaryTextButton(title: "Reset") {
-                    vm.recalibrate()
-                }
+            SecondaryTextButton(title: "Reset") {
+                vm.recalibrate()
             }
+            
+//            HStack(spacing: 24) {
+////                SecondaryTextButton(title: "Wake Watch") {
+////                    WatchSessionManager.shared.requestWatchAppLaunch()
+////                }
+////                
+////                SecondaryTextButton(title: "Sync Watch") {
+////                    vm.receiver.syncAppState(state: "calibrating")
+////                    vm.receiver.startCalibration()
+////                }
+//                
+//                SecondaryTextButton(title: "Reset") {
+//                    vm.recalibrate()
+//                }
+//            }
         }
     }
 }

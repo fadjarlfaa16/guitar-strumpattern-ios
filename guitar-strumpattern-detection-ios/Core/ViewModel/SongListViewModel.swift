@@ -11,9 +11,7 @@ import Combine
 final class SongListViewModel: ObservableObject {
     
     @Published var searchText = ""
-    
     @Published var showFilePicker = false
-    
     @Published var uploadError: String?
     @Published var showUploadError = false
     

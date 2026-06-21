@@ -148,7 +148,10 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
         }
     }
     
-    func stopDetecting() { motionManager.stopDeviceMotionUpdates() }
+    func stopDetecting() {
+        motionManager.stopDeviceMotionUpdates()
+        stopWorkoutSession()
+    }
     
     func startCalibrationProcess() {
         self.temporaryCalibrationSamples.removeAll()

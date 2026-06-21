@@ -20,10 +20,17 @@ class WatchAppDelegate: NSObject, WKApplicationDelegate {
 @main
 struct MotionDetector_Watch_AppApp: App {
     @WKApplicationDelegateAdaptor(WatchAppDelegate.self) var appDelegate
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
         WindowGroup {
             ContentView(detector: StrumDetector.shared)
+        }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            if newPhase == .background {
+                StrumDetector.shared.stopWorkoutSession()
+                StrumDetector.shared.currentWatchState = .disconnected
+            }
         }
     }
 }

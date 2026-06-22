@@ -350,6 +350,9 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     }
     
     func stopWorkoutSession() {
+        if session.isReachable {
+            session.sendMessage(["command": "watchAppExited"], replyHandler: nil, errorHandler: nil)
+        }
         workoutSession?.end()
         workoutBuilder?.endCollection(withEnd: Date()) { [weak self] _, _ in
             self?.workoutBuilder?.finishWorkout { _, _ in

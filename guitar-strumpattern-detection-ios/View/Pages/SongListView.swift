@@ -172,7 +172,7 @@ struct SongListView: View {
         }
         .searchable(text: $viewModel.searchText, prompt: "Search")
         .toolbar(.hidden, for: .navigationBar)
-        .background(Color.bgPrimary)
+        .background(Color.bgPrimary.ignoresSafeArea())
 
         .navigationDestination(for: UUID.self) { songID in
             SongDetailDestination(songID: songID)

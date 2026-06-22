@@ -12,7 +12,7 @@ struct ArrowIcon: View {
     var isCompleted: Bool = false
     
     private var foregroundStyle: Color {
-        isCompleted ? .brandColorAccentGreen : .gray
+        isCompleted ? .green : .gray
     }
     
     var body: some View {
@@ -31,5 +31,5 @@ enum AppIcon {
 }
 //
 #Preview {
-    ArrowIcon(direction: .up)
+    ArrowIcon(direction: .up, isCompleted: true)
 }

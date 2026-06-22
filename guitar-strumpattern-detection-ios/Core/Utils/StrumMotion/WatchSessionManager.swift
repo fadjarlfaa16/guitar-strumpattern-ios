@@ -33,7 +33,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
         guard WCSession.isSupported() else { return "Not Supported" }
         if !isPaired { return "Watch Disconnected" }
         if !isWatchAppInstalled { return "App Not Installed" }
-        if !isReachable { return "App Not Running" }
+        if !isWatchAppActive { return "App Not Running" }
         return "Watch Connected"
     }
 
@@ -55,10 +55,9 @@ final class WatchSessionManager: NSObject, ObservableObject {
     private override init() {
         super.init()
         activate()
-        requestHealthKitPermissionOnPhone()
     }
 
-    private func requestHealthKitPermissionOnPhone() {
+    func requestHealthKitPermissionOnPhone() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         let types: Set = [HKObjectType.workoutType()]
         healthStore.requestAuthorization(toShare: types, read: nil) { success, error in
@@ -131,6 +130,8 @@ final class WatchSessionManager: NSObject, ObservableObject {
     }
 //
     func stopWatchFromPhone() {
+        lastMessageTime = nil
+        timeoutWorkItem?.cancel()
         if session.isReachable {
             session.sendMessage(["command": "stop_sync"], replyHandler: nil) { error in
                 print("Error sending stop command: \(error.localizedDescription)")
@@ -172,6 +173,13 @@ extension WatchSessionManager: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         // Akses messageHandlers secara aman dengan melompat ke MainActor menggunakan Task
         Task { @MainActor in
+            if (message["command"] as? String) == "watchAppExited" {
+                self.lastMessageTime = nil
+                self.timeoutWorkItem?.cancel()
+                self.refreshStatus()
+                return
+            }
+            
             self.lastMessageTime = Date()
             self.timeoutWorkItem?.cancel()
             let workItem = DispatchWorkItem { [weak self] in

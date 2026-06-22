@@ -43,7 +43,7 @@ final class StrumInputValidator: ObservableObject {
         let thresholds = StrumCalibrationStore.loadThresholds()
         receiver.micBaseThreshold = thresholds.base
         receiver.micSpikeThreshold = thresholds.spike
-        receiver.requiresSoundValidation = true
+        receiver.requiresSoundValidation = false
         receiver.switchToChordAudioMode()
         
         receiver.soundDetectedProvider = { [weak self] in

@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct ChoosePatternHeader: View {
+    @State private var navigateToRecalibrate = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.md) {
             Text("Choose Your Preferred Strumming Pattern")
@@ -20,7 +22,19 @@ struct ChoosePatternHeader: View {
                 .font(AppFont.bodyRegular)
                 .foregroundColor(.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
-            WatchStatusView()
+            HStack {
+                WatchStatusView()
+                Spacer()
+                Button("Recalibrate") {
+                    navigateToRecalibrate.toggle() 
+                }
+                .navigationDestination(isPresented: $navigateToRecalibrate) {
+                    CalibrateWatchView(
+                        isRecalibrating: true
+                    )
+                }
+                .foregroundStyle(.textPrimaryWhite)
+            }
         }
     }
 }

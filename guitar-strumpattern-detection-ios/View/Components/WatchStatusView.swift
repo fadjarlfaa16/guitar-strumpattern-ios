@@ -12,6 +12,7 @@ struct WatchStatusView: View {
 
     @State private var showWatchInstructions = false
     var onWakeAndSync: (() -> Void)? = nil
+    var withConnectedText: Bool = true
 
     var body: some View {
         HStack(spacing: Spacing.lg) {
@@ -21,9 +22,11 @@ struct WatchStatusView: View {
                     .scaledToFit()
                     .frame(width: 24)
                     .foregroundStyle(.white)
-                Text(watchSession.statusMessage)
-                    .foregroundStyle(watchSession.isWatchAppActive ? .green : .red)
-                    .font(AppFont.caption1Bold)
+                if withConnectedText || !watchSession.isWatchAppActive {
+                    Text(watchSession.statusMessage)
+                        .foregroundStyle(watchSession.isWatchAppActive ? .green : .red)
+                        .font(AppFont.caption1Bold)                    
+                }
                 if !watchSession.isWatchAppActive {
                     Button {
                         WatchSessionManager.shared.requestWatchAppLaunch()

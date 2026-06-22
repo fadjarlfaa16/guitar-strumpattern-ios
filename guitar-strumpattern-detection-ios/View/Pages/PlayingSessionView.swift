@@ -67,7 +67,7 @@ struct PlayingSessionView: View {
         timeSignature: String         = ChordGroup.sampleTimeSignature,
         duration:      String?        = nil,
         audioURL:      URL?           = nil,
-        autoPlay:      Bool           = false,
+        autoPlay:      Bool           = true,
         patternNotation: String?      = nil,
         songTitle:     String?        = nil
     ) {
@@ -123,11 +123,12 @@ struct PlayingSessionView: View {
                     bpm: bpm,
                     timeSignature: timeSignature,
                     patternNotation: patternNotation,
-                    isFirstTime: isFirstTime
+                    isFirstTime: isFirstTime,
+                    onWakeAndSync: syncToWatch
                 ) {
                     navRoot = .uploadSong
                 }
-                    .padding(.horizontal, 28)
+//                    .padding(.horizontal, 28)
                     .padding(.vertical, 10)
 
                 ZStack(alignment: .top) {
@@ -164,16 +165,12 @@ struct PlayingSessionView: View {
                             .foregroundStyle(Color.textPrimaryWhite)
                     }
                     Spacer()
-                    WatchStatusView(onWakeAndSync: {
-                        syncToWatch()
-                    })
-                        .padding(.horizontal, 16)
-                    Button("Recalibrate Watch") {
-                        showRecalibrate = true
-                    }
-                    .navigationDestination(isPresented: $showRecalibrate) {
-                        CalibrateWatchView(isRecalibrating: true)
-                    }
+//                    Button("Recalibrate Watch") {
+//                        showRecalibrate = true
+//                    }
+//                    .navigationDestination(isPresented: $showRecalibrate) {
+//                        CalibrateWatchView(isRecalibrating: true)
+//                    }
                     .buttonStyle(.borderedProminent)
                     .tint(.brandColorAccentGreen.opacity(0.3))
                     Spacer()
@@ -336,6 +333,9 @@ struct PlayingSessionView: View {
             vm.stopGame()
             audioPlayer.stop()
         }
+        .navigationDestination(isPresented: $showRecalibrate) {
+            CalibrateWatchView(isRecalibrating: true)
+        }
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
         .navigationBarBackButtonHidden(true)
@@ -435,7 +435,7 @@ struct PlayingSessionView: View {
         pattern:       [.down, .up, .down, .noStrum, .down],
         bpm:           120,
         timeSignature: "4/4",
-        duration: "0:10",
+        duration: "0:4",
     )
     .environment(Routes())
     

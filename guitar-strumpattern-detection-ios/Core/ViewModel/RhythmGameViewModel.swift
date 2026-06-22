@@ -179,8 +179,14 @@ class RhythmGameViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isPlaying in
                 if !isPlaying && self?.isPlaying == true && self?.isPaused == false {
-                    // Audio finished
-                    self?.tick()
+                    // Audio finished but notes may still be scrolling off-screen.
+                    // Switch to a local timer so tick() keeps firing until the
+                    // finish condition is met.
+                    if self?.timer == nil, !(self?.isFinished ?? true) {
+                        self?.startDate = Date().addingTimeInterval(-(self?.currentTime ?? 0))
+                        self?.useAudioTiming = false
+                        self?.startLocalTimer()
+                    }
                 }
             }
             .store(in: &cancellables)

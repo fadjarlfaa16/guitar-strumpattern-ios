@@ -20,14 +20,17 @@ struct SessionHUDBar: View {
     let timeSignature: String
     let patternNotation: String
     let isFirstTime: Bool
+    let onWakeAndSync: () -> Void
 
     let onSkip: (() -> Void)?
 
     var body: some View {
         HStack {
-            if isFirstTime {
-                Spacer()
-            }
+            WatchStatusView(onWakeAndSync: {
+                onWakeAndSync()
+            }, withConnectedText: false)
+                .padding(.horizontal, 16)
+            Spacer()
             Image(systemName: "metronome.fill")
                 .foregroundStyle(.textPrimaryWhite)
                 .font(AppFont.bodyBold)
@@ -43,9 +46,9 @@ struct SessionHUDBar: View {
                 .font(.system(size: 13, weight: .semibold, design: .monospaced))
                 .foregroundStyle(.textPrimaryWhite.opacity(0.85))
                 .lineLimit(1)
+            Spacer()
 
             if isFirstTime {
-                Spacer()
                 SecondaryTextButton(
                     title: "Skip",
                     color: .textPrimaryWhite,
@@ -57,13 +60,17 @@ struct SessionHUDBar: View {
         }
     }
 }
-
-#Preview {
-    SessionHUDBar(
-        bpm: 120,
-        timeSignature: "4/4",
-        patternNotation: "DUDU",
-        isFirstTime: true,
-        onSkip: {}
-    )
-}
+//
+//#Preview {
+//    ZStack {
+//        Rectangle()
+//            .fill(Color(.backgroundPrimaryBlack))
+//        SessionHUDBar(
+//            bpm: 120,
+//            timeSignature: "4/4",
+//            patternNotation: "DUDU",
+//            isFirstTime: true,
+//            onSkip: {}
+//        )
+//    }
+//}

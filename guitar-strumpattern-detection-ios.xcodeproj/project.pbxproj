@@ -380,7 +380,7 @@
 				CODE_SIGN_ENTITLEMENTS = "guitar-strumpattern-detection-ios/guitar-strumpattern-detection-ios.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YC8SS4YRCV;
+				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
@@ -396,7 +396,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "arip.guitar-strumpattern-detection-ios";
+				PRODUCT_BUNDLE_IDENTIFIER = "pacemodddd.guitar-strumpattern-detection-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -416,7 +416,7 @@
 				CODE_SIGN_ENTITLEMENTS = "guitar-strumpattern-detection-ios/guitar-strumpattern-detection-ios.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YC8SS4YRCV;
+				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
@@ -432,7 +432,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "arip.guitar-strumpattern-detection-ios";
+				PRODUCT_BUNDLE_IDENTIFIER = "pacemodddd.guitar-strumpattern-detection-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -452,20 +452,20 @@
 				CODE_SIGN_ENTITLEMENTS = "MotionDetector Watch App/MotionDetector Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YC8SS4YRCV;
+				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "arip.guitar-strumpattern-detection-ios";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "arip.guitar-strumpattern-detection-ios.watchkitapp";
+				PRODUCT_BUNDLE_IDENTIFIER = "pacemodddd.guitar-strumpattern-detection-ios.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -488,20 +488,20 @@
 				CODE_SIGN_ENTITLEMENTS = "MotionDetector Watch App/MotionDetector Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YC8SS4YRCV;
+				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MotionDetector-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MotionDetector;
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs to connect to HealthKit to remotely launch and sync with your Apple Watch app.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "arip.guitar-strumpattern-detection-ios";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "pacemodddd.guitar-strumpattern-detection-ios";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "arip.guitar-strumpattern-detection-ios.watchkitapp";
+				PRODUCT_BUNDLE_IDENTIFIER = "pacemodddd.guitar-strumpattern-detection-ios.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;

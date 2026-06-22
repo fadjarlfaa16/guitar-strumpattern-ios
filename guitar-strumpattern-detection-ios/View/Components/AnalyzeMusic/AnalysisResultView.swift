@@ -19,11 +19,12 @@ struct AnalysisResultView: View {
 
             // Result Card
             VStack(spacing: 20) {
-                Text("Unique chords detected")
+                Text("Unique Chord Detected: ")
                     .font(AppFont.bodyRegular)
                     .foregroundStyle(.brandColorAccentGreen)
 
-                Text("\(result.chordSegments.count) Chords")
+                let uniqueChords = Set(result.chordSegments.map(\.label))
+                Text("\(uniqueChords.count) Chords")
                     .font(.system(size: 42, weight: .bold))
                     .foregroundStyle(.brandColorAccentGreen)
             }
@@ -75,7 +76,14 @@ struct AnalysisResultView: View {
         result: ChordAnalysisResult(
             bpm: 120,
             timeSignature: "4/4",
-            chordSegments: []
+            chordSegments: [
+                StoredChordSegment(startTime: 0, endTime: 2, label: "C"),
+                StoredChordSegment(startTime: 2, endTime: 4, label: "G"),
+                StoredChordSegment(startTime: 4, endTime: 6, label: "Am"),
+                StoredChordSegment(startTime: 6, endTime: 8, label: "F"),
+                StoredChordSegment(startTime: 8, endTime: 10, label: "C"),
+                StoredChordSegment(startTime: 10, endTime: 12, label: "G"),
+            ]
         ),
         onConfirm: {},
         songTitle: "Lirik Payung Teduh - Untuk Perempuan Yang Sedang Dalam Pelukan"

@@ -122,15 +122,6 @@ struct PlayingSessionWatchView: View {
                 .font(.footnote.monospacedDigit())
                 .foregroundColor(.gray)
             
-            // Pause / Play Button
-            Button(action: {
-                detector.togglePauseFromWatch()
-            }) {
-                Image(systemName: detector.isPlayingPaused ? "play.fill" : "pause.fill")
-                    .font(.title2)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(detector.isPlayingPaused ? .green : .red)
         }
         .padding()
     }

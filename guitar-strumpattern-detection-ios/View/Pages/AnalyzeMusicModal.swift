@@ -21,7 +21,7 @@ struct AnalyzeMusicModal: View {
     @State var analysisResult: ChordAnalysisResult? = nil
     @State var analysisError: String? = nil
     @State var progress: Double = 0
-    @State var analysisStage: String = "Analyzing BPM & Time Signature..."
+    @State var analysisStage: String = "Analyzing Music..."
 
     // MARK: - Body
 

@@ -171,12 +171,8 @@ class RhythmGameViewModel: ObservableObject {
         audioPlayer.$currentTime
             .receive(on: DispatchQueue.main)
             .sink { [weak self] time in
-                guard let self = self else { return }
-                // Ignore residual AVPlayer updates after pause() is called
-                if self.isPausedForInput { return }
-                
-                self.currentTime = time
-                self.tick()
+                self?.currentTime = time
+                self?.tick()
             }
             .store(in: &cancellables)
         

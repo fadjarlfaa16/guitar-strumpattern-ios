@@ -16,8 +16,6 @@ struct PatternNavigationDestination: View {
     let audioURL: URL?
     var songTitle: String?
 
-    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = false
-
     var body: some View {
         let beats = selectedPattern?.beats ?? []
 
@@ -38,7 +36,6 @@ struct PatternNavigationDestination: View {
             timeSignature: rhythm,
             audioURL: audioURL,
             autoPlay: false,
-            isFirstTime: isFirstTime,
             patternNotation: selectedPattern?.notation,
             songTitle: songTitle
         )

@@ -67,7 +67,8 @@ struct PlayingSessionView: View {
         timeSignature: String         = ChordGroup.sampleTimeSignature,
         duration:      String?        = nil,
         audioURL:      URL?           = nil,
-        autoPlay:      Bool           = false,
+        autoPlay:      Bool           = true,
+        isFirstTime:   Bool           = false,
         patternNotation: String?      = nil,
         songTitle:     String?        = nil
     ) {
@@ -80,13 +81,9 @@ struct PlayingSessionView: View {
         self.audioURL      = audioURL
         self.autoPlay      = autoPlay
         self.songTitle     = songTitle
-        // Determine first launch status locally to avoid capturing `self` before initialization
-        let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
-        let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
-        
+
         var processedChords = chords
-        if isFirst {
-            
+        if isFirstTime {
             // Give it 2.0s of clean slide-in time before it hits the line and pauses
             let delay: TimeInterval = 2.0
             processedChords = chords.map {
@@ -94,12 +91,12 @@ struct PlayingSessionView: View {
             }
         }
         self.chords = processedChords
-        
+
         let groups = ChordGroup.build(
             chords: processedChords, pattern: pattern,
             bpm: safeBPM, timeSignature: timeSignature, duration: duration
         )
-        
+
         _vm = StateObject(wrappedValue: RhythmGameViewModel(chordGroups: groups, bpm: safeBPM, autoPlay: autoPlay))
     }
     
@@ -248,9 +245,11 @@ struct PlayingSessionView: View {
                         vm.startGame()
                     },
                     onContinue: {
+                        print(isFirstTime)
                         if isFirstTime {
                             navRoot = .uploadSong
                         } else {
+                            dismiss()
                             routes.songLibraryRoute = NavigationPath()
                         }
                     }
@@ -261,6 +260,7 @@ struct PlayingSessionView: View {
                 PauseOverlay(
                     isFirstTime: isFirstTime,
                     onExit: {
+                        dismiss()
                         routes.songLibraryRoute = NavigationPath()
                     },
                     onReplay: {
@@ -307,22 +307,18 @@ struct PlayingSessionView: View {
             }
         }
         .onAppear {
-            let defaultIsFirst = UserDefaults.standard.object(forKey: "isFirstLaunch")
-            let isFirst = defaultIsFirst == nil ? true : (defaultIsFirst as? Bool ?? true)
-            print("isFirstTime is \(isFirst)")
-            
             lockToLandscape()
-            
+
             if let audioURL = audioURL {
                 audioPlayer.enablesMicrophoneInput = usesStrumValidator
                 audioPlayer.setupPlayer(with: audioURL)
                 vm.audioPlayer = audioPlayer
             }
-            
+
             setupStrumValidator()
             vm.startGame(startPaused: true)
-            
-            if isFirst {
+
+            if isFirstTime {
                 sessionState = .waitingForTap
             } else {
                 startCountdown()
@@ -437,7 +433,7 @@ struct PlayingSessionView: View {
         pattern:       [.down, .up, .down, .noStrum, .down],
         bpm:           120,
         timeSignature: "4/4",
-        duration: "0:20",
+        duration: "0:5",
     )
     .environment(Routes())
     

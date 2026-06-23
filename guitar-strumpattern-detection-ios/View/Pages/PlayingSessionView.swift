@@ -47,10 +47,10 @@ struct PlayingSessionView: View {
     // MARK: - ViewModel & State
 
     @StateObject private var vm: RhythmGameViewModel
-    @StateObject private var audioPlayer = AudioPlayerManager()
+    @StateObject private var audioPlayer = AudioPlayerManager() 
     @StateObject private var strumValidator = StrumInputValidator()
     @State private var screenWidth: CGFloat = 0
-    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = true
+    @AppStorage("isFirstLaunch") private var isFirstTime: Bool = false
     @AppStorage("navRoot") private var navRoot: NavRoot = .onboarding
     @Environment(Routes.self) private var routes
     @State private var sessionState: SessionState = .playing
@@ -67,7 +67,7 @@ struct PlayingSessionView: View {
         timeSignature: String         = ChordGroup.sampleTimeSignature,
         duration:      String?        = nil,
         audioURL:      URL?           = nil,
-        autoPlay:      Bool           = true,
+        autoPlay:      Bool           = false,
         patternNotation: String?      = nil,
         songTitle:     String?        = nil
     ) {
@@ -416,7 +416,7 @@ struct PlayingSessionView: View {
         pattern:       [.down, .up, .down, .noStrum, .down],
         bpm:           120,
         timeSignature: "4/4",
-        duration: "0:4",
+        duration: "0:20",
     )
     .environment(Routes())
     

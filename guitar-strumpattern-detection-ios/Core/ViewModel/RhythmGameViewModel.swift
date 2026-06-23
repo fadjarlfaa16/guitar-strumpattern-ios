@@ -36,6 +36,8 @@ class RhythmGameViewModel: ObservableObject {
     var bpm: Int
     private(set) var chordGroups: [ChordGroup]
     private let autoPlay: Bool
+    /// Delay in seconds before autoPlay marks a note as hit (simulates real strumming).
+    var autoPlayDelay: TimeInterval = 0.8
     var requireChordValidation: Bool = true
 
     // MARK: Layout Constants
@@ -178,7 +180,7 @@ class RhythmGameViewModel: ObservableObject {
         audioPlayer.$isPlaying
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isPlaying in
-                if !isPlaying && self?.isPlaying == true && self?.isPaused == false {
+                if !isPlaying && self?.isPlaying == true && self?.isPaused == false && self?.isPausedForInput == false {
                     // Audio finished but notes may still be scrolling off-screen.
                     // Switch to a local timer so tick() keeps firing until the
                     // finish condition is met.
@@ -223,13 +225,40 @@ class RhythmGameViewModel: ObservableObject {
             }
         }
 
-        if autoPlay {
-            for idx in activeNotes.indices {
-                guard !activeNotes[idx].isExpired,
-                      currentTime >= activeNotes[idx].input.time else { continue }
-                activeNotes[idx].isHit = true
-                activeNotes[idx].isExpired = true
-                if !hasPassedFirstNote { hasPassedFirstNote = true }
+        if autoPlay && !isPausedForInput {
+            // Find earliest unhit note that reached the hit line
+            if let earliest = activeNotes
+                .filter({ !$0.isHit && !$0.isExpired })
+                .min(by: { $0.input.time < $1.input.time }),
+               currentTime >= earliest.input.time {
+                // Snap to hit line and pause
+                currentTime = earliest.input.time
+                isPausedForInput = true
+                pausedTime = currentTime
+                timer?.invalidate()
+                timer = nil
+                audioPlayer?.pause()
+
+                // After delay, mark hit and resume
+                Task { @MainActor [weak self] in
+                    try? await Task.sleep(nanoseconds: UInt64((self?.autoPlayDelay ?? 0.8) * 1_000_000_000))
+                    guard let self, self.isPausedForInput, self.autoPlay else { return }
+
+                    if let idx = self.activeNotes.firstIndex(where: { $0.id == earliest.id }) {
+                        self.activeNotes[idx].isHit = true
+                        self.activeNotes[idx].isExpired = true
+                        if !self.hasPassedFirstNote { self.hasPassedFirstNote = true }
+                    }
+                    self.isPausedForInput = false
+
+                    if self.useAudioTiming {
+                        self.audioPlayer?.play()
+                    } else {
+                        self.startDate = Date().addingTimeInterval(-self.pausedTime)
+                        self.startLocalTimer()
+                    }
+                }
+                return
             }
         }
 

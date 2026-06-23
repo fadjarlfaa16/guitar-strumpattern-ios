@@ -40,13 +40,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6F58F0182FD2BD4D00A7E379 /* Exceptions for "guitar-strumpattern-detection-ios" folder in "guitar-strumpattern-detection-ios" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Core/ViewModel/Dummy/.gitkeep,
-			);
-			target = 31FEC7742FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios */;
-		};
 		A76917C92FE48BE80089F7A7 /* Exceptions for "MotionDetector Watch App" folder in "MotionDetector Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -57,23 +50,9 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		6F58F0192FD2BD4D00A7E379 /* Exceptions for "guitar-strumpattern-detection-ios" folder in "Compile Sources" phase from "guitar-strumpattern-detection-ios" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 31FEC7712FD2ACF600FE28F6 /* Sources */;
-			membershipExceptions = (
-				Core/ViewModel/Dummy/.gitkeep,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		31FEC7772FD2ACF600FE28F6 /* guitar-strumpattern-detection-ios */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				6F58F0182FD2BD4D00A7E379 /* Exceptions for "guitar-strumpattern-detection-ios" folder in "guitar-strumpattern-detection-ios" target */,
-				6F58F0192FD2BD4D00A7E379 /* Exceptions for "guitar-strumpattern-detection-ios" folder in "Compile Sources" phase from "guitar-strumpattern-detection-ios" target */,
-			);
 			path = "guitar-strumpattern-detection-ios";
 			sourceTree = "<group>";
 		};
@@ -383,6 +362,8 @@
 				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses HealthKit to connect with your Apple Watch so it can launch the watch app, sync your sessions, and detect your hand movements while you play.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow microphone access so we can listen to and detect your strumming patterns.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -419,6 +400,8 @@
 				DEVELOPMENT_TEAM = NQFG9R77M7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Genjreng;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app uses HealthKit to connect with your Apple Watch so it can launch the watch app, sync your sessions, and detect your hand movements while you play.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow microphone access so we can listen to and detect your strumming patterns.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

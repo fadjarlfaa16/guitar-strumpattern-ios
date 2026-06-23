@@ -40,7 +40,7 @@ final class AudioPlayerManager: NSObject, ObservableObject {
                 try audioSession.setCategory(
                     .playAndRecord,
                     mode: .measurement,
-                    options: [.defaultToSpeaker, .allowBluetooth]
+                    options: [.defaultToSpeaker, .allowBluetooth, .mixWithOthers]
                 )
             } else {
                 try audioSession.setCategory(.playback, mode: .default, options: [])

@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "9C3AC682-4BC0-4938-8C58-D8480FA8D735.heic",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -12,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "9C3AC682-4BC0-4938-8C58-D8480FA8D735 1.heic",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -23,6 +25,7 @@
           "value" : "tinted"
         }
       ],
+      "filename" : "9C3AC682-4BC0-4938-8C58-D8480FA8D735 2.heic",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

@@ -28,8 +28,11 @@ struct MotionDetector_Watch_AppApp: App {
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if newPhase == .background {
-                StrumDetector.shared.stopWorkoutSession()
-                StrumDetector.shared.currentWatchState = .disconnected
+                let state = StrumDetector.shared.currentWatchState
+                if state != .calibrating && state != .playing {
+                    StrumDetector.shared.stopWorkoutSession()
+                    StrumDetector.shared.currentWatchState = .disconnected
+                }
             }
         }
     }

@@ -13,7 +13,7 @@ enum NavRoot: String {
 
 struct ContentView: View {
     @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
-    @AppStorage("navRoot") private var appState: NavRoot = .songList
+    @AppStorage("navRoot") private var appState: NavRoot = .onboarding
     @Environment(Routes.self) private var routes
 
     var body: some View {

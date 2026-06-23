@@ -335,10 +335,11 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
                 }
             }
             
-            workoutBuilder?.beginCollection(withStart: Date()) { success, error in
+            workoutBuilder?.beginCollection(withStart: Date()) { [weak self] success, error in
                 DispatchQueue.main.async {
                     if success {
                         print("HKWorkoutSession started successfully")
+                        self?.startDetecting()
                     } else {
                         print("Failed to start HKLiveWorkoutBuilder collection: \(error?.localizedDescription ?? "unknown")")
                     }
@@ -350,6 +351,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     }
     
     func stopWorkoutSession() {
+        motionManager.stopDeviceMotionUpdates()
         if session.isReachable {
             session.sendMessage(["command": "watchAppExited"], replyHandler: nil, errorHandler: nil)
         }

@@ -23,8 +23,6 @@ struct ContentView: View {
                 PlayingSessionWatchView(detector: detector)
             }
         }
-        .onAppear { detector.startDetecting() }
-        .onDisappear { detector.stopDetecting() }
     }
 }
 

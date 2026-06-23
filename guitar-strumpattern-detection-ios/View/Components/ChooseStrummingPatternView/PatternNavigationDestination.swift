@@ -35,6 +35,7 @@ struct PatternNavigationDestination: View {
             bpm: bpm,
             timeSignature: rhythm,
             audioURL: audioURL,
+            autoPlay: false,
             patternNotation: selectedPattern?.notation,
             songTitle: songTitle
         )

@@ -19,3 +19,11 @@ struct SongListHeader: View {
         }
     }
 }
+
+#Preview {
+    ZStack {
+        Rectangle()
+            .foregroundColor(.green)
+        SongListHeader()
+    }
+}

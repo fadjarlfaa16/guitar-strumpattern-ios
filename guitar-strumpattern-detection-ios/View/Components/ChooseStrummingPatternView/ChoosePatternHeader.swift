@@ -25,7 +25,7 @@ struct ChoosePatternHeader: View {
             HStack {
                 WatchStatusView()
                 Spacer()
-                Button("Recalibrate") {
+                Button("Recalibrate Watch") {
                     navigateToRecalibrate.toggle() 
                 }
                 .navigationDestination(isPresented: $navigateToRecalibrate) {
@@ -33,7 +33,9 @@ struct ChoosePatternHeader: View {
                         isRecalibrating: true
                     )
                 }
-                .foregroundStyle(.textPrimaryWhite)
+                .buttonStyle(.borderedProminent)
+                .tint(.brandColorAccentGreen.opacity(0.2))
+                .foregroundStyle(.brandColorAccentGreen)
             }
         }
     }

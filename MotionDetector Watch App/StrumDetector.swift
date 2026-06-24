@@ -25,6 +25,8 @@ enum WatchAppState: Equatable {
 
 class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
     
+    static let shared = StrumDetector()
+    
     let motionManager = CMMotionManager()
     private let motionQueue = OperationQueue()
     var session = WCSession.default
@@ -51,6 +53,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     var workoutSession: HKWorkoutSession?
     var workoutBuilder: HKLiveWorkoutBuilder?
     private var temporaryCalibrationSamples: [Double] = []
+    private var heartbeatTimer: Timer? = nil
     
     @Published var downThreshold: Double = 0.5
     @Published var upThreshold: Double = 0.5
@@ -145,7 +148,10 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
         }
     }
     
-    func stopDetecting() { motionManager.stopDeviceMotionUpdates() }
+    func stopDetecting() {
+        motionManager.stopDeviceMotionUpdates()
+        stopWorkoutSession()
+    }
     
     func startCalibrationProcess() {
         self.temporaryCalibrationSamples.removeAll()
@@ -245,6 +251,7 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
         recordedSamplesCount = 0
         
         self.calibrationState = .calibratingUp
+        self.calibrationStatusText = "Strum Up"
         
         syncCalibrationStateToiPhone()
         WKInterfaceDevice.current().play(.success)
@@ -320,10 +327,19 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
             workoutBuilder?.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore, workoutConfiguration: config)
             
             workoutSession?.startActivity(with: Date())
-            workoutBuilder?.beginCollection(withStart: Date()) { success, error in
+            
+            DispatchQueue.main.async { [weak self] in
+                self?.heartbeatTimer?.invalidate()
+                self?.heartbeatTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+                    self?.sendHeartbeat()
+                }
+            }
+            
+            workoutBuilder?.beginCollection(withStart: Date()) { [weak self] success, error in
                 DispatchQueue.main.async {
                     if success {
                         print("HKWorkoutSession started successfully")
+                        self?.startDetecting()
                     } else {
                         print("Failed to start HKLiveWorkoutBuilder collection: \(error?.localizedDescription ?? "unknown")")
                     }
@@ -335,12 +351,18 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     }
     
     func stopWorkoutSession() {
+        motionManager.stopDeviceMotionUpdates()
+        if session.isReachable {
+            session.sendMessage(["command": "watchAppExited"], replyHandler: nil, errorHandler: nil)
+        }
         workoutSession?.end()
         workoutBuilder?.endCollection(withEnd: Date()) { [weak self] _, _ in
             self?.workoutBuilder?.finishWorkout { _, _ in
                 DispatchQueue.main.async {
                     self?.workoutSession = nil
                     self?.workoutBuilder = nil
+                    self?.heartbeatTimer?.invalidate()
+                    self?.heartbeatTimer = nil
                     print("HKWorkoutSession stopped successfully")
                 }
             }
@@ -364,4 +386,12 @@ class StrumDetector: NSObject, ObservableObject, WCSessionDelegate, HKWorkoutSes
     
     func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf types: Set<HKSampleType>) {}
     func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {}
+
+    private func sendHeartbeat() {
+        if session.isReachable {
+            session.sendMessage(["command": "heartbeat"], replyHandler: nil, errorHandler: nil)
+        } else {
+            session.sendMessage(["command": "heartbeat"], replyHandler: nil, errorHandler: nil)
+        }
+    }
 }

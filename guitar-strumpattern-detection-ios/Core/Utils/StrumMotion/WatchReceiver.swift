@@ -37,6 +37,8 @@ class WatchReceiver: ObservableObject {
 
     private let sessionManager = WatchSessionManager.shared
     private var messageHandlerID: UUID?
+    private var cancellables = Set<AnyCancellable>()
+    private var hasSyncedCalibration = false
      
     init() {
             // lebih aman jika kita pastikan pemanggilan sessionManager ada di Main Thread
@@ -51,7 +53,27 @@ class WatchReceiver: ObservableObject {
             audioMonitor.$currentDecibels
                 .receive(on: DispatchQueue.main)
                 .assign(to: &$currentDecibels)
+                
+            sessionManager.$isReachable
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] isReachable in
+                    if isReachable {
+                        self?.handleWatchBecameReachable()
+                    }
+                }
+                .store(in: &cancellables)
         }
+
+    private func handleWatchBecameReachable() {
+        if isCalibrating && !hasSyncedCalibration {
+            syncAppState(state: "calibrating")
+            if sessionManager.session.isReachable {
+                let message = ["command": "startCalibration"]
+                sessionManager.session.sendMessage(message, replyHandler: nil, errorHandler: nil)
+                hasSyncedCalibration = true
+            }
+        }
+    }
 
     deinit {
         if let id = messageHandlerID {
@@ -68,9 +90,11 @@ class WatchReceiver: ObservableObject {
         calibrationPhase = "down"
         recordedSamplesCount = 0
         isCalibrating = true
+        hasSyncedCalibration = false
         if sessionManager.session.isReachable {
             let message = ["command": "startCalibration"]
             sessionManager.session.sendMessage(message, replyHandler: nil, errorHandler: nil)
+            hasSyncedCalibration = true
         }
     }
     

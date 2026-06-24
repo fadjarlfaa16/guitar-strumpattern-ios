@@ -67,31 +67,24 @@ struct SongRow: View {
 
                 menuButton
             }
+            .padding(.horizontal, Spacing.lg)
         }
     }
 
     private var rowContent: some View {
-        HStack(spacing: Spacing.md) {
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                Text(item.title.isEmpty ? "Untitled" : item.title)
-                    .font(AppFont.bodyRegular)
-                    .foregroundColor(.textPrimaryWhite)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            Text(item.title.isEmpty ? "Untitled" : item.title)
+                .font(AppFont.bodyRegular)
+                .foregroundColor(.textPrimaryWhite)
+                .lineLimit(1)
+                .truncationMode(.tail)
 
-                HStack(spacing: Spacing.md) {
-                    metadataLabel(icon: "stopwatch.fill", text: "= \(item.bpm) bpm")
-                    metadataLabel(icon: "metronome.fill", text: "= \(item.timeSignature)")
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            if !isNavigationEnabled {
-                Image(systemName: "waveform.circle.fill")
-                    .font(.caption.weight(.semibold))
-                    .foregroundColor(.brandColorAccentGreen)
+            HStack(spacing: Spacing.md) {
+                metadataLabel(icon: "stopwatch.fill", text: "\(item.bpm) bpm")
+                metadataLabel(icon: "metronome.fill", text: item.timeSignature)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var menuButton: some View {

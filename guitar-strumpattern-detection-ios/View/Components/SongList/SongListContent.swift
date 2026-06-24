@@ -27,11 +27,14 @@ struct SongListContent: View {
                         onDeleteTapped: { onDelete(item) },
                         onAnalyzeTapped: { onAnalyze(item.id) }
                     )
+                    .listRowBackground(Color.bgPrimary)
                 }
             }
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color.bgPrimary)
     }
 }
-
 
 

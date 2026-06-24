@@ -11,24 +11,28 @@ struct WatchStatusView: View {
     @ObservedObject private var watchSession = WatchSessionManager.shared
 
     @State private var showWatchInstructions = false
-    var onRefresh: () -> Void = {}
+    var onWakeAndSync: (() -> Void)? = nil
+    var withConnectedText: Bool = true
 
     var body: some View {
         HStack(spacing: Spacing.lg) {
             HStack {
-                Image(watchSession.isConnected ? .applewatchBadgeCheckmark : .applewatchBadgeExclamationmark)
+                Image(watchSession.isWatchAppActive ? .applewatchBadgeCheckmark : .applewatchBadgeExclamationmark)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 24)
                     .foregroundStyle(.white)
-                Text(watchSession.statusMessage)
-                    .foregroundStyle(watchSession.isConnected ? .green : .red)
-                    .font(AppFont.caption1Bold)
-                if !watchSession.isConnected {
+                if withConnectedText || !watchSession.isWatchAppActive {
+                    Text(watchSession.statusMessage)
+                        .foregroundStyle(watchSession.isWatchAppActive ? .green : .red)
+                        .font(AppFont.caption1Bold)                    
+                }
+                if !watchSession.isWatchAppActive {
                     Button {
-                        onRefresh()
+                        WatchSessionManager.shared.requestWatchAppLaunch()
+                        onWakeAndSync?()
                     } label: {
-                        Image(systemName: "arrow.2.circlepath")
+                        Image(systemName: "arrow.clockwise")
                             .font(.system(size: 16))
                     }
                     .buttonStyle(.borderedProminent)
@@ -38,8 +42,13 @@ struct WatchStatusView: View {
             }
         }
         .padding(Spacing.sm)
-        .background(watchSession.isConnected ? Color.greenSurface : Color.redSurface)
+        .background(watchSession.isWatchAppActive ? Color.greenSurface : Color.redSurface)
         .clipShape(RoundedRectangle(cornerRadius: 8))
+        .onTapGesture {
+            if !watchSession.isWatchAppActive {
+                showWatchInstructions = true
+            }
+        }
         .onAppear {
             watchSession.activate()
         }
@@ -48,14 +57,5 @@ struct WatchStatusView: View {
         } message: {
             Text(watchSession.openWatchInstructionsMessage)
         }
-    }
-}
-
-#Preview {
-    ZStack {
-        Color.black
-            .ignoresSafeArea()
-        WatchStatusView()
-            .padding()
     }
 }

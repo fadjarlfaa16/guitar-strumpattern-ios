@@ -9,6 +9,7 @@ struct GreatPageView: View {
     @AppStorage("navRoot") private var navRoot: NavRoot = .onboarding
     var songListSample: [SongListItem] = []
     @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
+    @AppStorage("shouldShowFilePickerOnLoad") private var shouldShowFilePickerOnLoad = false
 
     var body: some View {
         ZStack {
@@ -44,6 +45,7 @@ struct GreatPageView: View {
                 // 4. CTA: Add Song + Skip for now
                 GreatCTA(
                     onAddSong: {
+                        shouldShowFilePickerOnLoad = true
                         navRoot = .songList
                         isFirstLaunch = false
                     },

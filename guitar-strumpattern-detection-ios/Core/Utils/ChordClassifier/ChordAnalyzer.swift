@@ -36,7 +36,7 @@ final class ChordAnalyzer {
         try Task.checkCancellation()
 
         // Step 2: Analyze BPM and Time Signature
-        onProgress?(0.22, "Analyzing BPM & time signature...")
+        onProgress?(0.22, "Analyzing Song...")
         UploadLogger.log("BPM/time signature mulai")
         let audioAnalysis = BPMTimeSignatureAnalyzer.shared.analyze(samples: samples)
         UploadLogger.log("BPM/time signature selesai: \(audioAnalysis.bpm) BPM, \(audioAnalysis.timeSignature)")
@@ -47,7 +47,7 @@ final class ChordAnalyzer {
             throw NSError(domain: "ChordAnalyzer", code: -5,
                          userInfo: [NSLocalizedDescriptionKey: "CQT filterbanks not available."])
         }
-        onProgress?(0.30, "Computing spectral features (CQT)...")
+        onProgress?(0.30, "Getting BPM info...")
         UploadLogger.log("HybridCQT started")
         let cqtMat = try hybridCQT.compute(samples: samples)
         UploadLogger.log("HybridCQT finished: \(cqtMat.count) frames")
@@ -59,7 +59,7 @@ final class ChordAnalyzer {
             throw NSError(domain: "ChordAnalyzer", code: -6,
                          userInfo: [NSLocalizedDescriptionKey: "CQT couldn't be built. Try to find another file."])
         }
-        onProgress?(0.48, "Building feature matrix...")
+        onProgress?(0.48, "Getting Time Signature Info...")
         UploadLogger.log("Build MLMultiArray started: frames=\(frames)")
         let cqtInput = try MLMultiArrayBuilder.makeCQTInput(matrix: cqtMat)
         UploadLogger.log("Build MLMultiArray finished")
@@ -70,7 +70,7 @@ final class ChordAnalyzer {
         ensembleOutputs.reserveCapacity(Self.ensembleModelNames.count)
         for (i, modelName) in Self.ensembleModelNames.enumerated() {
             try Task.checkCancellation()
-            onProgress?(0.52 + Double(i) * 0.06, "Neural net inference (\(i + 1)/5)...")
+            onProgress?(0.52 + Double(i) * 0.06, "Recognizing Chord...")
             UploadLogger.log("CoreML predict start: \(modelName)")
             let runner = try ChordNetModelRunner(modelName: modelName)
             ensembleOutputs.append(try runner.predict(cqt: cqtInput))
@@ -78,19 +78,19 @@ final class ChordAnalyzer {
         }
 
         // Step 6: Average ensemble outputs
-        onProgress?(0.80, "Combining model outputs...")
+        onProgress?(0.80, "Mapping Chord...")
         UploadLogger.log("Average ensemble output mulai")
         let outputs = try ChordNetModelRunner.averageOutputs(ensembleOutputs)
         UploadLogger.log("Average ensemble output selesai")
 
         // Step 7: Parse model outputs
-        onProgress?(0.84, "Parsing chord predictions...")
+        onProgress?(0.84, "Simplify chord...")
         UploadLogger.log("Parse model output mulai")
         let parsed = try ChordNetOutputParser.parse(outputs)
         UploadLogger.log("Parse model output selesai")
 
         // Step 8: HMM decode
-        onProgress?(0.88, "Decoding chord sequences...")
+        onProgress?(0.88, "Finishing...")
         UploadLogger.log("HMM decode mulai")
         let mapping = try ChordMapping.load()
         let decoder = ChordXHMMDecoder(mapping: mapping, diffTransPenalty: 30.0)
@@ -108,7 +108,7 @@ final class ChordAnalyzer {
         }
 
         // Step 9: Build chord timeline
-        onProgress?(0.93, "Building chord timeline...")
+        onProgress?(0.93, "Saving song to your library...")
         let adjustedLabels = ChordAdjuster.adjust(labels)
         let segments = frameIndicesToSegments(labels: adjustedLabels)
         UploadLogger.log("Analisis selesai: \(segments.count) chord segments")

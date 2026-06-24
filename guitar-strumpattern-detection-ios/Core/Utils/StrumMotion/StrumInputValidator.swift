@@ -9,13 +9,15 @@ import Foundation
 @MainActor
 final class StrumInputValidator: ObservableObject {
 
-    let receiver = WatchReceiver()
+    let receiver = WatchReceiver.shared
+    let chordVM = RealTimeChordViewModel()
 
     private var cancellables = Set<AnyCancellable>()
     private var isActive = false
 
     var allowsPlayback = false
     var onStrumConfirmed: ((String) -> Void)?
+    var onChordDetected: ((String) -> Void)?
 
     init() {
         receiver.$strumPulseTrigger
@@ -23,6 +25,13 @@ final class StrumInputValidator: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.handleConfirmedStrum()
+            }
+            .store(in: &cancellables)
+
+        chordVM.$currentChord
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] chord in
+                self?.onChordDetected?(chord)
             }
             .store(in: &cancellables)
     }
@@ -34,14 +43,24 @@ final class StrumInputValidator: ObservableObject {
         let thresholds = StrumCalibrationStore.loadThresholds()
         receiver.micBaseThreshold = thresholds.base
         receiver.micSpikeThreshold = thresholds.spike
-        receiver.switchToCalibrationAudioMode(allowsPlayback: allowsPlayback)
+        receiver.requiresSoundValidation = false
+        receiver.switchToChordAudioMode()
+        
+        receiver.soundDetectedProvider = { [weak self] in
+            self?.chordVM.isSoundDetected() ?? false
+        }
+        
+        chordVM.updateSoundThresholds(baseDecibels: thresholds.base, spikeDecibels: thresholds.spike)
+        chordVM.startListening()
+        
         receiver.syncAppState(state: "playing")
     }
 
     func stop() {
         guard isActive else { return }
         isActive = false
-        receiver.audioMonitor.stopMonitoring()
+        chordVM.stopListening()
+        receiver.soundDetectedProvider = nil
         receiver.syncAppState(state: "waitingForSong")
         WatchSessionManager.shared.stopWatchFromPhone()
     }

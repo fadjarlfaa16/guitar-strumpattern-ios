@@ -4,7 +4,7 @@
 //
 //  Created by Muhammad Fadjar Al Farisyi on 05/06/26.
 //
-
+//
 import SwiftUI
 
 // MARK: - Playing Session View
@@ -17,9 +17,9 @@ enum SessionState {
 
 struct PlayingSessionView: View {
     @Environment(\.dismiss) private var dismiss
-
+    
     // MARK: - Parameters
-
+    
     /// Chord segments — each segment's startTime anchors its group.
     var chords: [ChordSegment]
     /// Repeating pattern applied once per chord.
@@ -30,22 +30,22 @@ struct PlayingSessionView: View {
     var bpm: Int
     /// Time signature, e.g. "4/4", "3/4", "6/8".
     var timeSignature: String
-
+    
     /// Duration limit for repeating the sequence (e.g. "3:00"). If nil, plays once.
     var duration: String?
     
     /// Audio file URL untuk playback
     var audioURL: URL?
-
+    
     /// Runs the lane without requiring strum input.
     var autoPlay: Bool
     
     /// The title of the song being played.
     var songTitle: String?
     
-
+    
     // MARK: - ViewModel & State
-
+    
     @StateObject private var vm: RhythmGameViewModel
     @StateObject private var audioPlayer = AudioPlayerManager()
     @StateObject private var strumValidator = StrumInputValidator()
@@ -57,8 +57,8 @@ struct PlayingSessionView: View {
     @State private var countdownValue: Int = 3
     @State private var countdownTask: Task<Void, Never>? = nil
     @State private var showRecalibrate = false
-
-
+    
+    
     // MARK: - Init
     init(
         chords:        [ChordSegment] = ChordGroup.sampleSegments,
@@ -94,7 +94,7 @@ struct PlayingSessionView: View {
             }
         }
         self.chords = processedChords
-
+        
         let groups = ChordGroup.build(
             chords: processedChords, pattern: pattern,
             bpm: safeBPM, timeSignature: timeSignature, duration: duration
@@ -102,18 +102,18 @@ struct PlayingSessionView: View {
         
         _vm = StateObject(wrappedValue: RhythmGameViewModel(chordGroups: groups, bpm: safeBPM, autoPlay: autoPlay))
     }
-
+    
     // MARK: - Actions
-
+    
     private func handleStrumUp()   { vm.onAction(direction: "up") }
     private func handleStrumDown() { vm.onAction(direction: "down") }
-
+    
     private var usesStrumValidator: Bool { !autoPlay }
-
+    
     private var hitZoneX: CGFloat { screenWidth * RhythmGameViewModel.hitZoneFraction }
-
+    
     // MARK: - Body
-
+    
     var body: some View {
         ZStack {
             backgroundGradient
@@ -123,20 +123,21 @@ struct PlayingSessionView: View {
                     bpm: bpm,
                     timeSignature: timeSignature,
                     patternNotation: patternNotation,
-                    isFirstTime: isFirstTime
+                    isFirstTime: isFirstTime,
+                    onWakeAndSync: syncToWatch
                 ) {
                     navRoot = .uploadSong
                 }
-                    .padding(.horizontal, 28)
-                    .padding(.vertical, 10)
-
+                //                    .padding(.horizontal, 28)
+                .padding(.vertical, 10)
+                
                 ZStack(alignment: .top) {
                     RhythmLaneView(
                         vm: vm,
                         screenWidth: $screenWidth,
                         hitZoneX: hitZoneX
                     )
-
+                    
                     if isFirstTime && !vm.hasPassedFirstNote {
                         Text("Let’s get started by strumming \naccording to the arrow on the screen.")
                             .font(AppFont.bodyRegular)
@@ -150,7 +151,7 @@ struct PlayingSessionView: View {
                     }
                 }
                 .zIndex(10)
-
+                
                 Spacer()
                 
                 HStack {
@@ -164,16 +165,14 @@ struct PlayingSessionView: View {
                             .foregroundStyle(Color.textPrimaryWhite)
                     }
                     Spacer()
-                    WatchStatusView()
-                        .padding(.horizontal, 16)
-                    Button("Recalibrate Watch") {
-                        showRecalibrate = true
-                    }
-                    .navigationDestination(isPresented: $showRecalibrate) {
-                        CalibrateWatchView(isRecalibrating: true)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.brandColorAccentGreen.opacity(0.3))
+                    //                    Button("Recalibrate Watch") {
+                    //                        showRecalibrate = true
+                    //                    }
+                    //                    .navigationDestination(isPresented: $showRecalibrate) {
+                    //                        CalibrateWatchView(isRecalibrating: true)
+                    //                    }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.brandColorAccentGreen.opacity(0.3))
                     Spacer()
                     HStack {
                         Spacer()
@@ -199,10 +198,31 @@ struct PlayingSessionView: View {
                         onUp: handleStrumUp,
                         onDown: handleStrumDown
                     )
-                        .padding(.horizontal, 28)
-                        .padding(.vertical, 12)
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 12)
                 }
             }
+            
+            // Debug Components
+            
+//            VStack {
+//                Spacer()
+//                HStack {
+//                    VStack(alignment: .leading, spacing: 4) {
+//                        Text("Debug Mode").font(.caption2).bold()
+//                        Text("Chord: \(vm.liveDetectedChord)").font(.caption2)
+//                        Text("Strum: \(strumValidator.receiver.lastStrum)").font(.caption2)
+//                    }
+//                    .padding(8)
+//                    .background(Color.black.opacity(0.7))
+//                    .foregroundStyle(.white)
+//                    .cornerRadius(8)
+//                    .padding(.bottom, 20)
+//                    .padding(.leading, 20)
+//                    Spacer()
+//                }
+//            }
+//            .ignoresSafeArea() 
             
             if sessionState == .waitingForTap {
                 ZStack {
@@ -221,7 +241,7 @@ struct PlayingSessionView: View {
                 }
                 .zIndex(30)
             }
-
+            
             if vm.isFinished {
                 FinishedOverlay(
                     onReplay: {
@@ -236,7 +256,7 @@ struct PlayingSessionView: View {
                     }
                 )
             }
-
+            
             if vm.isPaused && sessionState != .countingDown {
                 PauseOverlay(
                     isFirstTime: isFirstTime,
@@ -255,8 +275,8 @@ struct PlayingSessionView: View {
                     }
                 )
             }
-
-
+            
+            
         }
         .onTapGesture {
             if sessionState == .waitingForTap {
@@ -292,13 +312,13 @@ struct PlayingSessionView: View {
             print("isFirstTime is \(isFirst)")
             
             lockToLandscape()
-
+            
             if let audioURL = audioURL {
                 audioPlayer.enablesMicrophoneInput = usesStrumValidator
                 audioPlayer.setupPlayer(with: audioURL)
                 vm.audioPlayer = audioPlayer
             }
-
+            
             setupStrumValidator()
             vm.startGame(startPaused: true)
             
@@ -315,24 +335,30 @@ struct PlayingSessionView: View {
             vm.stopGame()
             audioPlayer.stop()
         }
+        .navigationDestination(isPresented: $showRecalibrate) {
+            CalibrateWatchView(isRecalibrating: true)
+        }
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
         .navigationBarBackButtonHidden(true)
     }
-
+    
     // ──────────────────────────────────────────────────────────────────
     // MARK: - Orientation
     // ──────────────────────────────────────────────────────────────────
-
+    
     private func setupStrumValidator() {
         guard usesStrumValidator else { return }
         strumValidator.allowsPlayback = audioURL != nil
         strumValidator.onStrumConfirmed = { direction in
             vm.onAction(direction: direction)
         }
+        strumValidator.onChordDetected = { chord in
+            vm.liveDetectedChord = chord
+        }
         strumValidator.start()
     }
-
+    
     private func lockToLandscape() {
         AppDelegate.orientationLock = .landscape
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
@@ -340,7 +366,7 @@ struct PlayingSessionView: View {
             scene.keyWindow?.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations()
         }
     }
-
+    
     private func unlockOrientation() {
         AppDelegate.orientationLock = .portrait
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
@@ -348,17 +374,17 @@ struct PlayingSessionView: View {
             scene.keyWindow?.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations()
         }
     }
-
+    
     // ──────────────────────────────────────────────────────────────────
     // MARK: - Background
     // ──────────────────────────────────────────────────────────────────
-
+    
     private var backgroundGradient: some View {
-                Color(hex: "170C2F")
-        .ignoresSafeArea()
+        Color(hex: "170C2F")
+            .ignoresSafeArea()
     }
-
-
+    
+    
     private func startCountdown() {
         sessionState = .countingDown
         countdownValue = 3
@@ -377,14 +403,14 @@ struct PlayingSessionView: View {
             }
         }
     }
-
+    
     private func formatTime(_ time: TimeInterval) -> String {
         let maxTime = max(0, time)
         let m = Int(maxTime) / 60
         let s = Int(maxTime) % 60
         return String(format: "%d:%02d", m, s)
     }
-
+    
     private func syncToWatch() {
         var maxT: Double = vm.chordGroups.last?.endTime ?? 0
         if let dur = duration {
@@ -411,7 +437,7 @@ struct PlayingSessionView: View {
         pattern:       [.down, .up, .down, .noStrum, .down],
         bpm:           120,
         timeSignature: "4/4",
-        duration: "0:10",
+        duration: "0:20",
     )
     .environment(Routes())
     
